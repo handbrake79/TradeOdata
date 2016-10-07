@@ -2,17 +2,19 @@ package ru.sk42.tradeodata.Model.Catalogs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 
 /**
  * Created by я on 29.09.2016.
  */
-@DatabaseTable(tableName = "0vtypes")
+@DatabaseTable
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleType extends CDO
 {
@@ -56,7 +58,17 @@ public class VehicleType extends CDO
 
     public Integer getMaxVolume() { return this.maxVolume; }
 
+    @Override
+    public Dao<VehicleType, Object> getDao() {
+        return MyHelper.getVehicleTypesDao();
+    }
+
     public void setMaxVolume(Integer maxVolume) { this.maxVolume = maxVolume; }
+
+    @Override
+    public Dao<VehicleType, Object> getDao() {
+        return MyHelper.getVehicleTypesDao();
+    }
 
     @DatabaseField
     @JsonProperty("МаксимальнаяГрузоподъемность")
@@ -83,7 +95,9 @@ public class VehicleType extends CDO
     }
 
     @Override
-    public void setForeignObjects() {
-
+    public String getRetroFilterString() {
+        return "";
     }
+
+
 }

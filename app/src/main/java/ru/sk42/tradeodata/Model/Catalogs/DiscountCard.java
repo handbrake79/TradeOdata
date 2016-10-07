@@ -2,14 +2,16 @@ package ru.sk42.tradeodata.Model.Catalogs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 
 
 /**
@@ -18,12 +20,13 @@ import ru.sk42.tradeodata.Model.Constants;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable
 public class DiscountCard extends CDO {
-    @JsonProperty
-    @DatabaseField
-    private String Description;
     @DatabaseField(id = true, columnName = "ref_Key")
     @JsonProperty("Ref_Key")
     private String ref_Key;
+
+    @JsonProperty
+    @DatabaseField
+    private String Description;
 
     public DiscountCard(String ref_Key) {
         this.setRef_Key(ref_Key);
@@ -55,9 +58,15 @@ public class DiscountCard extends CDO {
     }
 
     @Override
-    public void setForeignObjects() {
-
+    public Dao<DiscountCard, Object> getDao() {
+        return MyHelper.getDiscountCardDao();
     }
+
+    @Override
+    public String getRetroFilterString() {
+        return RetroConstants.FILTERS.DISCOUNT_CARDS;
+    }
+
 
     public boolean isEmpty() {
         return ref_Key.equals(Constants.NULL_GUID);
@@ -67,7 +76,7 @@ public class DiscountCard extends CDO {
     public void save() {
 
         try {
-            Helper.getInstance().getDao(DiscountCard.class).createOrUpdate(this);
+            MyHelper.getInstance().getDao(DiscountCard.class).createOrUpdate(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }

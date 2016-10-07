@@ -2,12 +2,13 @@ package ru.sk42.tradeodata.Model.Catalogs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
 
@@ -55,9 +56,15 @@ public class Currency extends CDO {
     }
 
     @Override
-    public void setForeignObjects() {
-
+    public Dao<Currency, Object> getDao() {
+        return MyHelper.getCurrencyDao();
     }
+
+    @Override
+    public String getRetroFilterString() {
+        return "";
+    }
+
 
     public boolean isEmpty() {
         return ref_Key.equals(Constants.NULL_GUID);
@@ -67,7 +74,7 @@ public class Currency extends CDO {
     public void save() {
 
         try {
-            Helper.getInstance().getDao(Currency.class).createOrUpdate(this);
+            MyHelper.getInstance().getDao(Currency.class).createOrUpdate(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }

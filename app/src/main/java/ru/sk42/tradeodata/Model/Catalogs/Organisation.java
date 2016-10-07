@@ -2,12 +2,13 @@ package ru.sk42.tradeodata.Model.Catalogs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
 
@@ -57,8 +58,13 @@ public class Organisation extends CDO {
     }
 
     @Override
-    public void setForeignObjects() {
+    public String getRetroFilterString() {
+        return "";
+    }
 
+    @Override
+    public Dao<Organisation, Object> getDao() {
+        return MyHelper.getOrganisationDao();
     }
 
     public boolean isEmpty() {
@@ -69,7 +75,7 @@ public class Organisation extends CDO {
     public void save() {
 
         try {
-            Helper.getInstance().getDao(Organisation.class).createOrUpdate(this);
+            MyHelper.getInstance().getDao(Organisation.class).createOrUpdate(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }

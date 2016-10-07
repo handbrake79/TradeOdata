@@ -1,20 +1,14 @@
 package ru.sk42.tradeodata.Model.Catalogs.HelperLists;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
-import com.j256.ormlite.table.DatabaseTable;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Helpers.Helper;
 
 /**
  * Created by test on 18.03.2016.
@@ -65,7 +59,7 @@ public class ProductsList {
         try {
             Iterator<Product> it = getValues().iterator();
             while (it.hasNext()) {
-                Helper.getInstance().getDao(Product.class).createOrUpdate(it.next());
+                MyHelper.getInstance().getDao(Product.class).createOrUpdate(it.next());
             }
         } catch (SQLException e) {
             e.printStackTrace();

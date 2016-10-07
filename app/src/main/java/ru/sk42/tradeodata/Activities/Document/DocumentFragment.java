@@ -13,8 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
@@ -25,20 +23,16 @@ import ru.sk42.tradeodata.R;
 // In this case, the fragment displays simple text based on the page
 public class DocumentFragment extends Fragment {
     public static final String ARG_PAGE = "ARG_PAGE";
-    private DocSale docSale;
-
     static String TAG = "DocumentFragment";
-    private MyActivityFragmentInteractionInterface mListener;
-
-    private int mPage;
-
     Requisites_Adapter requisitesAdapter;
     SaleRowProductAdapter productsAdapter;
     SaleRowServiceAdapter servicesAdapter;
     RecyclerView rvReq;
     RecyclerView rvProducts;
     RecyclerView rvServices;
-
+    private DocSale docSale;
+    private MyActivityFragmentInteractionInterface mListener;
+    private int mPage;
 
     public static DocumentFragment newInstance(int position) {
         Bundle args = new Bundle();

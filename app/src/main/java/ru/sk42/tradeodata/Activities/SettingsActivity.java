@@ -19,9 +19,9 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
 import ru.sk42.tradeodata.Model.Printers;
 import ru.sk42.tradeodata.Model.Settings;
-import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
@@ -42,10 +42,9 @@ import ru.sk42.tradeodata.RetroRequests.UsersRequest;
  */
 public class SettingsActivity extends PreferenceActivity {
 
+    static final String TAG = "SETTINGS";
     public static Printers printers;
     public static UsersList usersList;
-    static final String TAG = "SETTINGS";
-
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -77,7 +76,7 @@ public class SettingsActivity extends PreferenceActivity {
     };
 
     /**
-     * Helper method to determine if the device has an extra-large screen. For
+     * MyHelper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
      */
     private static boolean isXLargeTablet(Context context) {

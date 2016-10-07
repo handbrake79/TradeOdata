@@ -9,9 +9,8 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
 
@@ -75,16 +74,14 @@ public class ProductInfo extends CDO {
     }
 
     @Override
-    public void setForeignObjects() {
-        Iterator<Stock> it = getStocks().iterator();
-        while (it.hasNext()) {
-            Stock stock = it.next();
-            stock.setForeignObjects();
-        }
-        save();
+    public String getRetroFilterString() {
+        return "";
     }
 
-
+    @Override
+    public Dao<ProductInfo, Object> getDao() {
+        return MyHelper.getProductInfoDao();
+    }
 
     public String getRef_Key() {
         return ref_Key;
@@ -96,8 +93,8 @@ public class ProductInfo extends CDO {
 
     @Override
     public void save() {
-        Dao<ProductInfo, Object> daoInfo = Helper.getProductInfoDao();
-        Dao<Stock, Object> daoStock = Helper.getStockDao();
+        Dao<ProductInfo, Object> daoInfo = MyHelper.getProductInfoDao();
+        Dao<Stock, Object> daoStock = MyHelper.getStockDao();
 
         try {
             for (Stock stock :

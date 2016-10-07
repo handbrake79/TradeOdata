@@ -1,19 +1,14 @@
 package ru.sk42.tradeodata.Model.Catalogs.HelperLists;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
-import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Constants;
 
@@ -31,7 +26,7 @@ public class UsersList {
     public static CharSequence[] getValuesAsCharSequence() {
         List<User> list;
         try {
-            list = Helper.getInstance().getDao(User.class).queryForAll();
+            list = MyHelper.getInstance().getDao(User.class).queryForAll();
         } catch (SQLException e) {
             e.printStackTrace();
             list = new ArrayList<>();
@@ -80,7 +75,7 @@ public class UsersList {
 
     public void save(){
         try {
-            Helper.getUserDao().create(this.values);
+            MyHelper.getUserDao().create(this.values);
         } catch (SQLException e) {
             e.printStackTrace();
         }

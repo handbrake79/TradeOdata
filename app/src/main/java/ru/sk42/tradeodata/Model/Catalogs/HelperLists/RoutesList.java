@@ -7,7 +7,7 @@ import com.j256.ormlite.dao.Dao;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 
 /**
@@ -15,11 +15,11 @@ import ru.sk42.tradeodata.Model.Catalogs.Route;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RoutesList {
-    public RoutesList() {
-    }
-
     @JsonProperty("value")
     Collection<Route> values;
+
+    public RoutesList() {
+    }
 
     public Collection<Route> getValues() {
         return values;
@@ -31,7 +31,7 @@ public class RoutesList {
 
     public void save() {
         try {
-            Dao<Route, Object> dao = Helper.getRoutesDao();
+            Dao<Route, Object> dao = MyHelper.getRouteDao();
             dao.delete(dao.queryForAll());
             dao.create(values);
         } catch (SQLException e) {

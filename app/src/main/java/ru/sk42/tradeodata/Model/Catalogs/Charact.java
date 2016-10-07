@@ -2,13 +2,14 @@ package ru.sk42.tradeodata.Model.Catalogs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 import java.util.List;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
 
@@ -18,35 +19,28 @@ import ru.sk42.tradeodata.Model.Constants;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Chars")
 public class Charact extends CDO{
-    public Charact(String ref_Key) {
-        this.ref_Key = ref_Key;
-    }
-
     @DatabaseField(id = true)
     @JsonProperty("Ref_Key")
     private String ref_Key;
-
     @DatabaseField
     @JsonProperty("Owner_Key")
     private String owner_Key;
-
     @DatabaseField
     @JsonProperty("Description")
     private String description;
 
-    public Charact() {
+    public Charact(String ref_Key) {
+        this.ref_Key = ref_Key;
     }
 
-    @Override
-    public void save() throws SQLException {
-
+    public Charact() {
     }
 
     public static Charact getObjectOrStub(String key) {
         if (key.equals(Constants.NULL_GUID))
             return getStub();
         try {
-            List<Charact> list = Helper.getInstance().getDao(Charact.class).queryForEq("ref_Key", key);
+            List<Charact> list = MyHelper.getInstance().getDao(Charact.class).queryForEq("ref_Key", key);
             if (list.size() > 0)
                 return list.get(0);
             else return null;
@@ -61,6 +55,11 @@ public class Charact extends CDO{
         p.setRef_Key(Constants.NULL_GUID);
         p.setDescription("");
         return p;
+    }
+
+    @Override
+    public void save() throws SQLException {
+
     }
 
     public String getDescription() {
@@ -94,13 +93,15 @@ public class Charact extends CDO{
         return "Catalog_ХарактеристикиНоменклатуры";
     }
 
-
     @Override
-    public void setForeignObjects() {
-
+    public String getRetroFilterString() {
+        return "";
     }
 
-
+    @Override
+    public Dao<Charact, Object> getDao() {
+        return MyHelper.getCharactDao();
+    }
 
     public String getOwner_Key() {
         return owner_Key;

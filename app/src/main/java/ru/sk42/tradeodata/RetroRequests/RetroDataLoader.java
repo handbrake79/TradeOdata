@@ -2,24 +2,22 @@ package ru.sk42.tradeodata.RetroRequests;
 
 import android.util.Log;
 
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import retrofit2.Call;
 import ru.sk42.tradeodata.Activities.MyCallBackInterface;
+import ru.sk42.tradeodata.Helpers.CheckRelatedDataToLoad;
+import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.CharList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ContractsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.CustomersList;
-import ru.sk42.tradeodata.Model.Catalogs.HelperLists.StoreList;
-import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
-import ru.sk42.tradeodata.Model.CDO;
-import ru.sk42.tradeodata.Helpers.CheckRelatedDataToLoad;
-import ru.sk42.tradeodata.Model.Documents.DocSaleList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
+import ru.sk42.tradeodata.Model.Catalogs.HelperLists.StoreList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UnitsList;
+import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
+import ru.sk42.tradeodata.Model.Documents.DocSaleList;
 
 /**
  * Created by я on 19.08.2016.
@@ -29,33 +27,8 @@ public class RetroDataLoader {
     static String TAG = "RetroDataLoader";
 
     static MyCallBackInterface callBackInterface;
-    boolean needReload;
-    Integer requestsPending;
     static private CDO objectToCheck;
     static private HashMap<Class<?>, ArrayList<String>> unresolvedLinks;
-
-    public static void LoadMissingDataForObject(Object mcdo, Class clazz) {
-
-       // callBackInterface = mCallBackInterface;
-
-        if (clazz.getCanonicalName().equals("ru.sk42.tradeodata.Model.Documents.DocSaleList")) {
-            objectToCheck = DocSaleList.getList();
-        } else {
-            CDO cdo = (CDO) mcdo;
-            String ref_Key = cdo.getRef_Key();
-            objectToCheck = (CDO) CDO.getObject(clazz, ref_Key);
-        }
-        if (objectToCheck == null) return;
-        //нужно пройти по ссылкам и догрузить недостающие
-        unresolvedLinks = CheckRelatedDataToLoad.checkObject(objectToCheck);
-        Log.d(TAG, "LoadMissingDataForObject: НАЧАЛИ ОТПРАВЛЯТЬ ЗАПРОСЫ");
-        sendRequestsInNewThread();
-        Log.d(TAG, "LoadMissingDataForObject: ЗАКОНЧИЛИ ОТПРАВЛЯТЬ ЗАПРОСЫ, ВОЗВРАЩАЕМСЯ В СЕРВИС");
-        //callBackInterface.onAllRequestsComplete();
-
-
-    }
-
     static Runnable myrunnable = new Runnable() {
         @Override
         public void run() {
@@ -69,6 +42,25 @@ public class RetroDataLoader {
             }
         }
     };
+    boolean needReload;
+    Integer requestsPending;
+
+    public static void LoadMissingDataForObject(Object mcdo, Class clazz) {
+
+       // callBackInterface = mCallBackInterface;
+
+        if (clazz.getCanonicalName().equals("ru.sk42.tradeodata.Model.Documents.DocSaleList")) {
+            unresolvedLinks = CheckRelatedDataToLoad.checkObject(DocSaleList.getList());
+        } else {
+            CDO cdo = (CDO) mcdo;
+            String ref_Key = cdo.getRef_Key();
+            objectToCheck = (CDO) CDO.getObject(clazz, ref_Key);
+            unresolvedLinks = CheckRelatedDataToLoad.checkObject(objectToCheck);
+        }
+        sendRequestsInNewThread();
+
+
+    }
 
     static private void sendRequestsInNewThread(){
         Thread thread1 = new Thread(myrunnable);

@@ -2,12 +2,13 @@ package ru.sk42.tradeodata.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
 import ru.sk42.tradeodata.Model.Catalogs.Unit;
@@ -183,20 +184,20 @@ public class Stock extends CDO {
     @Override
     public void save() {
         try {
-            Helper.getStockDao().createOrUpdate(this);
+            MyHelper.getStockDao().createOrUpdate(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void setRef_Key(String s) {
-
+    public String getRef_Key() {
+        return null;
     }
 
     @Override
-    public String getRef_Key() {
-        return null;
+    public void setRef_Key(String s) {
+
     }
 
     @Override
@@ -215,16 +216,13 @@ public class Stock extends CDO {
     }
 
     @Override
-    public void setForeignObjects() {
-        //у нас тут склад, единица, характеристика
-        if (this.getCharact() == null)
-            this.setCharact(Charact.getObjectOrStub(this.getCharact_Key())); //
-
-        if (this.getStore() == null)
-            this.setStore(Store.getObject(Store.class, this.getStore_Key()));
-
-        if (this.getUnit() == null)
-            this.setUnit(Unit.getObject(Unit.class, this.getProductUnit_Key()));
-        save();
+    public String getRetroFilterString() {
+        return "";
     }
+
+    @Override
+    public <T> Dao<T, Object> getDao() {
+        return null;
+    }
+
 }

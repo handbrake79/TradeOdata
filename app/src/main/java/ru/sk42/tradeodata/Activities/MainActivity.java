@@ -5,30 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-
-import java.io.IOException;
-import java.sql.SQLException;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity;
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Settings;
 import ru.sk42.tradeodata.R;
-import ru.sk42.tradeodata.RetroRequests.DocsRequest;
-import ru.sk42.tradeodata.RetroRequests.RetroConstants;
-import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
-import ru.sk42.tradeodata.RetroRequests.TestRequest;
 import ru.sk42.tradeodata.Services.LoadDataAndSetObjectsService;
 import ru.sk42.tradeodata.Services.MyResultReceiver;
-import ru.sk42.tradeodata.TestList;
-import ru.sk42.tradeodata.Tttest;
 
 public class MainActivity extends AppCompatActivity implements MyResultReceiver.Receiver {
 
@@ -46,8 +32,8 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
 
         progressDialog = new ProgressDialog(this);
 
-        Helper.getInstance(getApplication());
-        Helper.createTables();
+        MyHelper.getInstance(getApplication());
+        MyHelper.createTables();
         Settings.setApplication(getApplication());
         Settings.readSettings();
         mReceiver = new MyResultReceiver(new Handler());

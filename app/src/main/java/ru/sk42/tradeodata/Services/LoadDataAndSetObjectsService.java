@@ -13,31 +13,32 @@ import java.sql.SQLException;
 
 import retrofit2.Call;
 import retrofit2.Response;
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
-import ru.sk42.tradeodata.Model.Catalogs.Customer;
-import ru.sk42.tradeodata.Model.Catalogs.HelperLists.CharList;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Catalogs.Contract;
-import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ContractsList;
 import ru.sk42.tradeodata.Model.Catalogs.Currency;
-import ru.sk42.tradeodata.Model.Catalogs.HelperLists.CurrencyList;
+import ru.sk42.tradeodata.Model.Catalogs.Customer;
 import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
+import ru.sk42.tradeodata.Model.Catalogs.HelperLists.CharList;
+import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ContractsList;
+import ru.sk42.tradeodata.Model.Catalogs.HelperLists.CurrencyList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.CustomersList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.DiscountCardsList;
-import ru.sk42.tradeodata.Model.Catalogs.Organisation;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.OrganisationsList;
-import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.RoutesList;
-import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.StartingPointsList;
-import ru.sk42.tradeodata.Model.Catalogs.Store;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.StoreList;
-import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UnitsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
-import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.VehicleTypesList;
+import ru.sk42.tradeodata.Model.Catalogs.Organisation;
+import ru.sk42.tradeodata.Model.Catalogs.Route;
+import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
+import ru.sk42.tradeodata.Model.Catalogs.Store;
+import ru.sk42.tradeodata.Model.Catalogs.Unit;
+import ru.sk42.tradeodata.Model.Catalogs.User;
+import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
@@ -69,10 +70,9 @@ import ru.sk42.tradeodata.RetroRequests.VehicleTypesRequest;
 public class LoadDataAndSetObjectsService extends IntentService {
 
 
+    final String TAG = "Service ***";
     ResultReceiver resultReceiver;
     Intent intent;
-
-    final String TAG = "Service ***";
 
     public LoadDataAndSetObjectsService() {
         super("LoadDataAndSetObjectsService");
@@ -133,7 +133,7 @@ public class LoadDataAndSetObjectsService extends IntentService {
 
         loadCurrency();
 
-        locadOrganisations();
+        loadOrganisations();
 
         loadCustomers();
 
@@ -141,124 +141,120 @@ public class LoadDataAndSetObjectsService extends IntentService {
     }
 
     private void loadCustomers() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Customer().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Customer.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
+        Customer object = new Customer();
+        if (!isLoadRequired(object)) return;
             CustomersRequest request = ServiceGenerator.createService(CustomersRequest.class);
             Call<CustomersList> call = request.call(RetroConstants.getMap("Ref_Key eq '"+ Constants.CUSTOMER_GUID+"'"));
             try {
-                sendMessage("Валюты");
+                //sendMessage("Контрагенты");
 
                 Response<CustomersList> response = call.execute();
                 CustomersList list = response.body();
-                sendMessage("Валюты получены");
-                Helper.getCustomerDao().delete(Helper.getCustomerDao().queryForAll());
+                //sendMessage("Контрагенты получены");
+                MyHelper.getCustomerDao().delete(MyHelper.getCustomerDao().queryForAll());
                 list.save();
-                sendMessage("Валюты сохранены в базу");
+                //sendMessage("Контрагенты сохранены в базу");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
     }
 
     private void loadCurrency() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Currency().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Currency.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
+        Currency object = new Currency();
+        if (!isLoadRequired(object)) return;
+
             CurrencyRequest request = ServiceGenerator.createService(CurrencyRequest.class);
             Call<CurrencyList> call = request.call(RetroConstants.getMap(""));
             try {
-                sendMessage("Валюты");
+//                sendMessage("Валюты");
 
                 Response<CurrencyList> response = call.execute();
                 CurrencyList list = response.body();
-                sendMessage("Валюты получены");
-                Helper.getCurrencyDao().delete(Helper.getCurrencyDao().queryForAll());
+                //              sendMessage("Валюты получены");
+                MyHelper.getCurrencyDao().delete(MyHelper.getCurrencyDao().queryForAll());
                 list.save();
-                sendMessage("Валюты сохранены в базу");
+                //            sendMessage("Валюты сохранены в базу");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
     }
 
-    private void locadOrganisations() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Organisation().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Organisation.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
+    private void loadOrganisations() {
+        Organisation object = new Organisation();
+
+        if (!isLoadRequired(object)) return;
+
             OrganisationsRequest request = ServiceGenerator.createService(OrganisationsRequest.class);
             Call<OrganisationsList> call = request.call(RetroConstants.getMap(""));
             try {
-                sendMessage("Организации");
+//                sendMessage("Организации");
 
                 Response<OrganisationsList> response = call.execute();
                 OrganisationsList list = response.body();
-                sendMessage("Организации получены");
-                Helper.getOrganisationDao().delete(Helper.getOrganisationDao().queryForAll());
+                //              sendMessage("Организации получены");
+                MyHelper.getOrganisationDao().delete(MyHelper.getOrganisationDao().queryForAll());
                 list.save();
-                sendMessage("Организации сохранены в базу");
+                //            sendMessage("Организации сохранены в базу");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
 
 
     private void loadVehicleTypes() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new VehicleType().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(VehicleType.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
+        VehicleType object = new VehicleType();
+
+        if (!isLoadRequired(object)) return;
             VehicleTypesRequest request = ServiceGenerator.createService(VehicleTypesRequest.class);
             Call<VehicleTypesList> call = request.call(RetroConstants.getMap(""));
             try {
-                sendMessage("Типы ТС");
+                //      sendMessage("Типы ТС");
 
                 Response<VehicleTypesList> response = call.execute();
                 VehicleTypesList list = response.body();
-                sendMessage("Типы ТС получены");
-                Helper.getVehicleTypesDao().delete(Helper.getVehicleTypesDao().queryForAll());
+                //    sendMessage("Типы ТС получены");
+                MyHelper.getVehicleTypesDao().delete(MyHelper.getVehicleTypesDao().queryForAll());
                 list.save();
-                sendMessage("Типы ТС сохранены в базу");
+                //  sendMessage("Типы ТС сохранены в базу");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
+
 
 
     private void loadStores() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Store().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Store.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
+        Store object = new Store();
+
+        if (!isLoadRequired(object)) return;
             StoresRequest request = ServiceGenerator.createService(StoresRequest.class);
             Call<StoreList> call = request.call(RetroConstants.getMap(""));
             try {
-                sendMessage("Склады " + serverRecordsCount.toString());
+//                sendMessage("Склады ");
                 Response<StoreList> response = call.execute();
                 StoreList list = response.body();
-                sendMessage("Склады получены");
-                Helper.getStoreDao().delete(Helper.getStoreDao().queryForAll());
+                //              sendMessage("Склады получены");
+                MyHelper.getStoreDao().delete(MyHelper.getStoreDao().queryForAll());
                 list.save();
-                sendMessage("Склады сохранены в базу");
+                //            sendMessage("Склады сохранены в базу");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
 
     private void loadUnits() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Unit().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Unit.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
-            UnitsRequest request = ServiceGenerator.createService(UnitsRequest.class);
+        Unit object = new Unit();
+
+        if (!isLoadRequired(object)) return;
+        UnitsRequest request = ServiceGenerator.createService(UnitsRequest.class);
             Call<UnitsList> call = request.call(RetroConstants.getMap(""));
             try {
-                sendMessage("Единицы измерения " + serverRecordsCount.toString());
+                sendMessage("Единицы измерения ");
                 Response<UnitsList> response = call.execute();
                 UnitsList list = response.body();
-                TableUtils.dropTable(Helper.getUnitsDao(), false);
-                TableUtils.createTable(Helper.getUnitsDao());
-                Helper.getUnitsDao().delete(Helper.getUnitsDao().queryForAll());
+                TableUtils.dropTable(MyHelper.getUnitDao(), false);
+                TableUtils.createTable(MyHelper.getUnitDao());
+                MyHelper.getUnitDao().delete(MyHelper.getUnitDao().queryForAll());
                 sendMessage("Единицы получены ");
                 list.save();
                 sendMessage("Единицы сохранены в базу ");
@@ -266,66 +262,70 @@ public class LoadDataAndSetObjectsService extends IntentService {
                 e.printStackTrace();
             }
         }
-    }
 
     private void loadContracts() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Contract().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Contract.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
+        Contract object = new Contract();
+
+        if (!isLoadRequired(object)) return;
+
             ContractsRequest request = ServiceGenerator.createService(ContractsRequest.class);
             Call<ContractsList> call = request.call(RetroConstants.getMap("Owner_Key eq guid'" + Constants.CUSTOMER_GUID + "'"));
             try {
-                sendMessage("Договоры контрагента " + serverRecordsCount.toString());
+                sendMessage("Договоры контрагента ");
                 Response<ContractsList> response = call.execute();
                 ContractsList list = response.body();
-                TableUtils.dropTable(Helper.getContractDao(), false);
-                TableUtils.createTable(Helper.getContractDao());
-                Helper.getContractDao().delete(Helper.getContractDao().queryForAll());
-                sendMessage("Договоры получены ");
+                TableUtils.dropTable(MyHelper.getContractDao(), false);
+                TableUtils.createTable(MyHelper.getContractDao());
+                MyHelper.getContractDao().delete(MyHelper.getContractDao().queryForAll());
+                sendMessage("Договоры получены в количестве " + String.valueOf(list.getValues().size()));
                 list.save();
                 sendMessage("Договоры сохранены в базу ");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
+
 
 
     private void loadDiscountCards() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new DiscountCard().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(DiscountCard.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
-            DiscountCardsRequest request1 = ServiceGenerator.createService(DiscountCardsRequest.class);
-            Call<DiscountCardsList> call1 = request1.call(RetroConstants.getMap("DeletionMark eq false"));
+
+        DiscountCard object = new DiscountCard();
+
+        if (!isLoadRequired(object)) return;
+
+
+        DiscountCardsRequest request = ServiceGenerator.createService(DiscountCardsRequest.class);
+        Call<DiscountCardsList> call = request.call(RetroConstants.getMap(RetroConstants.FILTERS.DISCOUNT_CARDS));
             try {
-                sendMessage("Скидочные карты " + serverRecordsCount.toString());
-                Response<DiscountCardsList> response = call1.execute();
+                sendMessage("Скидочные карты ");
+                Response<DiscountCardsList> response = call.execute();
                 DiscountCardsList list = response.body();
-                TableUtils.dropTable(Helper.getDiscountCardDao(),false);
-                TableUtils.createTable(Helper.getDiscountCardDao());
-                sendMessage("карты получены");
+                TableUtils.dropTable(MyHelper.getDiscountCardDao(), false);
+                TableUtils.createTable(MyHelper.getDiscountCardDao());
+                sendMessage("карты получены в количестве " + String.valueOf(list.getValues().size()));
                 list.save();
                 sendMessage("карты сохранены в базу");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
+
 
 
 
     private void loadCharacts() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Charact().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Charact.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
-            CharRequest request1 = ServiceGenerator.createService(CharRequest.class);
+        Charact object = new Charact();
+
+        if (!isLoadRequired(object)) return;
+
+        CharRequest request1 = ServiceGenerator.createService(CharRequest.class);
             Call<CharList> call1 = request1.call(RetroConstants.getMap(""));
             try {
-                sendMessage("Характеристики " + serverRecordsCount.toString());
+                sendMessage("Характеристики ");
                 Response<CharList> response = call1.execute();
                 CharList list = response.body();
-                TableUtils.dropTable(Helper.getCharDao(),false);
-                TableUtils.createTable(Helper.getCharDao());
+                TableUtils.dropTable(MyHelper.getCharactDao(), false);
+                TableUtils.createTable(MyHelper.getCharactDao());
                 sendMessage("Характеристики получены");
                 list.save();
                 sendMessage("Характеристики сохранены в базу");
@@ -333,82 +333,82 @@ public class LoadDataAndSetObjectsService extends IntentService {
                 e.printStackTrace();
             }
         }
-    }
 
     private void loadUsers() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Charact().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Charact.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
-            UsersRequest request1 = ServiceGenerator.createService(UsersRequest.class);
+        User object = new User();
+
+        if (!isLoadRequired(object)) return;
+
+
+        UsersRequest request1 = ServiceGenerator.createService(UsersRequest.class);
             Call<UsersList> call1 = request1.call(RetroConstants.getMap(""));
             try {
-                sendMessage("Пользователи");
+                // sendMessage("Пользователи");
                 Response<UsersList> response = call1.execute();
                 UsersList list = response.body();
-                Helper.getUserDao().delete(Helper.getUserDao().queryForAll());
+                MyHelper.getUserDao().delete(MyHelper.getUserDao().queryForAll());
                 list.save();
-                sendMessage("Пользователи сохранены");
+                //    sendMessage("Пользователи сохранены");
                 Settings.renewCurrentUser();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
 
 
     private void loadRoutes() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new Route().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Route.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
-            RoutesRequest request1 = ServiceGenerator.createService(RoutesRequest.class);
+        Route object = new Route();
+
+        if (!isLoadRequired(object)) return;
+
+
+        RoutesRequest request1 = ServiceGenerator.createService(RoutesRequest.class);
             Call<RoutesList> call1 = request1.call(RetroConstants.getMap("DeletionMark eq false"));
             try {
-                sendMessage("Маршруты " + serverRecordsCount.toString());
+                //sendMessage("Маршруты " );
                 Response<RoutesList> response = call1.execute();
                 RoutesList list = response.body();
-                Helper.getRoutesDao().delete(Helper.getRoutesDao().queryForAll());
+                MyHelper.getRouteDao().delete(MyHelper.getRouteDao().queryForAll());
                 list.save();
-                sendMessage("Маршруты сохранены");
-                Settings.renewCurrentUser();
+                //sendMessage("Маршруты сохранены");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
 
     private void loadStartingPoints() {
-        Integer serverRecordsCount = getRecordsCountFromServer(new StartingPoint().getMaintainedTableName());
-        Integer localRecordsCount = getRecordsCountLocal(Route.class);
-        if(serverRecordsCount == null || localRecordsCount == null || serverRecordsCount > localRecordsCount){
-            StartingPointsRequest request1 = ServiceGenerator.createService(StartingPointsRequest.class);
-            Call<StartingPointsList> call1 = request1.call(RetroConstants.getMap("DeletionMark eq false"));
+        StartingPoint object = new StartingPoint();
+
+        if (!isLoadRequired(object)) return;
+
+
+        StartingPointsRequest request1 = ServiceGenerator.createService(StartingPointsRequest.class);
+        Call<StartingPointsList> call1 = request1.call(RetroConstants.getMap(""));
             try {
-                sendMessage("Начальные точки маршрутов " + serverRecordsCount.toString());
+                //sendMessage("Начальные точки маршрутов ");
                 Response<StartingPointsList> response = call1.execute();
                 StartingPointsList list = response.body();
-                Helper.getStartingPointsDao().delete(Helper.getStartingPointsDao().queryForAll());
+                MyHelper.getStartingPointDao().delete(MyHelper.getStartingPointDao().queryForAll());
                 list.save();
-                sendMessage("Точки сохранены");
-                Settings.renewCurrentUser();
+                //sendMessage("Точки сохранены");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-    }
 
-    private Integer getRecordsCountLocal(Class<?> clazz) {
+    private Integer getRecordsCountLocal(CDO object) {
         try {
-            return Helper.getInstance().getDao(clazz).queryForAll().size();
+            return object.getDao().queryForAll().size();
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    private  Integer getRecordsCountFromServer(String tableName){
+    private Integer getRecordsCountFromServer(CDO object) {
         RecordsCountRequest request = ServiceGenerator.createService(RecordsCountRequest.class);
-        Call<Integer> call = request.call(Settings.getInfoBaseName() + "/odata/standard.odata/" + tableName + "/$count");
-        Integer count = null;
+        Call<Integer> call = request.call(Settings.getInfoBaseName() + "/odata/standard.odata/" + object.getMaintainedTableName() + "/$count" + "&$filter=" + object.getRetroFilterString());
+        Integer count = 0;
         try {
             Response<Integer> response = call.execute();
             count = response.body();
@@ -430,7 +430,7 @@ public class LoadDataAndSetObjectsService extends IntentService {
         CDO cdo = null;
         Class clazz = null;
         if(id != -1) {
-            cdo = (CDO) DocSaleList.getList();
+            cdo = null;
             clazz = DocSaleList.class;
         }
         else
@@ -467,5 +467,19 @@ public class LoadDataAndSetObjectsService extends IntentService {
     }
 
 
+    private boolean isLoadRequired(CDO object) {
+        Integer serverRecordsCount = getRecordsCountFromServer(object);
+        Integer localRecordsCount = 0;
+        try {
+            localRecordsCount = object.getDao().queryForAll().size();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (serverRecordsCount != localRecordsCount)
+            return true;
+        else
+            return false;
+
+    }
 
 }

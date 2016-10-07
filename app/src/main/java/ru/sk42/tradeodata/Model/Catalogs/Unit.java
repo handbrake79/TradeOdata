@@ -1,17 +1,16 @@
 package ru.sk42.tradeodata.Model.Catalogs;
 
-import android.util.Log;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Model.Constants;
 
 /**
  * Created by test on 19.04.2016.
@@ -21,22 +20,21 @@ import ru.sk42.tradeodata.Helpers.Helper;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Unit extends CDO {
 
+    static String TAG = "*** productUnit";
     @JsonProperty("Ref_Key")
     @DatabaseField(id = true)
     private String ref_Key;
+    @JsonProperty("Description")
+    @DatabaseField
+    private String description;
 
     public Unit(String ref_Key) {
         this.ref_Key = ref_Key;
     }
 
+
     public Unit(){}
 
-    @JsonProperty("Description")
-    @DatabaseField
-    private String description;
-
-
-    static String TAG = "*** productUnit";
     public String getDescription() {
 
         return description;
@@ -57,7 +55,7 @@ public class Unit extends CDO {
 
     public void save() {
         try {
-            Helper.getInstance().getDao(Unit.class).create(this);
+            MyHelper.getInstance().getDao(Unit.class).create(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -76,8 +74,13 @@ public class Unit extends CDO {
     }
 
     @Override
-    public void setForeignObjects() {
+    public String getRetroFilterString() {
+        return "";
+    }
 
+    @Override
+    public Dao<Unit, Object> getDao() {
+        return MyHelper.getUnitDao();
     }
 
     public String toString() {

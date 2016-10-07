@@ -7,7 +7,7 @@ import com.j256.ormlite.dao.Dao;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 
 /**
@@ -15,11 +15,11 @@ import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleTypesList {
-    public VehicleTypesList() {
-    }
-
     @JsonProperty("value")
     Collection<VehicleType> values;
+
+    public VehicleTypesList() {
+    }
 
     public Collection<VehicleType> getValues() {
         return values;
@@ -31,7 +31,7 @@ public class VehicleTypesList {
 
     public void save() {
         try {
-            Dao<VehicleType, Object> dao = Helper.getInstance().getDao(VehicleType.class);
+            Dao<VehicleType, Object> dao = MyHelper.getInstance().getDao(VehicleType.class);
             dao.delete(dao.queryForAll());
             dao.create(values);
         } catch (SQLException e) {

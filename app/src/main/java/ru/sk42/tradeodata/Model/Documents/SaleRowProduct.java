@@ -8,10 +8,10 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Helpers.Helper;
-import ru.sk42.tradeodata.Model.Catalogs.Store;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
+import ru.sk42.tradeodata.Model.Catalogs.Store;
 import ru.sk42.tradeodata.Model.Catalogs.Unit;
 
 /**
@@ -21,6 +21,58 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SaleRowProduct {
 
+    @DatabaseField( generatedId = true)
+    @JsonIgnore
+    Long id;
+    @DatabaseField(foreign = true)
+    DocSale docSale;
+    @DatabaseField
+    @JsonProperty("ПроцентСкидкиНаценки")
+    private Integer discountPercentManual;
+    @DatabaseField
+    @JsonProperty("ПроцентАвтоматическихСкидок")
+    private Integer discountPercentAuto;
+    @DatabaseField
+    @JsonProperty("Склад_Key")
+    private String store_Key;
+    @DatabaseField
+    @JsonProperty("Сумма")
+    private Float total;
+    @DatabaseField
+    @JsonProperty("Ref_Key")
+    private String ref_Key;
+    @DatabaseField()
+    @JsonProperty("LineNumber")
+    private String lineNumber;
+    @DatabaseField
+    @JsonProperty("Количество")
+    private Float qty;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonIgnore
+    private Unit unit;
+    @DatabaseField
+    @JsonProperty("Номенклатура_Key")
+    private String product_Key;
+    @DatabaseField
+    @JsonProperty("ХарактеристикаНоменклатуры_Key")
+    private String charact_Key;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonIgnore
+    private Charact charact;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    private Store store;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    private Product product;
+    @DatabaseField
+    @JsonProperty("Цена")
+    private Float price;
+    @DatabaseField
+    @JsonProperty("ЕдиницаИзмерения_Key")
+    private String productUnit_Key;
+
+    public SaleRowProduct() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -29,81 +81,12 @@ public class SaleRowProduct {
         this.id = id;
     }
 
-    @DatabaseField( generatedId = true)
-    @JsonIgnore
-    Long id;
-
-    @DatabaseField(foreign = true)
-    DocSale docSale;
-
-
-    @DatabaseField
-    @JsonProperty("ПроцентСкидкиНаценки")
-    private Integer discountPercentManual;
-
-    @DatabaseField
-    @JsonProperty("ПроцентАвтоматическихСкидок")
-    private Integer discountPercentAuto;
-
-    @DatabaseField
-    @JsonProperty("Склад_Key")
-    private String store_Key;
-
-    @DatabaseField
-    @JsonProperty("Сумма")
-    private Float total;
-
-    @DatabaseField
-    @JsonProperty("Ref_Key")
-    private String ref_Key;
-
-    @DatabaseField()
-    @JsonProperty("LineNumber")
-    private String lineNumber;
-
     public String getLineNumber() {
         return lineNumber;
     }
 
     public void setLineNumber(String lineNumber) {
         this.lineNumber = lineNumber;
-    }
-
-    @DatabaseField
-    @JsonProperty("Количество")
-    private Float qty;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonIgnore
-    private Unit unit;
-
-    @DatabaseField
-    @JsonProperty("Номенклатура_Key")
-    private String product_Key;
-
-    @DatabaseField
-    @JsonProperty("ХарактеристикаНоменклатуры_Key")
-    private String charact_Key;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonIgnore
-    private Charact charact;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private Store store;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private Product product;
-
-    @DatabaseField
-    @JsonProperty("Цена")
-    private Float price;
-
-    @DatabaseField
-    @JsonProperty("ЕдиницаИзмерения_Key")
-    private String productUnit_Key;
-
-    public SaleRowProduct() {
     }
 
     public Store getStore() {
@@ -231,7 +214,7 @@ public class SaleRowProduct {
 
     public void save() {
         try {
-            Helper.getSaleRowProductDao().create(this);
+            MyHelper.getSaleRowProductDao().create(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -239,7 +222,7 @@ public class SaleRowProduct {
 
     public void update() {
         try {
-            Helper.getSaleRowProductDao().update(this);
+            MyHelper.getSaleRowProductDao().update(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }

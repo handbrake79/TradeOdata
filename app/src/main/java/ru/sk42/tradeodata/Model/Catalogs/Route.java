@@ -2,11 +2,13 @@ package ru.sk42.tradeodata.Model.Catalogs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 
 /**
@@ -17,6 +19,16 @@ import ru.sk42.tradeodata.Model.CDO;
 public class Route extends CDO
 {
 
+    @DatabaseField(id = true)
+    @JsonProperty("Ref_Key")
+    private String ref_Key;
+    @DatabaseField
+    @JsonProperty
+    private String Code;
+    @DatabaseField
+    @JsonProperty
+    private String Description;
+
     public Route() {
     }
 
@@ -24,28 +36,15 @@ public class Route extends CDO
         this.ref_Key = ref_Key;
     }
 
-    @DatabaseField(id = true)
-    @JsonProperty("Ref_Key")
-    private String ref_Key;
-
     @Override
     public String getRef_Key() { return this.ref_Key; }
 
     @Override
     public void setRef_Key(String Ref_Key) { this.ref_Key = Ref_Key; }
 
-
-    @DatabaseField
-    @JsonProperty
-    private String Code;
-
     public String getCode() { return this.Code; }
 
     public void setCode(String Code) { this.Code = Code; }
-
-    @DatabaseField
-    @JsonProperty
-    private String Description;
 
     public String getDescription() { return this.Description; }
 
@@ -67,7 +66,12 @@ public class Route extends CDO
     }
 
     @Override
-    public void setForeignObjects() {
+    public String getRetroFilterString() {
+        return "";
+    }
 
+    @Override
+    public Dao<Route, Object> getDao() {
+        return MyHelper.getRouteDao();
     }
 }

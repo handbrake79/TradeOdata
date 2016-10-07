@@ -1,16 +1,17 @@
 package ru.sk42.tradeodata.Model.Catalogs;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 
 
 /**
@@ -58,9 +59,15 @@ public class Contract extends CDO {
     }
 
     @Override
-    public void setForeignObjects() {
-
+    public String getRetroFilterString() {
+        return RetroConstants.FILTERS.CONTRACT;
     }
+
+    @Override
+    public Dao<Contract, Object> getDao() {
+        return MyHelper.getContractDao();
+    }
+
 
     public boolean isEmpty() {
         return ref_Key.equals(Constants.NULL_GUID);
@@ -70,7 +77,7 @@ public class Contract extends CDO {
     public void save() {
 
         try {
-            Helper.getInstance().getDao(Contract.class).createOrUpdate(this);
+            MyHelper.getInstance().getDao(Contract.class).createOrUpdate(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }

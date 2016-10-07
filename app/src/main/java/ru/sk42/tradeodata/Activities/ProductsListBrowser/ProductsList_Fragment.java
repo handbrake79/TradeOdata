@@ -16,7 +16,6 @@ import com.j256.ormlite.dao.Dao;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersTouchListener;
 
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,11 +26,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
-import ru.sk42.tradeodata.Helpers.Helper;
-import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Catalogs.Product;
-import ru.sk42.tradeodata.Model.ProductInfo;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
+import ru.sk42.tradeodata.Model.Catalogs.Product;
+import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.ProductInfoRequest;
 import ru.sk42.tradeodata.RetroRequests.ProductsRequest;
@@ -41,10 +40,9 @@ import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
 
 public class ProductsList_Fragment extends Fragment {
 
-    static String TAG = "ProductsList_Fragment";
-
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    static String TAG = "ProductsList_Fragment";
     Product testProduct;
     // TODO: Customize parameters
     private int mColumnCount = 1;
@@ -146,8 +144,8 @@ public class ProductsList_Fragment extends Fragment {
                     ProductInfo productInfo = response.body();
                     if (productInfo != null) {
                         try {
-                            Helper.getProductInfoDao().delete(Helper.getProductInfoDao().queryForAll());
-                            Helper.getStockDao().delete(Helper.getStockDao().queryForAll());
+                            MyHelper.getProductInfoDao().delete(MyHelper.getProductInfoDao().queryForAll());
+                            MyHelper.getStockDao().delete(MyHelper.getStockDao().queryForAll());
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
@@ -197,7 +195,7 @@ public class ProductsList_Fragment extends Fragment {
 
         try {
 
-            testProduct = Helper.getInstance().getDao(Product.class).queryForEq("ref_key", guid).get(0);
+            testProduct = MyHelper.getInstance().getDao(Product.class).queryForEq("ref_key", guid).get(0);
             currentCategory = testProduct;
             ShowChildrenProducts(currentCategory);
 
@@ -211,7 +209,7 @@ public class ProductsList_Fragment extends Fragment {
     }
 
     private List<Product> getProductsByParent(String guid){
-        Dao<Product, Object> dao = Helper.getProductsDao();
+        Dao<Product, Object> dao = MyHelper.getProductDao();
         List<Product> list = null;
         try {
             list = dao.queryForEq("Parent_Key", guid);
@@ -227,7 +225,7 @@ public class ProductsList_Fragment extends Fragment {
         String guid = product.getRef_Key();
         currentCategory = product;
         mAdapter.setParentProduct(currentCategory);
-        Dao<Product, Object> dao = Helper.getProductsDao();
+        Dao<Product, Object> dao = MyHelper.getProductDao();
         List<Product> list = getProductsByParent(guid);
 
         if(list == null || list.size() == 0) {
@@ -257,24 +255,6 @@ public class ProductsList_Fragment extends Fragment {
 
     }
 
-
-    class MyCallBack implements Callback<ProductsList>
-    {
-            @Override
-            public void onResponse(Call<ProductsList> call, Response<ProductsList> response) {
-                ProductsList list = response.body();
-                list.save();
-                updateView(list);
-            }
-
-            @Override
-            public void onFailure(Call<ProductsList> call, Throwable t) {
-                Log.e("", "onResponse: " + t.toString());
-            }
-    }
-
-
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -282,9 +262,6 @@ public class ProductsList_Fragment extends Fragment {
         mListener = null;
         currentCategory = null;
     }
-
-
-
 
     public void updateView(Object list) {
         productArrayList.clear();
@@ -303,6 +280,20 @@ public class ProductsList_Fragment extends Fragment {
         }
         Collections.sort(productArrayList, new ProductComporator());
         mAdapter.notifyDataSetChanged();
+    }
+
+    class MyCallBack implements Callback<ProductsList> {
+        @Override
+        public void onResponse(Call<ProductsList> call, Response<ProductsList> response) {
+            ProductsList list = response.body();
+            list.save();
+            updateView(list);
+        }
+
+        @Override
+        public void onFailure(Call<ProductsList> call, Throwable t) {
+            Log.e("", "onResponse: " + t.toString());
+        }
     }
 
 

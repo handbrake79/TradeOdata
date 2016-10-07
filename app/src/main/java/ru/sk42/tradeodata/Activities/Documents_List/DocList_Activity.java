@@ -24,11 +24,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.sk42.tradeodata.Activities.Document.DocumentActivity;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
 import ru.sk42.tradeodata.Model.Settings;
-import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.DocsRequest;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
@@ -39,8 +39,8 @@ import ru.sk42.tradeodata.Services.MyResultReceiver;
 public class DocList_Activity extends AppCompatActivity implements MyActivityFragmentInteractionInterface, MyResultReceiver.Receiver {
 
     private static final String TAG = "Doclist activity";
-    Date startDate;
     public MyResultReceiver mReceiver;
+    Date startDate;
     ProgressDialog progress;
 
     @Override
@@ -175,7 +175,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
                 }
                 showProgress("Persist to DB","Получено " + list.size() + " документов, сохраняем в БД.");
 
-                Helper.getInstance().deleteDocSaleList();
+                MyHelper.getInstance().deleteDocSaleList();
 
                 try {
                     list.save();

@@ -1,17 +1,12 @@
 package ru.sk42.tradeodata.Model.Catalogs.HelperLists;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
-import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
 
 /**
@@ -38,7 +33,7 @@ public class DiscountCardsList {
 
     public void save() {
         try {
-            Helper.getDiscountCardDao().create(this.values);
+            MyHelper.getDiscountCardDao().create(this.values);
         } catch (SQLException e) {
             e.printStackTrace();
         }

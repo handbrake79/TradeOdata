@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 
 /**
@@ -25,19 +25,32 @@ public class Settings {
     private static String ServerUser;
     private static Date startDate;
     private static User currentUser;
+    private static Application application;
 
     public static User getCurrentUser() {
         return currentUser;
     }
 
-    private static Application application;
+    static void setCurrentUser(String desrc) {
+        if (desrc == null) return;
+        if (desrc.isEmpty()) return;
+
+        try {
+            List<User> list = MyHelper.getInstance().getDao(User.class).queryForEq("description", desrc);
+            if (list.size() > 0) {
+                currentUser = list.get(0);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static String getInfoBaseName() {
         if (InfoBaseName == "")
             return "ut836";
         return InfoBaseName;
     }
-
 
     public static String getServerAddress() {
 
@@ -62,12 +75,12 @@ public class Settings {
         return Printer;
     }
 
-    public static void setApplication(Application mapplication) {
-        application = mapplication;
-    }
-
     public static Application getApplication() {
         return application;
+    }
+
+    public static void setApplication(Application mapplication) {
+        application = mapplication;
     }
 
     public static SimpleDateFormat getDateFormat() {
@@ -102,7 +115,6 @@ public class Settings {
         setCurrentUser(preferences.getString("currentUserKey",""));
     }
 
-
     static SharedPreferences getPreferences() {
         String name = application.getBaseContext().getPackageName() + "_preferences";
         SharedPreferences preferences = application.getSharedPreferences(name, Context.MODE_PRIVATE);
@@ -119,7 +131,6 @@ public class Settings {
         preferences.edit().putString("startDate", getDateFormat().format(startDate)).commit();
     }
 
-
     public static Date getStartOfDay(Date mDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(1900 + mDate.getYear(), mDate.getMonth(), mDate.getDate(), 0, 0, 0);
@@ -130,21 +141,6 @@ public class Settings {
         Calendar calendar = Calendar.getInstance();
         calendar.set(1900 + date.getYear(), date.getMonth(), date.getDate(), 23, 59, 59);
         return calendar.getTime();
-    }
-
-    static void setCurrentUser(String desrc) {
-        if(desrc == null) return;
-        if (desrc.isEmpty())           return;
-
-        try {
-            List<User> list = Helper.getInstance().getDao(User.class).queryForEq("description", desrc);
-            if(list.size() > 0){
-                currentUser = list.get(0);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
 

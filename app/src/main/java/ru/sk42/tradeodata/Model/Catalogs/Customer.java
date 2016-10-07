@@ -1,16 +1,16 @@
 package ru.sk42.tradeodata.Model.Catalogs;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Model.Constants;
 
 
 /**
@@ -19,16 +19,16 @@ import ru.sk42.tradeodata.Helpers.Helper;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Customers")
 public class Customer extends CDO {
-    public Customer(String ref_Key) {
-        this.ref_Key = ref_Key;
-    }
-
     @JsonProperty("Description")
     @DatabaseField
     private String Description;
     @DatabaseField(id = true)
     @JsonProperty("Ref_Key")
     private String ref_Key;
+
+    public Customer(String ref_Key) {
+        this.ref_Key = ref_Key;
+    }
 
     public Customer() {
     }
@@ -56,8 +56,14 @@ public class Customer extends CDO {
     }
 
     @Override
-    public void setForeignObjects() {
+    public String getRetroFilterString() {
+        return "";
+    }
 
+
+    @Override
+    public Dao<Customer, Object> getDao() {
+        return MyHelper.getCustomerDao();
     }
 
     public boolean isEmpty() {
@@ -68,7 +74,7 @@ public class Customer extends CDO {
     public void save() {
 
         try {
-            Helper.getInstance().getDao(Customer.class).create(this);
+            MyHelper.getInstance().getDao(Customer.class).create(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }

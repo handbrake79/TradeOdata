@@ -13,12 +13,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Activities.MyCallBackInterface;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
-import ru.sk42.tradeodata.Helpers.Helper;
-import ru.sk42.tradeodata.Model.Catalogs.Product;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
@@ -73,7 +71,7 @@ public class ProductInfo_Fragment extends  android.support.v4.app.Fragment  impl
         if (getArguments() != null) {
             String ref_Key = getArguments().getString("ref_Key");
             try {
-                productInfo = Helper.getInstance().getDao(ProductInfo.class).queryForEq("ref_Key", ref_Key).get(0);
+                productInfo = MyHelper.getInstance().getDao(ProductInfo.class).queryForEq("ref_Key", ref_Key).get(0);
             } catch (Exception e) {
                 Toast.makeText(this.getContext(), "не найден продакт_инфо в базе по ссылке " + ref_Key, Toast.LENGTH_LONG).show();
             }
@@ -103,7 +101,6 @@ public class ProductInfo_Fragment extends  android.support.v4.app.Fragment  impl
             } else {
                 mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            productInfo.setForeignObjects();
             productInfo = ProductInfo.getObject(ProductInfo.class, productInfo.getRef_Key());
             mAdapter = new ProductInfo_Adapter(productInfo.getArrayList(), mListener);
             mRecyclerView.setAdapter(mAdapter);

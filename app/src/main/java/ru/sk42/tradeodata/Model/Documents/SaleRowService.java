@@ -8,8 +8,8 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
 
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
-import ru.sk42.tradeodata.Helpers.Helper;
 
 
 /**
@@ -18,54 +18,28 @@ import ru.sk42.tradeodata.Helpers.Helper;
 @DatabaseTable(tableName = "SaleRowService")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SaleRowService {
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     @DatabaseField(foreign = true)
     DocSale docSale;
-
     @DatabaseField(generatedId = true)
     @JsonIgnore
     Long id;
-
-
     @DatabaseField
     @JsonProperty("Сумма")
     private Float total;
-
     @DatabaseField
     @JsonProperty("Ref_Key")
     private String ref_Key;
-
     @DatabaseField
     @JsonProperty("LineNumber")
     private String lineNumber;
-
-    public String getLineNumber() {
-        return lineNumber;
-    }
-
-    public void setLineNumber(String lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-
     @DatabaseField
     @JsonProperty("Количество")
     private Float qty;
-
     @DatabaseField
     @JsonProperty("Номенклатура_Key")
     private String product_Key;
-
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Product product;
-
     @DatabaseField
     @JsonProperty("Цена")
     private Float price;
@@ -74,6 +48,22 @@ public class SaleRowService {
     private String productDescription;
 
     public SaleRowService() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(String lineNumber) {
+        this.lineNumber = lineNumber;
     }
 
     public Product getProduct() {
@@ -143,7 +133,7 @@ public class SaleRowService {
 
     public void save() {
         try {
-            Helper.getSaleRowServiceDao().create(this);
+            MyHelper.getSaleRowServiceDao().create(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -152,7 +142,7 @@ public class SaleRowService {
 
     public void update() {
         try {
-            Helper.getSaleRowServiceDao().update(this);
+            MyHelper.getSaleRowServiceDao().update(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }

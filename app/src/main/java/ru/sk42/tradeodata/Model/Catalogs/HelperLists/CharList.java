@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,7 +30,7 @@ public class CharList {
 
     public void save() {
         try {
-            Helper.getCharDao().create(this.values);
+            MyHelper.getCharactDao().create(this.values);
         } catch (SQLException e) {
             e.printStackTrace();
         }

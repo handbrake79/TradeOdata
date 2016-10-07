@@ -2,6 +2,7 @@ package ru.sk42.tradeodata.Model.Documents;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -16,19 +17,19 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
-import ru.sk42.tradeodata.Helpers.Helper;
+import ru.sk42.tradeodata.Helpers.MyHelper;
+import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Catalogs.Contract;
 import ru.sk42.tradeodata.Model.Catalogs.Currency;
 import ru.sk42.tradeodata.Model.Catalogs.Customer;
 import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
 import ru.sk42.tradeodata.Model.Catalogs.Organisation;
+import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
-import ru.sk42.tradeodata.Model.Catalogs.User;
-import ru.sk42.tradeodata.Model.CDO;
-import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Unit;
+import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 
@@ -39,6 +40,133 @@ import ru.sk42.tradeodata.Model.Constants;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DocSale extends CDO {
     private static final String TAG = "DocSale class";
+    @JsonProperty("Товары")
+    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
+    private Collection<SaleRowProduct> products;
+    @JsonProperty("Услуги")
+    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
+    private Collection<SaleRowService> services;
+    @JsonProperty("Number")
+    @DatabaseField
+    private String sNumber;
+    @JsonProperty("Date")
+    @DatabaseField
+    private Date dDate;
+    @JsonProperty("Posted")
+    @DatabaseField
+    private Boolean bPosted;
+    @JsonProperty("ФИОДляПропуска")
+    @DatabaseField
+    private String sPassPerson;
+    @JsonProperty("СуммаДоставки")
+    @DatabaseField
+    private Float fShippingTotal;
+    @JsonProperty("СтоимостьДоставки")
+    @DatabaseField
+    private Float fShippingCost;
+    @JsonProperty("НужнаДоставка")
+    @DatabaseField
+    private Boolean bNeedShipping;
+    @JsonProperty("НужнаРазгрузка")
+    @DatabaseField
+    private Boolean bNeedUnload;
+    @JsonProperty("Ref_Key")
+    @DatabaseField(id = true)
+    private String ref_Key;
+    @JsonProperty("ТипТС_Key")
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    private VehicleType vehicleType;
+    @JsonProperty("ВалютаДокумента_Key")
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    private Currency currency;
+    @JsonProperty("АвтомобильДляПропуска")
+    @DatabaseField
+    private String PassVehicle;
+    //@JsonIgnore
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("Ответственный_Key")
+    private User author;
+//    @JsonIgnore
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("ДоговорКонтрагента_Key")
+    private Contract contract;
+//    @JsonIgnore
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("Контрагент_Key")
+    private Customer customer;
+    @JsonProperty("Комментарий")
+    @DatabaseField
+    private String Comment;
+    @JsonProperty("СуммаДокумента")
+    @DatabaseField
+    private Float Total;
+    @JsonProperty("ДисконтнаяКарта_Key")
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    private DiscountCard discountCard;
+    @JsonProperty("Организация_Key")
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    private Organisation organisation;
+
+//    @JsonProperty("Контрагент_Key")
+//    @DatabaseField
+//    private String customer_Key;
+
+    //    @JsonProperty("Ответственный_Key")
+//    @DatabaseField
+//    private String author_Key;
+    @JsonProperty("Вес")
+    @DatabaseField
+    private Integer Weight;
+
+
+    //    @JsonProperty("ДоговорКонтрагента_Key")
+//    @DatabaseField
+//    private String contractRefKey;
+    @JsonProperty("Объем")
+    @DatabaseField
+    private Integer Volume;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("Маршрут_Key")
+    private Route route;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("НачальнаяТочкаМаршрута_Key")
+    private StartingPoint startingPoint;
+    @JsonProperty("СтоимостьРазгрузки")
+    @DatabaseField
+    private Float unloadCost;
+    @JsonProperty("АдресДоставки")
+    @DatabaseField
+    private String shippingAddress;
+    @JsonProperty("КоличествоГрузчиков")
+    @DatabaseField
+    private Integer workers;
+    @JsonProperty("ДатаДоставки")
+    @DatabaseField
+    private Date shippingDate;
+    @JsonProperty("ВремяДоставкиС")
+    @DatabaseField
+    private Date shippingTimeFrom;
+    @JsonProperty("ВремяДоставкиПо")
+    @DatabaseField
+    private Date shippingTimeTo;
+
+    public DocSale() {
+    }
+
+    public static DocSale getDocument(String ref_Key) {
+        try {
+            List<DocSale> list = MyHelper.getInstance().getDao(DocSale.class).queryForEq("ref_key", ref_Key);
+            if (list.size() > 0)
+                return list.get(0);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static DocSale getStub() {
+        return new DocSale();
+    }
 
     public Currency getCurrency() {
         return currency;
@@ -67,143 +195,6 @@ public class DocSale extends CDO {
         return this;
     }
 
-    public DocSale() {
-    }
-
-    @JsonProperty("Товары")
-    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
-    private Collection<SaleRowProduct> products;
-
-    @JsonProperty("Услуги")
-    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
-    private Collection<SaleRowService> services;
-
-    @JsonProperty("Number")
-    @DatabaseField
-    private String sNumber;
-
-    @JsonProperty("Date")
-    @DatabaseField
-    private Date dDate;
-
-    @JsonProperty("Posted")
-    @DatabaseField
-    private Boolean bPosted;
-
-
-    @JsonProperty("ФИОДляПропуска")
-    @DatabaseField
-    private String sPassPerson;
-
-    @JsonProperty("СуммаДоставки")
-    @DatabaseField
-    private Float fShippingTotal;
-
-    @JsonProperty("СтоимостьДоставки")
-    @DatabaseField
-    private Float fShippingCost;
-
-    @JsonProperty("НужнаДоставка")
-    @DatabaseField
-    private Boolean bNeedShipping;
-
-
-    @JsonProperty("НужнаРазгрузка")
-    @DatabaseField
-    private Boolean bNeedUnload;
-
-    @JsonProperty("Ref_Key")
-    @DatabaseField(id = true)
-    private String ref_Key;
-
-    @JsonProperty("ТипТС_Key")
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private VehicleType vehicleType;
-
-    @JsonProperty("ВалютаДокумента_Key")
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private Currency currency;
-
-    @JsonProperty("АвтомобильДляПропуска")
-    @DatabaseField
-    private String PassVehicle;
-
-//    @JsonProperty("Контрагент_Key")
-//    @DatabaseField
-//    private String customer_Key;
-
-//    @JsonProperty("Ответственный_Key")
-//    @DatabaseField
-//    private String author_Key;
-
-    //@JsonIgnore
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonProperty("Ответственный_Key")
-    private User author;
-
-
-//    @JsonProperty("ДоговорКонтрагента_Key")
-//    @DatabaseField
-//    private String contractRefKey;
-
-//    @JsonIgnore
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonProperty("ДоговорКонтрагента_Key")
-    private Contract contract;
-
-//    @JsonIgnore
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonProperty("Контрагент_Key")
-    private Customer customer;
-
-    @JsonProperty("Комментарий")
-    @DatabaseField
-    private String Comment;
-
-
-    @JsonProperty("СуммаДокумента")
-    @DatabaseField
-    private Float Total;
-
-    @JsonProperty("ДисконтнаяКарта_Key")
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private DiscountCard discountCard;
-
-    @JsonProperty("Организация_Key")
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private Organisation organisation;
-
-    @JsonProperty("Вес")
-    @DatabaseField
-    private Integer Weight;
-
-    @JsonProperty("Объем")
-    @DatabaseField
-    private Integer Volume;
-
-
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonProperty("Маршрут_Key")
-    private Route route;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonProperty("НачальнаяТочкаМаршрута_Key")
-    private StartingPoint startingPoint;
-
-    @JsonProperty("СтоимостьРазгрузки")
-    @DatabaseField
-    private Float unloadCost;
-
-    @JsonProperty("АдресДоставки")
-    @DatabaseField
-    private String shippingAddress;
-
-
-    @JsonProperty("КоличествоГрузчиков")
-    @DatabaseField
-    private Integer workers;
-
     public Integer getWorkers() {
         return workers;
     }
@@ -213,19 +204,6 @@ public class DocSale extends CDO {
         return this;
     }
 
-    @JsonProperty("ДатаДоставки")
-    @DatabaseField
-    private Date shippingDate;
-
-    @JsonProperty("ВремяДоставкиС")
-    @DatabaseField
-    private Date shippingTimeFrom;
-
-    @JsonProperty("ВремяДоставкиПо")
-    @DatabaseField
-    private Date shippingTimeTo;
-
-
     public String getShippingAddress() {
         return shippingAddress;
     }
@@ -234,22 +212,6 @@ public class DocSale extends CDO {
         this.shippingAddress = shippingAddress;
         return this;
     }
-
-    public static DocSale getDocument(String ref_Key) {
-        try {
-            List<DocSale> list = Helper.getInstance().getDao(DocSale.class).queryForEq("ref_key", ref_Key);
-            if (list.size() > 0)
-                return list.get(0);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private static DocSale getStub() {
-        return new DocSale();
-    }
-
 
     public Boolean getbNeedShipping() {
         return bNeedShipping;
@@ -392,7 +354,7 @@ public class DocSale extends CDO {
             row.save();
         }
 
-        Helper.getDocSaleDao().create(this);
+        MyHelper.getDocSaleDao().create(this);
 
     }
 
@@ -409,6 +371,16 @@ public class DocSale extends CDO {
     @Override
     public String getMaintainedTableName() {
         return null;
+    }
+
+    @Override
+    public String getRetroFilterString() {
+        return "";
+    }
+
+    @Override
+    public Dao<DocSale, Object> getDao() {
+        return MyHelper.getDocSaleDao();
     }
 
 
@@ -597,7 +569,7 @@ public class DocSale extends CDO {
 
     void update(){
         try {
-            Helper.getDocSaleDao().update(this);
+            MyHelper.getDocSaleDao().update(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }
