@@ -97,11 +97,11 @@ public class LoadDataAndSetObjectsService extends IntentService {
                 return;
             }
             if(mode.equals(Constants.DATALOADER_MODE.DOCLIST.name())){
-                LoadDataAndSFO();
+                LoadDataFromServer();
                 return;
             }
             if(mode.equals(Constants.DATALOADER_MODE.DOC.name())){
-                LoadDataAndSFO();
+                LoadDataFromServer();
                 return;
             }
         }
@@ -396,14 +396,6 @@ public class LoadDataAndSetObjectsService extends IntentService {
             }
         }
 
-    private Integer getRecordsCountLocal(CDO object) {
-        try {
-            return object.getDao().queryForAll().size();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     private Integer getRecordsCountFromServer(CDO object) {
         RecordsCountRequest request = ServiceGenerator.createService(RecordsCountRequest.class);
@@ -420,8 +412,7 @@ public class LoadDataAndSetObjectsService extends IntentService {
     }
 
 
-
-    private void LoadDataAndSFO(){
+    private void LoadDataFromServer() {
         Integer id = intent.getIntExtra("id", -1);
         String ref_Key = intent.getStringExtra("ref_Key");
 
