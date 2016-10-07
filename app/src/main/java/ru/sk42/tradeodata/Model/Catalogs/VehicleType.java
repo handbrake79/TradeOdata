@@ -18,6 +18,23 @@ import ru.sk42.tradeodata.Model.CDO;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleType extends CDO
 {
+    @DatabaseField(id = true)
+    @JsonProperty("Ref_Key")
+    private String ref_Key;
+    @DatabaseField
+    @JsonProperty
+    private String Code;
+    @DatabaseField
+    @JsonProperty
+    private String Description;
+    @DatabaseField
+    @JsonProperty("МаксимальныйОбъем")
+    private Integer maxVolume;
+    @DatabaseField
+    @JsonProperty("МаксимальнаяГрузоподъемность")
+    private Integer maxTonnage;
+
+
     public VehicleType() {
     }
 
@@ -25,43 +42,21 @@ public class VehicleType extends CDO
         this.ref_Key = ref_Key;
     }
 
-    @DatabaseField(id = true)
-    @JsonProperty("Ref_Key")
-    private String ref_Key;
-
     @Override
     public String getRef_Key() { return this.ref_Key; }
 
     @Override
     public void setRef_Key(String Ref_Key) { this.ref_Key = Ref_Key; }
 
-
-    @DatabaseField
-    @JsonProperty
-    private String Code;
-
     public String getCode() { return this.Code; }
 
     public void setCode(String Code) { this.Code = Code; }
-
-    @DatabaseField
-    @JsonProperty
-    private String Description;
 
     public String getDescription() { return this.Description; }
 
     public void setDescription(String Description) { this.Description = Description; }
 
-    @DatabaseField
-    @JsonProperty("МаксимальныйОбъем")
-    private Integer maxVolume;
-
     public Integer getMaxVolume() { return this.maxVolume; }
-
-    @Override
-    public Dao<VehicleType, Object> getDao() {
-        return MyHelper.getVehicleTypesDao();
-    }
 
     public void setMaxVolume(Integer maxVolume) { this.maxVolume = maxVolume; }
 
@@ -69,10 +64,6 @@ public class VehicleType extends CDO
     public Dao<VehicleType, Object> getDao() {
         return MyHelper.getVehicleTypesDao();
     }
-
-    @DatabaseField
-    @JsonProperty("МаксимальнаяГрузоподъемность")
-    private Integer maxTonnage;
 
     public Integer getMaxTonnage() { return this.maxTonnage; }
 

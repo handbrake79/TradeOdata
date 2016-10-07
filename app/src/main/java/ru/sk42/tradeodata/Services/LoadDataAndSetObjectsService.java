@@ -341,7 +341,7 @@ public class LoadDataAndSetObjectsService extends IntentService {
 
 
         UsersRequest request1 = ServiceGenerator.createService(UsersRequest.class);
-            Call<UsersList> call1 = request1.call(RetroConstants.getMap(""));
+        Call<UsersList> call1 = request1.call(RetroConstants.getMap(RetroConstants.FILTERS.USERS));
             try {
                 // sendMessage("Пользователи");
                 Response<UsersList> response = call1.execute();
@@ -475,6 +475,9 @@ public class LoadDataAndSetObjectsService extends IntentService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        Log.d(TAG, "isLoadRequired: класс " + object.getMaintainedTableName() + " локально " + localRecordsCount.toString() + " записей, на сервере " + serverRecordsCount.toString() + " записей");
+
         if (serverRecordsCount != localRecordsCount)
             return true;
         else
