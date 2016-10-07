@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TradeOdata</string>
+    <string name="title_activity_product_info">ProductInfo</string>
+
+    <string name="product_selection">Выбрать товар</string>
+    <string name="get_doc_from_1c">Загрузить</string>
+    <string name="title_activity_documents__list_">Documents_List_Activity</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

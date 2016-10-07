@@ -1,0 +1,90 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cv"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_ProductInfo_Product"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="tvCardProduct" />
+
+        <TextView
+            android:id="@+id/tv_ProductInfo_Charact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_ProductInfo_Product"
+            android:text="tvCardCharact" />
+
+        <TextView
+            android:id="@+id/tv_ProductInfo_Store"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/tv_ProductInfo_Charact"
+            android:text="tvCardStore" />
+
+        <TextView
+            android:id="@+id/tv_ProductInfo_Qty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_ProductInfo_Charact"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@+id/tv_ProductInfo_Store"
+            android:layout_toRightOf="@+id/tv_ProductInfo_Store"
+            android:text="tvCardQty" />
+
+        <TextView
+            android:id="@+id/tv_ProductInfo_Unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/tv_ProductInfo_Qty"
+            android:layout_below="@+id/tv_ProductInfo_Charact"
+
+            android:layout_marginLeft="10dp"
+
+            android:layout_toEndOf="@+id/tv_ProductInfo_Qty"
+            android:text="Ед.изм." />
+
+        <TextView
+            android:id="@+id/tv_ProductInfo_Asterisk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginLeft="10dp"
+
+            android:layout_toEndOf="@+id/tv_ProductInfo_Unit"
+            android:layout_below="@+id/tv_ProductInfo_Charact"
+            android:text="*" />
+
+        <TextView
+            android:id="@+id/tv_ProductInfo_Price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginLeft="10dp"
+
+            android:layout_below="@+id/tv_ProductInfo_Charact"
+            android:layout_toEndOf="@+id/tv_ProductInfo_Asterisk"
+            android:text="Цена" />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_unknown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="руб."
+
+            android:layout_below="@+id/tv_ProductInfo_Charact"
+            android:layout_toEndOf="@+id/tv_ProductInfo_Price"
+
+            android:layout_marginLeft="10dp"
+            />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

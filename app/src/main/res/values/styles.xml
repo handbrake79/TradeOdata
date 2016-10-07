@@ -1,0 +1,23 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Light">
+        <!-- Customize your theme here. -->
+        <item name="android:actionBarStyle">@style/MyStyle</item>
+
+    </style>
+
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+    <style name="MyStyle">
+        <item name="android:titleTextStyle">@style/MyStyle.ActionBar.TitleTextStyle</item>
+    </style>
+
+    <style name="MyStyle.ActionBar.TitleTextStyle" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">8sp</item>
+    </style>
+
+</resources>

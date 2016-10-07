@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ru.sk42.tradeodata">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.Light">
+        <activity android:name="ru.sk42.tradeodata.Activities.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="ru.sk42.tradeodata.Activities.SettingsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.PREFERENCE" />
+            </intent-filter>
+        </activity>
+
+
+        <activity android:name="ru.sk42.tradeodata.Activities.Document.DocumentActivity" />
+        <activity
+            android:name="ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity"
+            android:label="@string/title_activity_documents__list_"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <service
+            android:name="ru.sk42.tradeodata.Services.LoadDataAndSetObjectsService"
+            android:exported="false"></service>
+        <service
+            android:name="ru.sk42.tradeodata.Services.PersisterService"
+            android:exported="false"></service>
+    </application>
+
+</manifest>

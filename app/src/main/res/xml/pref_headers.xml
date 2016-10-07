@@ -1,0 +1,22 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- These settings headers are only used on tablets. -->
+
+    <header
+        android:fragment="ru.sk42.tradeodata.Activities.SettingsActivity$UserPreferenceFragment"
+        android:icon="@drawable/user"
+        android:title="Настройки пользователя"
+        />
+
+    <header
+        android:fragment="ru.sk42.tradeodata.Activities.SettingsActivity$ConnectionPreferenceFragment"
+        android:icon="@drawable/network"
+        android:title="Настройки подключения"
+        />
+
+    <header
+        android:fragment="ru.sk42.tradeodata.Activities.SettingsActivity$PrinterPreferenceFragment"
+        android:icon="@drawable/printer"
+        android:title="Настройки принтера"
+        />
+</preference-headers>

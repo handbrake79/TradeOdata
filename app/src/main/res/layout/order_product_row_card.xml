@@ -1,0 +1,140 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cv_order_product_row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rl_order_product_row"
+        android:layout_width="match_parent"
+        android:layout_height="107dp"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Product"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="Номенклатура"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Charact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_below="@+id/tv_DocSale_Products_Product"
+
+            android:text="Характеристика"
+            android:layout_alignEnd="@+id/tv_DocSale_Products_Product"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Store"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/tv_DocSale_Products_Charact"
+            android:text="Склад" />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Qty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_DocSale_Products_Charact"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@+id/tv_DocSale_Products_Store"
+            android:layout_toRightOf="@+id/tv_DocSale_Products_Store"
+            android:textStyle="bold"
+
+            android:text="Количество" />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/tv_DocSale_Products_Qty"
+            android:layout_below="@+id/tv_DocSale_Products_Charact"
+
+            android:layout_marginLeft="10dp"
+
+            android:layout_toEndOf="@+id/tv_DocSale_Products_Qty"
+            android:layout_toRightOf="@+id/tv_DocSale_Products_Qty"
+            android:text="Ед.изм." />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Asterisk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/tv_DocSale_Products_Unit"
+
+            android:layout_marginLeft="3dp"
+
+            android:layout_toEndOf="@+id/tv_DocSale_Products_Unit"
+            android:layout_toRightOf="@+id/tv_DocSale_Products_Unit"
+            android:text="*" />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_below="@+id/tv_DocSale_Products_Charact"
+
+            android:layout_marginLeft="3dp"
+
+            android:layout_toEndOf="@+id/tv_DocSale_Products_Asterisk"
+            android:layout_toRightOf="@+id/tv_DocSale_Products_Asterisk"
+            android:text="Цена" />
+
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_EqualsSign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:text="="
+            android:layout_below="@+id/tv_DocSale_Products_Charact"
+            android:layout_toRightOf="@+id/tv_DocSale_Products_Price"
+            />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Сумма"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/tv_DocSale_Products_Charact"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_Rub_Char"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:text="р."
+            android:layout_toRightOf="@id/tv_DocSale_Products_Total"
+            android:layout_below="@id/tv_DocSale_Products_Charact"
+            />
+
+        <TextView
+            android:id="@+id/tv_DocSale_Products_DiscountPercentAuto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Скидка по карте"
+            android:layout_below="@id/tv_DocSale_Products_Store"
+            />
+        <TextView
+            android:id="@+id/tv_DocSale_Products_DiscountPercentManual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Скидка ручная"
+            android:layout_toRightOf="@id/tv_DocSale_Products_DiscountPercentAuto"
+            android:layout_below="@id/tv_DocSale_Products_Store"
+            />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
