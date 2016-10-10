@@ -35,14 +35,18 @@ public class SaleRowService {
     @DatabaseField
     @JsonProperty("Количество")
     private Float qty;
-    @DatabaseField
+
     @JsonProperty("Номенклатура_Key")
+    @DatabaseField
     private String product_Key;
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Product product;
+
     @DatabaseField
     @JsonProperty("Цена")
     private Float price;
+
     @DatabaseField
     @JsonProperty("Содержание")
     private String productDescription;

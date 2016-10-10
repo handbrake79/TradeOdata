@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import retrofit2.Call;
-import ru.sk42.tradeodata.Activities.MyCallBackInterface;
 import ru.sk42.tradeodata.Helpers.CheckRelatedDataToLoad;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.CharList;
@@ -24,9 +23,8 @@ import ru.sk42.tradeodata.Model.Documents.DocSaleList;
  */
 public class RetroDataLoader {
 
-    static String TAG = "RetroDataLoader";
+    static String TAG = "RetroDataLoader***";
 
-    static MyCallBackInterface callBackInterface;
     static private CDO objectToCheck;
     static private HashMap<Class<?>, ArrayList<String>> unresolvedLinks;
     static Runnable myrunnable = new Runnable() {
@@ -172,11 +170,7 @@ public class RetroDataLoader {
     }
 
     static private void showProgress(String message) {
-
-        if(callBackInterface != null)
-            callBackInterface.showMessage("*** rdqm ***", message);
-//        else
-//            throw new RuntimeException("*** callbackInterface is null!");
+        Log.d(TAG, "showProgress: " + message);
     }
 
 

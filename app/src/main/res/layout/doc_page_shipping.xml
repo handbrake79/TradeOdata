@@ -1,244 +1,299 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_height="wrap_content"
-    android:layout_width="match_parent">
-
-    <LinearLayout
-        android:orientation="vertical"
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/llNeedShipping"
-        android:layout_width="match_parent">
+        android:elevation="1dp"
+        android:orientation="vertical"
+        android:weightSum="100">
 
-        <CheckBox
-            android:text="Нужна доставка"
+
+        <TableRow
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/cbNeedShipping"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <EditText
+            <CheckBox
+                android:id="@+id/cbNeedShipping"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:text="Нужна доставка" />
+        </TableRow>
+
+        <TableRow
+
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="ТипТС"
-            android:ems="10"
-            android:id="@+id/edtVehicleType"
-            android:layout_below="@+id/cbNeedShipping"
-            android:layout_alignParentStart="true"
-            tools:text="Тип ТС"
-            android:layout_toStartOf="@+id/edtWorkers" />
+            android:layout_height="70dp"
+            android:layout_marginTop="10dp">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="Начальная точка маршрута"
-            android:ems="10"
-            android:id="@+id/edtStartingPoint"
-            android:layout_below="@+id/edtVehicleType"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="11dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Тип ТС" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="Маршрут"
-            android:ems="10"
-            android:id="@+id/edtRoute"
-            android:layout_below="@+id/edtStartingPoint"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/edtShippingCost"
-            android:text="Стоимость доставки"
-            android:layout_marginTop="12dp"
-            android:layout_below="@+id/edtRoute"
-            android:layout_alignParentStart="true" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:text="Button"
+            <Spinner
+                android:id="@+id/input_vehicle_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/btnVoiceAddress"
-                android:layout_weight="1" />
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/cbNeedShipping"
+                android:layout_marginLeft="5sp"
+                android:layout_toStartOf="@+id/edtWorkers"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="ТипТС"
+                tools:text="Тип ТС" />
+
+        </TableRow>
+
+        <TableRow
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Начальная точка" />
+
+            <Spinner
+                android:id="@+id/input_starting_point"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/cbNeedShipping"
+                android:layout_marginLeft="5sp"
+                android:layout_toStartOf="@+id/edtWorkers"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="ТипТС"
+                tools:text="Тип ТС" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/edtStartingPoint"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="Маршрут" />
+
+            <AutoCompleteTextView
+                android:id="@+id/input_route"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:hint="Набрать или нажать" />
+
+        </TableRow>
+
+        <TableRow android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:elevation="1dp"
+                android:inputType="numberDecimal"
+                android:text="Стоимость доставки" />
 
             <EditText
+                android:id="@+id/edtShippingCost"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:inputType="textMultiLine"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
                 android:ems="10"
+                android:hint="Стоимость доставки"
+                android:inputType="numberDecimal" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/shipping_form_tableRow_address"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+
+            android:orientation="horizontal"
+            android:weightSum="10"
+            tools:weightSum="10">
+
+            <Button
+                android:id="@+id/btnVoiceAddress"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="5dp"
+                android:text="Голосовой ввод" />
+
+            <EditText
                 android:id="@+id/edtShippingAddress"
-                android:text="Адрес доставки"
-                android:layout_weight="1" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:ems="10"
+                android:hint="Адрес доставки"
+                android:inputType="textMultiLine" />
+        </TableRow>
 
-    </LinearLayout>
 
+        <TableRow
+            android:id="@+id/llNeedUnload"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/llNeedShipping"
+            android:layout_marginTop="10sp"
+            android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_marginTop="10sp"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/llNeedShipping"
-        android:id="@+id/llNeedUnload">
+            <CheckBox
+                android:id="@+id/cbNeedUnload"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Нужна разгрузка" />
 
-        <CheckBox
-            android:text="Нужна разгрузка"
+            <EditText
+                android:id="@+id/edtUnloadCost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cbNeedUnload"
+                android:ems="10"
+                android:hint="Стоимость разгрузки"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/edtWorkers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtUnloadCost"
+                android:ems="10"
+                android:inputType="number"
+                android:text="Количество грузчиков"
+
+                />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/llShippingDate"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/cbNeedUnload"
-            />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edtUnloadCost"
-            android:text="Стоимость разгрузки"
-            android:layout_below="@+id/cbNeedUnload"
-             />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edtWorkers"
-            android:text="Количество грузчиков"
-            android:layout_below="@+id/edtUnloadCost"
-
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_marginTop="10sp"
-
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/llNeedUnload"
-        android:layout_alignParentStart="true"
-        android:id="@+id/llShippingDate">
-
-        <TextView
-            android:text="Дата доставки"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/edtShippingDate"
             android:layout_alignParentStart="true"
-            android:id="@+id/tvShippingDate"
-            android:layout_weight="1" />
+            android:layout_below="@id/llNeedUnload"
+            android:layout_marginTop="10sp"
+            android:orientation="horizontal">
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="date"
-            android:ems="10"
-            android:layout_below="@+id/edtShippingCost"
-            android:layout_toEndOf="@+id/tvTotalShippingCost"
-            android:id="@+id/edtShippingDate"
-            android:text="Дата доставки"
-            android:layout_weight="1" />
+            <TextView
+                android:id="@+id/tvShippingDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/edtShippingDate"
+                android:layout_alignParentStart="true"
+                android:layout_weight="1"
+                android:text="Дата доставки" />
 
-    </LinearLayout>
+            <EditText
+                android:id="@+id/edtShippingDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtShippingCost"
+                android:layout_toEndOf="@+id/tvTotalShippingCost"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Дата доставки"
+                android:inputType="date" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/llShippingDate"
-        android:id="@+id/llShippingTime">
+        </TableRow>
 
-        <TextView
-            android:text="время доставки"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="38dp"
-            android:id="@+id/tvShippingTime"
-            android:layout_below="@+id/tvShippingDate"
-            android:layout_alignParentStart="true"
-            android:layout_weight="1" />
-
-        <EditText
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edtShippingTimeFrom"
-            android:text="С 09"
-            android:layout_alignBaseline="@+id/edtShippingTimeTo"
-            android:layout_alignBottom="@+id/edtShippingTimeTo"
-            android:layout_toEndOf="@+id/tvPageShjipping_DocumentTotal"
-            android:layout_marginStart="14dp"
-            android:layout_weight="1" />
-
-        <EditText
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edtShippingTimeTo"
-            android:text="до 19"
-            android:layout_width="60dp"
-            android:layout_marginStart="22dp"
-            android:layout_alignBottom="@+id/tvShippingTime"
-            android:layout_toEndOf="@+id/edtShippingTimeFrom"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_below="@+id/llShippingTime"
-        android:id="@+id/llShippingTotal">
-
-        <TextView
-            android:text="Сумма документа"
+        <TableRow
+            android:id="@+id/llShippingTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvPageShjipping_DocumentTotal"
-            android:textStyle="bold"
-            tools:textStyle="bold"
-            android:textSize="22sp"
-            android:layout_below="@+id/tvTotalShippingCost"
+            android:layout_below="@+id/llShippingDate"
+            android:orientation="horizontal">
 
-             />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/tvShippingDate"
+                android:layout_marginTop="38dp"
+                android:layout_weight="1"
+                android:text="время доставки" />
 
-        <TextView
-            android:text="Итого доставка"
+            <TextView
+                android:id="@+id/input_time_from"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/edtShippingTimeTo"
+                android:layout_alignBottom="@+id/edtShippingTimeTo"
+                android:layout_marginStart="14dp"
+                android:layout_toEndOf="@+id/tvPageShjipping_DocumentTotal"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="время с"
+                android:inputType="number" />
+
+            <TextView
+                android:id="@+id/input_time_to"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/tvShippingTime"
+                android:layout_marginStart="22dp"
+                android:layout_toEndOf="@+id/edtShippingTimeFrom"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="по"
+                android:inputType="number" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/llShippingTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvTotalShippingCost"
-            android:textStyle="bold"
-            tools:textStyle="bold"
-            android:textSize="22sp"
-            android:layout_below="@+id/edtShippingCost"
-            />
-    </LinearLayout>
+            android:layout_below="@+id/llShippingTime"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvPageShjipping_DocumentTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvTotalShippingCost"
+                android:text="Сумма документа"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                tools:textStyle="bold"
+
+                />
+
+            <TextView
+                android:id="@+id/tvTotalShippingCost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edtShippingCost"
+                android:text="Итого доставка"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                tools:textStyle="bold" />
+        </TableRow>
 
 
-
-</RelativeLayout>
+    </TableLayout>
 </ScrollView>

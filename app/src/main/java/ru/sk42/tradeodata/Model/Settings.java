@@ -47,26 +47,26 @@ public class Settings {
     }
 
     public static String getInfoBaseName() {
-        if (InfoBaseName == "")
+        if (InfoBaseName.isEmpty())
             return "ut836";
         return InfoBaseName;
     }
 
     public static String getServerAddress() {
 
-        if (ServerAddress == "")
+        if (ServerAddress.isEmpty())
             return "http://192.168.0.171/";
         return ServerAddress;
     }
 
     public static String getServerUser() {
-        if (ServerUser == "")
+        if (ServerUser.isEmpty())
             return "Коган";
         return ServerUser;
     }
 
     public static String getServerPassword() {
-        if (ServerPassword == "")
+        if (ServerPassword.isEmpty())
             return "";
         return ServerPassword;
     }

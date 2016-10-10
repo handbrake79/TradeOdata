@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
-import ru.sk42.tradeodata.Activities.MyCallBackInterface;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.ProductInfo;
@@ -27,10 +27,10 @@ import ru.sk42.tradeodata.R;
  * Activities containing this fragment MUST implement the {@link MyActivityFragmentInteractionInterface}
  * interface.
  */
-public class ProductInfo_Fragment extends  android.support.v4.app.Fragment  implements MyCallBackInterface {
+public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
 
     // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String TAG = "ProductInfo***";
     public ProductInfo productInfo;
     RecyclerView mRecyclerView;
     // TODO: Customize parameters
@@ -140,18 +140,15 @@ public class ProductInfo_Fragment extends  android.support.v4.app.Fragment  impl
         mListener.onItemSelection(stock);
     }
 
-    @Override
-    public void onAllRequestsComplete() {
-        progress.dismiss();
 
-    }
 
     public void showMessage(String title, String message) {
-//        tvLog.append(title + " : " + message + "\n");
-        progress.setIndeterminate(true);
-        progress.setTitle(title);
-        progress.setMessage(message);
-        progress.show();
+        Log.d(TAG, "showMessage: " + message);
+////        tvLog.append(title + " : " + message + "\n");
+//        progress.setIndeterminate(true);
+//        progress.setTitle(title);
+//        progress.setMessage(message);
+//        progress.show();
     }
 
 

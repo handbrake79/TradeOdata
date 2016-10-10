@@ -13,7 +13,7 @@ import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Settings;
 import ru.sk42.tradeodata.R;
-import ru.sk42.tradeodata.Services.LoadDataAndSetObjectsService;
+import ru.sk42.tradeodata.Services.LoadDataFromServer;
 import ru.sk42.tradeodata.Services.MyResultReceiver;
 
 public class MainActivity extends AppCompatActivity implements MyResultReceiver.Receiver {
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
         Settings.readSettings();
         mReceiver = new MyResultReceiver(new Handler());
         mReceiver.setReceiver(this);
-        Intent i = new Intent(this, LoadDataAndSetObjectsService.class);
+        Intent i = new Intent(this, LoadDataFromServer.class);
         i.putExtra("from","MainAct");
         i.putExtra("mode", Constants.DATALOADER_MODE.PRELOAD.name());
         i.putExtra("receiverTag", mReceiver);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.types.StringType;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
@@ -87,8 +88,12 @@ public class VehicleType extends CDO
 
     @Override
     public String getRetroFilterString() {
-        return "";
+        return "DeletionMark eq false";
     }
 
 
+    @Override
+    public String toString() {
+        return getDescription();
+    }
 }

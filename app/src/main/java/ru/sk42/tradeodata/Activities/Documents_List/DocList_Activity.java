@@ -33,7 +33,7 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.DocsRequest;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
-import ru.sk42.tradeodata.Services.LoadDataAndSetObjectsService;
+import ru.sk42.tradeodata.Services.LoadDataFromServer;
 import ru.sk42.tradeodata.Services.MyResultReceiver;
 
 public class DocList_Activity extends AppCompatActivity implements MyActivityFragmentInteractionInterface, MyResultReceiver.Receiver {
@@ -140,7 +140,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
     }
 
     private void callDataLoaderService() {
-        Intent i = new Intent(this, LoadDataAndSetObjectsService.class);
+        Intent i = new Intent(this, LoadDataFromServer.class);
         i.putExtra("id", 0);
         i.putExtra("mode", Constants.DATALOADER_MODE.DOCLIST.name());
         i.putExtra("receiverTag", mReceiver);

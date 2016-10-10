@@ -67,11 +67,16 @@ public class StartingPoint extends CDO
 
     @Override
     public String getRetroFilterString() {
-        return null;
+        return "DeletionMark eq false";
     }
 
     @Override
     public Dao<StartingPoint, Object> getDao() {
         return MyHelper.getStartingPointDao();
+    }
+
+    @Override
+    public String toString() {
+        return getDescription();
     }
 }

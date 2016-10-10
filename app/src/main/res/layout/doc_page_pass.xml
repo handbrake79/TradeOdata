@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
 
     <EditText
+        android:id="@+id/input_pass_vehicle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="Марка и номер ТС"
-        android:ems="10"
-        android:layout_marginTop="29dp"
-        android:id="@+id/edtPassVehicle"
-        android:layout_below="@+id/edtPassPerson"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginTop="29dp"
+        android:ems="10"
+        android:hint="Марка и номер ТС"
+        android:inputType="textPersonName" />
 
     <EditText
+        android:id="@+id/input_pass_person"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="ФИО для пропуска"
-        android:ems="10"
-        android:id="@+id/edtPassPerson"
-        tools:text="Тип ТС"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:ems="10"
+        android:hint="ФИО для пропуска"
+        android:inputType="textPersonName"
+        tools:text="Тип ТС" />
 
 
 </RelativeLayout>

@@ -164,7 +164,7 @@ public class Product extends CDO {
 
     @Override
     public String getRetroFilterString() {
-        return "";
+        return "DeletionMark eq false";
     }
 
 

@@ -67,11 +67,16 @@ public class Route extends CDO
 
     @Override
     public String getRetroFilterString() {
-        return "";
+        return "DeletionMark eq false";
     }
 
     @Override
     public Dao<Route, Object> getDao() {
         return MyHelper.getRouteDao();
+    }
+
+    @Override
+    public String toString() {
+        return Description;
     }
 }

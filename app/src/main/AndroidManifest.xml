@@ -35,7 +35,7 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <service
-            android:name="ru.sk42.tradeodata.Services.LoadDataAndSetObjectsService"
+            android:name="ru.sk42.tradeodata.Services.LoadDataFromServer"
             android:exported="false"></service>
         <service
             android:name="ru.sk42.tradeodata.Services.PersisterService"

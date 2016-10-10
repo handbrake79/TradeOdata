@@ -17,7 +17,7 @@ public class Requisites {
     public static Requisites NewInstance(DocSale docSale) {
         Requisites rq = new Requisites();
 
-        rq.add("Номер", docSale.getsNumber());
+        rq.add("Номер", docSale.getNumber());
         rq.add("Дата", docSale.getFormattedDate());
         rq.add(docSale.getbPosted() ? "Проведен" : "Не проведен", "");
         rq.add("Покупатель", docSale.getCustomer().toString());

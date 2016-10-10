@@ -59,7 +59,7 @@ public class Organisation extends CDO {
 
     @Override
     public String getRetroFilterString() {
-        return "";
+        return "Ref_Key eq guid'" + Constants.ORGANISATION_GUID + "'";
     }
 
     @Override

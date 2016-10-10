@@ -12,9 +12,7 @@ public class Constants {
     public static final String ORGANISATION_GUID = "2dbd363a-d053-4721-801b-c45a27de99a3";
     public static final String CUSTOMER_GUID = "b779d1b9-be4f-4bfa-a65b-10641c5d1370";
     public static final String CURRENCY_GUID = "e8a12aca-26fe-11e1-b72e-984be1645106";
-    public static final String CONTRACT_GUID = "";
     public static final String ACTION_DOCLIST_SET_FOREIGN_OBJECTS = "ACTION_DOCLIST_SET_FOREIGN_OBJECTS";
-    public static final String DOCLIST_ID = "DOCLIST_ID";
     public static int ModeNewOrder = 0;
     public static int ModeExistingOrder = 1;
 

@@ -42,28 +42,37 @@ public class DocSale extends CDO {
     private static final String TAG = "DocSale class";
     @JsonProperty("Товары")
     @ForeignCollectionField(eager = true, maxEagerLevel = 3)
+
     private Collection<SaleRowProduct> products;
     @JsonProperty("Услуги")
     @ForeignCollectionField(eager = true, maxEagerLevel = 3)
+
     private Collection<SaleRowService> services;
+
     @JsonProperty("Number")
     @DatabaseField
-    private String sNumber;
+    private String number;
+
     @JsonProperty("Date")
     @DatabaseField
     private Date dDate;
+
     @JsonProperty("Posted")
     @DatabaseField
     private Boolean bPosted;
+
     @JsonProperty("ФИОДляПропуска")
     @DatabaseField
     private String sPassPerson;
+
     @JsonProperty("СуммаДоставки")
     @DatabaseField
     private Float fShippingTotal;
+
     @JsonProperty("СтоимостьДоставки")
     @DatabaseField
     private Float fShippingCost;
+
     @JsonProperty("НужнаДоставка")
     @DatabaseField
     private Boolean bNeedShipping;
@@ -392,12 +401,12 @@ public class DocSale extends CDO {
         this.Comment = comment;
     }
 
-    public String getsNumber() {
-        return sNumber;
+    public String getNumber() {
+        return number;
     }
 
-    public void setsNumber(String sNumber) {
-        this.sNumber = sNumber;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public String getsPassPerson() {
@@ -554,7 +563,7 @@ public class DocSale extends CDO {
 
     @Override
     public String toString() {
-        return "Реализация № " + getsNumber() + " от " + getFormattedDate();
+        return "Реализация № " + getNumber() + " от " + getFormattedDate();
     }
 
     public void setForeignObjectsInHeader() {

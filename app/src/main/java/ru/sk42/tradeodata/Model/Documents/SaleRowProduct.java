@@ -27,6 +27,9 @@ public class SaleRowProduct {
     @DatabaseField(foreign = true)
     DocSale docSale;
     @DatabaseField
+    @JsonProperty("Номенклатура_Key")
+    private String product_Key;
+    @DatabaseField
     @JsonProperty("ПроцентСкидкиНаценки")
     private Integer discountPercentManual;
     @DatabaseField
@@ -50,9 +53,8 @@ public class SaleRowProduct {
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonIgnore
     private Unit unit;
-    @DatabaseField
-    @JsonProperty("Номенклатура_Key")
-    private String product_Key;
+
+
     @DatabaseField
     @JsonProperty("ХарактеристикаНоменклатуры_Key")
     private String charact_Key;
@@ -61,8 +63,10 @@ public class SaleRowProduct {
     private Charact charact;
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Store store;
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Product product;
+
     @DatabaseField
     @JsonProperty("Цена")
     private Float price;
@@ -187,7 +191,7 @@ public class SaleRowProduct {
 
     public Charact getCharact() {
         if (charact == null)
-            charact = Charact.getObjectOrStub(charact_Key);
+            charact = Charact.getObject(Charact.class, charact_Key);
         return charact;
     }
 

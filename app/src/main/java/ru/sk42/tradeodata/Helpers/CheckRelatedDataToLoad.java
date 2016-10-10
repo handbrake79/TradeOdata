@@ -52,14 +52,14 @@ public class CheckRelatedDataToLoad {
                 current++;
 
                 if (current % 20 == 0) {
-                    //callBackInterface.showProgress(current.toString() + " from " + size.toString() + " completed", "Processing " + docSale.getsNumber());
+                    //callBackInterface.showProgress(current.toString() + " from " + size.toString() + " completed", "Processing " + docSale.getNumber());
                 }
 
                 checkDocCustomer(docSale);
                 checkDocContract(docSale);
                 checkDocAuthor(docSale);
                 checkDocProductsAndServices(docSale);
-                //callBackInterface.showProgress(current.toString() + " from " + size.toString() + " completed", "processed " + docSale.getsNumber());
+                //callBackInterface.showProgress(current.toString() + " from " + size.toString() + " completed", "processed " + docSale.getNumber());
 
             }
         }
@@ -74,7 +74,7 @@ public class CheckRelatedDataToLoad {
             DocSale docSale = (DocSale) obj;
             if (docSale != null) {
 
-                //callBackInterface.showProgress("Check doc", "Processing " + docSale.getsNumber());
+                //callBackInterface.showProgress("Check doc", "Processing " + docSale.getNumber());
 
                 checkDocCustomer(docSale);
                 checkDocContract(docSale);

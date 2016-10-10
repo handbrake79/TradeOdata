@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -21,7 +22,7 @@ import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
-import ru.sk42.tradeodata.Services.LoadDataAndSetObjectsService;
+import ru.sk42.tradeodata.Services.LoadDataFromServer;
 import ru.sk42.tradeodata.Services.MyResultReceiver;
 
 public class DocumentActivity extends AppCompatActivity implements MyActivityFragmentInteractionInterface, MyResultReceiver.Receiver {
@@ -34,10 +35,6 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     private DocSale docSale;
     private String docRef_Key;
 
-    public void setDocSale(DocSale docSale) {
-        this.docSale = docSale;
-    }
-
     public String getDocRef_Key() {
         return docRef_Key;
     }
@@ -46,9 +43,12 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
         this.docRef_Key = docRef_Key;
     }
 
-
     public DocSale getDocSale() {
         return docSale;
+    }
+
+    public void setDocSale(DocSale docSale) {
+        this.docSale = docSale;
     }
 
     @Override
@@ -105,9 +105,6 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
     @Override
     public void onDetachFragment(Fragment fragment) {
-        if (fragment instanceof ProductsList_Fragment) {
-            showProductSelectionMenuItem();
-        }
         if (fragment instanceof DocumentFragment) {
             //закрыли документ, нужно закрыть активность
             //проверить изменения, сохранить
@@ -115,12 +112,6 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
         }
     }
 
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        if (fragment instanceof ProductsList_Fragment) {
-            hideProductSelectionMenuItem();
-        }
-    }
 
     @Override
     public void onRequestSuccess(Object object) {
@@ -158,25 +149,6 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
     }
 
-    private void hideProductSelectionMenuItem() {
-//        if (menu != null) {
-//            MenuItem item = menu.findItem(R.id.product_selection_menu_item);
-//            if (item != null)
-//                item.setVisible(false);
-//        }
-    }
-
-    private void showProductSelectionMenuItem() {
-//
-//        if (menu != null) {
-//            MenuItem item = menu.findItem(R.id.product_selection_menu_item);
-//            if (item != null) {
-//                item.setVisible(true);
-//            }
-//
-//        }
-    }
-
     private void showStockInfoFragment(ProductInfo productInfo) {
 
         if (productInfo == null) {
@@ -193,16 +165,22 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     }
 
     private void showDocumentFragment() {
-//        Log.d("*** DocSale SFO ***", "start");
-  //      docSale.setForeignObjects();
-    //    docSale = DocSale.getDocument(docSale.getRef_Key());
-  //      Log.d("*** DocSale SFO ***", "stop");
+        setActionBarTitle();
         DocMainFragment fragment = new DocMainFragment();
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.content_frame, fragment, String.valueOf(R.id.llDocMainFragment));
         fragmentTransaction.addToBackStack(fragment.getClass().getName());
         fragmentTransaction.commit();
+
+    }
+
+    private void setActionBarTitle() {
+        ActionBar actionBar = getSupportActionBar();
+        String title = docSale.getNumber();
+        actionBar.setTitle(title);
+        actionBar.setWindowTitle(" WindowTitle");
+        actionBar.setSubtitle(String.valueOf(docSale.getProducts().size() + " товаров"));
 
     }
 
@@ -214,7 +192,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
 
     private void callDataLoaderService() {
-        Intent i = new Intent(this, LoadDataAndSetObjectsService.class);
+        Intent i = new Intent(this, LoadDataFromServer.class);
         i.putExtra("mode", Constants.DATALOADER_MODE.DOC.name());
         i.putExtra("from","Document");
         i.putExtra("ref_Key", getDocRef_Key());

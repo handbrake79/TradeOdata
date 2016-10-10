@@ -3,7 +3,6 @@ package ru.sk42.tradeodata.Activities.Document;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.widget.Toast;
 
 /**
  * Created by test on 18.04.2016.
@@ -24,7 +23,21 @@ public class MyFragmentPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return DocumentFragment.newInstance(position);
+        switch (position) {
+            case 0:
+                return new RequisitesFragment();
+            case 1:
+                return new ProductsFragment();
+            case 2:
+                return new ServicesFragment();
+            case 3:
+                return new ShippingFragment();
+            case 4:
+                return new PassFragment();
+
+
+        }
+        return new RequisitesFragment();
     }
 
     @Override

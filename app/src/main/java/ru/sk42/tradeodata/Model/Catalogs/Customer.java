@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 
 
 /**
@@ -19,12 +20,13 @@ import ru.sk42.tradeodata.Model.Constants;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Customers")
 public class Customer extends CDO {
-    @JsonProperty("Description")
-    @DatabaseField
-    private String Description;
     @DatabaseField(id = true)
     @JsonProperty("Ref_Key")
     private String ref_Key;
+
+    @JsonProperty("Description")
+    @DatabaseField
+    private String Description;
 
     public Customer(String ref_Key) {
         this.ref_Key = ref_Key;
@@ -57,7 +59,7 @@ public class Customer extends CDO {
 
     @Override
     public String getRetroFilterString() {
-        return "";
+        return RetroConstants.FILTERS.CUSTOMER;
     }
 
 

@@ -50,7 +50,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
 
         holder.mItem = mValues.get(position);
         holder.mDate.setText(holder.mItem.getFormattedDate());
-        holder.mNumber.setText(holder.mItem.getsNumber());
+        holder.mNumber.setText(holder.mItem.getNumber());
         holder.mAuthor.setText(holder.mItem.getAuthor().getDescription());
         holder.mTotal.setText(holder.mItem.getTotal().toString());
         holder.mPosted.setText(holder.mItem.getPostedDescr());

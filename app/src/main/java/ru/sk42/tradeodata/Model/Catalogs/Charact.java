@@ -36,13 +36,13 @@ public class Charact extends CDO{
     public Charact() {
     }
 
-    public static Charact getObjectOrStub(String key) {
+    public static <T> T getObject(Class<T> clazz, String key) {
         if (key.equals(Constants.NULL_GUID))
-            return getStub();
+            return (T) getStub();
         try {
             List<Charact> list = MyHelper.getInstance().getDao(Charact.class).queryForEq("ref_Key", key);
             if (list.size() > 0)
-                return list.get(0);
+                return (T) list.get(0);
             else return null;
         } catch (SQLException e) {
             e.printStackTrace();

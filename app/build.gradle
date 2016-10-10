@@ -53,6 +53,8 @@ dependencies {
     compile 'com.timehop.stickyheadersrecyclerview:library:0.4.3@aar'
     compile 'com.android.support:design:23.2.1'
     compile 'com.astuetz:pagerslidingtabstrip:1.+'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.code-troopers.betterpickers:library:3.0.1'
 //    compile 'joda-time:joda-time:2.0'
 //    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha1'
 
