@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -20,6 +19,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
     private final List<Stock> mValues;
     private final MyActivityFragmentInteractionInterface mListener;
     private Integer selectedItem;
+
     public ProductInfo_Adapter(List<Stock> items, MyActivityFragmentInteractionInterface listener) {
         selectedItem = -1;
 
@@ -55,7 +55,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
         holder.mCharact.setText(mValues.get(position).getCharact_Description());
         holder.mPrice.setText(mValues.get(position).getPrice().toString());
         holder.mQty.setText(mValues.get(position).getQty().toString());
-        holder.mUnit.setText(mValues.get(position).getUnit_Description());
+        holder.mUnit.setText(mValues.get(position).getUnit().getDescription());
 
     }
 
@@ -91,10 +91,9 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
                 @Override
                 public void onClick(View v) {
                     // Redraw the old selection and the new
-                    notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
-                    Toast.makeText(view.getContext(), selectedItem.toString() + " position selected", Toast.LENGTH_SHORT).show();
+                    mListener.onItemSelection(mValues.get(selectedItem));
                 }
             });
         }

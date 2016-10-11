@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/doc_page_req_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:text="tvDocRequisitesDescription"
-        android:id="@+id/tvDocRequisitesDescription"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
-        android:layout_marginLeft="10sp"
+        android:id="@+id/doc_page_req_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="object"
-        android:id="@+id/tvDocRequisitesObject"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/tvDocRequisitesDescription" />
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10sp"
+        android:layout_toEndOf="@+id/doc_page_req_title"
+        android:text="object"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 </RelativeLayout>

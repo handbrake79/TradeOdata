@@ -55,33 +55,34 @@ public class DocSale extends CDO {
 
     @JsonProperty("Date")
     @DatabaseField
-    private Date dDate;
+    private Date date;
 
     @JsonProperty("Posted")
     @DatabaseField
-    private Boolean bPosted;
+    private Boolean posted;
 
     @JsonProperty("ФИОДляПропуска")
     @DatabaseField
-    private String sPassPerson;
+    private String passPerson;
 
     @JsonProperty("СуммаДоставки")
     @DatabaseField
-    private Float fShippingTotal;
+    private Float shippingTotal;
 
     @JsonProperty("СтоимостьДоставки")
     @DatabaseField
-    private Float fShippingCost;
+    private Float shippingCost;
 
     @JsonProperty("НужнаДоставка")
     @DatabaseField
-    private Boolean bNeedShipping;
+    private Boolean needShipping;
     @JsonProperty("НужнаРазгрузка")
     @DatabaseField
-    private Boolean bNeedUnload;
+    private Boolean needUnload;
     @JsonProperty("Ref_Key")
     @DatabaseField(id = true)
     private String ref_Key;
+
     @JsonProperty("ТипТС_Key")
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private VehicleType vehicleType;
@@ -90,7 +91,7 @@ public class DocSale extends CDO {
     private Currency currency;
     @JsonProperty("АвтомобильДляПропуска")
     @DatabaseField
-    private String PassVehicle;
+    private String passVehicle;
     //@JsonIgnore
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("Ответственный_Key")
@@ -105,10 +106,10 @@ public class DocSale extends CDO {
     private Customer customer;
     @JsonProperty("Комментарий")
     @DatabaseField
-    private String Comment;
+    private String comment;
     @JsonProperty("СуммаДокумента")
     @DatabaseField
-    private Float Total;
+    private Float total;
     @JsonProperty("ДисконтнаяКарта_Key")
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private DiscountCard discountCard;
@@ -148,7 +149,7 @@ public class DocSale extends CDO {
     private String shippingAddress;
     @JsonProperty("КоличествоГрузчиков")
     @DatabaseField
-    private Integer workers;
+    private Integer workersCount;
     @JsonProperty("ДатаДоставки")
     @DatabaseField
     private Date shippingDate;
@@ -204,12 +205,12 @@ public class DocSale extends CDO {
         return this;
     }
 
-    public Integer getWorkers() {
-        return workers;
+    public Integer getWorkersCount() {
+        return workersCount;
     }
 
-    public DocSale setWorkers(Integer workers) {
-        this.workers = workers;
+    public DocSale setWorkersCount(Integer workersCount) {
+        this.workersCount = workersCount;
         return this;
     }
 
@@ -222,28 +223,28 @@ public class DocSale extends CDO {
         return this;
     }
 
-    public Boolean getbNeedShipping() {
-        return bNeedShipping;
+    public Boolean getNeedShipping() {
+        return needShipping;
     }
 
-    public void setbNeedShipping(Boolean bNeedShipping) {
-        this.bNeedShipping = bNeedShipping;
+    public void setNeedShipping(Boolean needShipping) {
+        this.needShipping = needShipping;
     }
 
-    public Boolean getbNeedUnload() {
-        return bNeedUnload;
+    public Boolean getNeedUnload() {
+        return needUnload;
     }
 
-    public void setbNeedUnload(Boolean bNeedUnload) {
-        this.bNeedUnload = bNeedUnload;
+    public void setNeedUnload(Boolean needUnload) {
+        this.needUnload = needUnload;
     }
 
-    public Boolean getbPosted() {
-        return bPosted;
+    public Boolean getPosted() {
+        return posted;
     }
 
-    public void setbPosted(Boolean bPosted) {
-        this.bPosted = bPosted;
+    public void setPosted(Boolean posted) {
+        this.posted = posted;
     }
 
 
@@ -254,41 +255,41 @@ public class DocSale extends CDO {
 
     public String getFormattedDate() {
         SimpleDateFormat fmt = new SimpleDateFormat("dd-MM-yy hh:mm:ss");
-        Calendar calendar = new GregorianCalendar(1900 + dDate.getYear(), dDate.getMonth(), dDate.getDate(), dDate.getHours(), dDate.getMinutes(), dDate.getSeconds());
+        Calendar calendar = new GregorianCalendar(1900 + date.getYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
         fmt.setCalendar(calendar);
         return fmt.format(calendar.getTime());
     }
 
-    public Date getdDate() {
-        return dDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setdDate(Date dDate) {
-        this.dDate = dDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public Float getTotal() {
-        return Total;
+        return total;
     }
 
     public void setTotal(Float total) {
-        this.Total = total;
+        this.total = total;
     }
 
-    public Float getfShippingCost() {
-        return fShippingCost;
+    public Float getShippingCost() {
+        return shippingCost;
     }
 
-    public void setfShippingCost(Float fShippingCost) {
-        this.fShippingCost = fShippingCost;
+    public void setShippingCost(Float shippingCost) {
+        this.shippingCost = shippingCost;
     }
 
-    public Float getfShippingTotal() {
-        return fShippingTotal;
+    public Float getShippingTotal() {
+        return shippingTotal;
     }
 
-    public void setfShippingTotal(Float fShippingTotal) {
-        this.fShippingTotal = fShippingTotal;
+    public void setShippingTotal(Float shippingTotal) {
+        this.shippingTotal = shippingTotal;
     }
 
     public Float getUnloadCost() {
@@ -394,11 +395,11 @@ public class DocSale extends CDO {
 
 
     public String getComment() {
-        return Comment;
+        return comment;
     }
 
     public void setComment(String comment) {
-        this.Comment = comment;
+        this.comment = comment;
     }
 
     public String getNumber() {
@@ -409,20 +410,20 @@ public class DocSale extends CDO {
         this.number = number;
     }
 
-    public String getsPassPerson() {
-        return sPassPerson;
+    public String getPassPerson() {
+        return passPerson;
     }
 
-    public void setsPassPerson(String sPassPerson) {
-        this.sPassPerson = sPassPerson;
+    public void setPassPerson(String passPerson) {
+        this.passPerson = passPerson;
     }
 
     public String getPassVehicle() {
-        return PassVehicle;
+        return passVehicle;
     }
 
     public void setPassVehicle(String passVehicle) {
-        this.PassVehicle = passVehicle;
+        this.passVehicle = passVehicle;
     }
 
     public Collection<SaleRowProduct> getProducts() {
@@ -517,7 +518,7 @@ public class DocSale extends CDO {
     }
 
     public String getPostedDescr() {
-        return bPosted ? "Проведен" : "Не проведен";
+        return posted ? "Проведен" : "Не проведен";
     }
 
     public Date getShippingDate() {
@@ -548,8 +549,8 @@ public class DocSale extends CDO {
     }
 
     public String getShippingDescription() {
-        if (bNeedShipping)
-            return getfShippingTotal().toString() + "руб. " + route.getDescription();
+        if (needShipping)
+            return getShippingTotal().toString() + "руб. " + route.getDescription();
         else
             return "Нет";
     }

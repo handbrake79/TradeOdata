@@ -19,7 +19,7 @@ public class Requisites {
 
         rq.add("Номер", docSale.getNumber());
         rq.add("Дата", docSale.getFormattedDate());
-        rq.add(docSale.getbPosted() ? "Проведен" : "Не проведен", "");
+        rq.add(docSale.getPosted() ? "Проведен" : "Не проведен", "");
         rq.add("Покупатель", docSale.getCustomer().toString());
         rq.add("Договор", docSale.getContract().toString());
         rq.add("Автор", docSale.getAuthor().toString());

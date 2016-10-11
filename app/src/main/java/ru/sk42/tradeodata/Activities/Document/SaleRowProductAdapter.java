@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.SaleRowProduct;
 import ru.sk42.tradeodata.R;
 
@@ -46,7 +47,7 @@ public class SaleRowProductAdapter extends RecyclerView.Adapter<SaleRowProductAd
 
         holder.itemView.setSelected(selectedItem == position);
         if (selectedItem == position)
-            holder.itemView.setBackgroundColor(Color.LTGRAY);
+            holder.itemView.setBackgroundColor(Constants.COLORS.SELECTED_COLOR);
         else
             holder.itemView.setBackgroundColor(Color.WHITE);
 

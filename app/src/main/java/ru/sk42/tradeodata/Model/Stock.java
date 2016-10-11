@@ -1,6 +1,7 @@
 package ru.sk42.tradeodata.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
@@ -15,42 +16,21 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 
 
 @DatabaseTable(tableName = "stock")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Stock extends CDO {
-
-    @DatabaseField
-    @JsonProperty("Charact_Description")
-    public String charact_Description;
-
-    @DatabaseField
-    @JsonProperty("Store_Description")
-    public String storeDescription;
 
     @DatabaseField(generatedId = true)
     private int id;
 
-    @DatabaseField
-    @JsonProperty("Unit_Key")
-    private String unit_Key;
-
-    @DatabaseField
-    @JsonProperty("Unit_Description")
-    private String unit_Description;
-
     @DatabaseField(foreign = true)
     private ProductInfo productInfo;
 
-    @DatabaseField
-    @JsonProperty("Store_Key")
-    private String store_Key;
-
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("Store_Key")
     private Store store;
 
-    @DatabaseField
-    @JsonProperty("Charact_Key")
-    private String charact_Key;
-
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("Charact_Key")
     @JsonIgnore
     private Charact charact;
 
@@ -62,7 +42,8 @@ public class Stock extends CDO {
     @JsonProperty("Qty")
     private Float qty;
 
-    @DatabaseField(foreign = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("Unit_Key")
     private Unit unit;
 
     public Stock() {
@@ -129,57 +110,14 @@ public class Stock extends CDO {
         return this.store.getDescription();
     }
 
-    public void setStoreDescription(String storeDescription) {
-        this.storeDescription = storeDescription;
-    }
 
     public String getCharact_Description() {
-        if(this.charact == null)
+        if (this.charact == null)
             return "";
         else
             return this.charact.getDescription();
     }
 
-    public void setCharact_Description(String charact_Description) {
-        this.charact_Description = charact_Description;
-    }
-
-    public String getCharact_Key() {
-        return charact_Key;
-    }
-
-    public void setCharact_Key(String charact_Key) {
-        this.charact_Key = charact_Key;
-    }
-
-
-    public String getProductUnit_Key() {
-        return unit_Key;
-    }
-
-    public String getUnit_Key() {
-        return unit_Key;
-    }
-
-    public void setUnit_Key(String unit_Key) {
-        this.unit_Key = unit_Key;
-    }
-
-    public String getUnit_Description() {
-        return unit_Description;
-    }
-
-    public void setUnit_Description(String unit_Description) {
-        this.unit_Description = unit_Description;
-    }
-
-    public String getStore_Key() {
-        return store_Key;
-    }
-
-    public void setStore_Key(String store_Key) {
-        this.store_Key = store_Key;
-    }
 
     @Override
     public void save() {

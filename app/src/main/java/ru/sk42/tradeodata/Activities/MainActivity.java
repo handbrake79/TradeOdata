@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.____main____activity);
+        setContentView(R.layout.main_activity);
 
 
 

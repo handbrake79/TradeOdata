@@ -9,8 +9,8 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 public class MyFragmentPageAdapter extends FragmentPagerAdapter {
 
-    final int PAGE_COUNT = 5;
-    private String tabTitles[] = new String[]{"Реквизиты", "Товары", "Услуги", "Доставка", "Пропуск"};
+    final int PAGE_COUNT = 4;
+    private String tabTitles[] = new String[]{"Реквизиты", "Товары", "Услуги", "Доставка"};
 
     public MyFragmentPageAdapter(FragmentManager fm) {
         super(fm);
@@ -32,8 +32,6 @@ public class MyFragmentPageAdapter extends FragmentPagerAdapter {
                 return new ServicesFragment();
             case 3:
                 return new ShippingFragment();
-            case 4:
-                return new PassFragment();
 
 
         }

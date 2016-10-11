@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import ru.sk42.tradeodata.Model.CDO;
+import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Catalogs.Contract;
 import ru.sk42.tradeodata.Model.Catalogs.Customer;
+import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
+import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
-import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
 import ru.sk42.tradeodata.Model.Documents.SaleRowProduct;
 import ru.sk42.tradeodata.Model.Documents.SaleRowService;
-import ru.sk42.tradeodata.Model.Catalogs.Charact;
-import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.ProductInfo;
-import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Stock;
 
 /**
@@ -94,17 +94,17 @@ public class CheckRelatedDataToLoad {
             while (it.hasNext()) {
                 Stock row = it.next();
 
-                String guid = row.getCharact_Key();
+                String guid = row.getCharact().getRef_Key();
                 if (!listCharact.contains(guid) && row.getCharact() == null) {
                     listCharact.add(guid);
                 }
 
-                guid = row.getStore_Key();
+                guid = row.getStore().getRef_Key();
                 if (!listStores.contains(guid) && row.getStore() == null) {
                     listStores.add(guid);
                 }
 
-                guid = row.getProductUnit_Key();
+                guid = row.getUnit().getRef_Key();
                 if (!listUnits.contains(guid) && row.getUnit() == null) {
                     listUnits.add(guid);
                 }
@@ -127,7 +127,7 @@ public class CheckRelatedDataToLoad {
         for (SaleRowProduct row : docSale.getProducts()) {
             Product product = Product.getObject(Product.class, row.getProduct_Key());
             Charact charact = Charact.getObject(Charact.class, row.getCharact_Key());
-            Unit    unit    = Unit.getObject(Unit.class, row.getProductUnit_Key());
+            Unit unit = Unit.getObject(Unit.class, row.getProductUnit_Key());
             Store store = Store.getObject(Store.class, row.getStore_Key());
 
             String guid = row.getProduct_Key();
@@ -136,7 +136,7 @@ public class CheckRelatedDataToLoad {
             }
 
             guid = row.getCharact_Key();
-            if(!guid.equals(Constants.NULL_GUID)) {
+            if (!guid.equals(Constants.NULL_GUID)) {
                 if (!listCharact.contains(guid) && charact == null) {
                     listCharact.add(guid);
                 }
@@ -177,7 +177,7 @@ public class CheckRelatedDataToLoad {
             return;
 
         if (User.getObject(User.class, guid) != null) {
-                return;
+            return;
         }
         list.add(guid);
         guidsToLoadMap.put(User.class, list);
@@ -228,7 +228,7 @@ public class CheckRelatedDataToLoad {
             return;
 
         if (Contract.getObject(Contract.class, guid) != null) {
-                return;
+            return;
         }
         list.add(guid);
         guidsToLoadMap.put(Contract.class, list);
@@ -245,7 +245,7 @@ public class CheckRelatedDataToLoad {
 
         Customer customer = Customer.getObject(Customer.class, guid);
         if (customer != null) {
-                return;
+            return;
         }
         list.add(guid);
         guidsToLoadMap.put(Customer.class, list);

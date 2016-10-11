@@ -32,6 +32,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     ProductsList_Fragment productsList_fragment;
     Menu menu;
     ProgressDialog progressDialog;
+    DocMainFragment mainFragment;
     private DocSale docSale;
     private String docRef_Key;
 
@@ -105,7 +106,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
     @Override
     public void onDetachFragment(Fragment fragment) {
-        if (fragment instanceof DocumentFragment) {
+        if (fragment instanceof Fragment) {
             //закрыли документ, нужно закрыть активность
             //проверить изменения, сохранить
             this.finish();
@@ -166,26 +167,25 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
     private void showDocumentFragment() {
         setActionBarTitle();
-        DocMainFragment fragment = new DocMainFragment();
+        mainFragment = new DocMainFragment();
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_frame, fragment, String.valueOf(R.id.llDocMainFragment));
-        fragmentTransaction.addToBackStack(fragment.getClass().getName());
+        fragmentTransaction.replace(R.id.content_frame, mainFragment, String.valueOf(R.id.llDocMainFragment));
+        fragmentTransaction.addToBackStack(mainFragment.getClass().getName());
         fragmentTransaction.commit();
 
     }
 
     private void setActionBarTitle() {
         ActionBar actionBar = getSupportActionBar();
-        String title = docSale.getNumber();
+        String title = docSale.getNumber() + " от " + Constants.DATE_FORMATTER.format(docSale.getDate());
         actionBar.setTitle(title);
-        actionBar.setWindowTitle(" WindowTitle");
-        actionBar.setSubtitle(String.valueOf(docSale.getProducts().size() + " товаров"));
+        actionBar.setWindowTitle("WindowTitle");
+        actionBar.setSubtitle((!docSale.getRef_Key().equals(Constants.NULL_GUID) ? "записан, " : "не записан, ") + (docSale.getPosted() ? " проведен" : "не проведен"));
 
     }
 
     private void reloadDocSale(){
-
         docSale = DocSale.getObject(DocSale.class, getDocRef_Key());
     }
 
@@ -209,6 +209,8 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
             reloadDocSale();
             showDocumentFragment();
         }
+
+
     }
 
 

@@ -98,6 +98,9 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTableIfNotExists(getInstance().connectionSource, SaleRowProduct.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, SaleRowService.class);
 
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, ProductInfo.class);
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, Stock.class);
+
 
         } catch (SQLException e) {
             e.printStackTrace();

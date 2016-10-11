@@ -2,11 +2,11 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/DocList_Activity"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true"
-    tools:context=".Activities.Documents_List.DocList_Activity"
-    android:id="@+id/DocList_Activity">
+    tools:context=".Activities.Documents_List.DocList_Activity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -17,12 +17,12 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/PopupOverlay"
-            android:background="@color/accent_material_dark" />
+            android:background="@color/accent_material_dark"
+            app:popupTheme="@style/PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_documents__list_" />
+    <include layout="@layout/fragment_doc_list" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_menu_today"
-        android:onClick="fab_onclick" />
+        android:onClick="fab_onclick"
+        android:src="@android:drawable/ic_menu_today" />
 
 </android.support.design.widget.CoordinatorLayout>
