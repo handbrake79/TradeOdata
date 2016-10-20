@@ -10,6 +10,7 @@ import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
+import ru.sk42.tradeodata.Model.Constants;
 
 /**
  * Created by я on 29.09.2016.
@@ -52,7 +53,7 @@ public class StartingPoint extends CDO
 
     @Override
     public void save() throws SQLException {
-
+        MyHelper.getStartingPointDao().createOrUpdate(this);
     }
 
     @Override
@@ -78,5 +79,16 @@ public class StartingPoint extends CDO
     @Override
     public String toString() {
         return getDescription();
+    }
+
+    public static void createStub() {
+        StartingPoint s = new StartingPoint(Constants.NULL_GUID);
+        s.setDescription("");
+        try {
+            s.save();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 }

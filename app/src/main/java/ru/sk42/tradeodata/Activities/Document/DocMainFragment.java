@@ -3,6 +3,7 @@ package ru.sk42.tradeodata.Activities.Document;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +14,18 @@ import com.astuetz.PagerSlidingTabStrip;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
+import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.R;
 
 // In this case, the fragment displays simple text based on the page
 public class DocMainFragment extends Fragment {
+    private MyActivityFragmentInteractionInterface mListener;
 
+    FragmentPagerAdapter fragmentPagerAdapter ;
+    public ViewPager viewPager;
+    PagerSlidingTabStrip pagerSlidingTabStrip;
 
     @Bind(R.id.doc_total_total_text)
     TextView mTotalText;
@@ -83,16 +90,30 @@ public class DocMainFragment extends Fragment {
         return v;
     }
 
+    public void setCurrentPage(int page){
+        viewPager.setCurrentItem(page);
+    }
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        viewPager.setAdapter(new MyFragmentPageAdapter(getChildFragmentManager()));
+        fragmentPagerAdapter = new DocumentFragmentPageAdapter(getChildFragmentManager());
+
+        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
+        viewPager.setAdapter(fragmentPagerAdapter);
 
         // Give the PagerSlidingTabStrip the ViewPager
-        PagerSlidingTabStrip tabsStrip = (PagerSlidingTabStrip) view.findViewById(R.id.tabs);
+         pagerSlidingTabStrip = (PagerSlidingTabStrip) view.findViewById(R.id.tabs);
         // Attach the view pager to the tab strip
-        tabsStrip.setViewPager(viewPager);
+        pagerSlidingTabStrip.setViewPager(viewPager);
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = (MyActivityFragmentInteractionInterface) getActivity();
+        mListener.onFragmentDetached(this);
+    }
+
 }

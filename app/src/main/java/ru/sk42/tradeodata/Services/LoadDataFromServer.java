@@ -44,7 +44,7 @@ import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
-import ru.sk42.tradeodata.Model.Settings;
+import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.RetroRequests.CharRequest;
 import ru.sk42.tradeodata.RetroRequests.ContractsRequest;
 import ru.sk42.tradeodata.RetroRequests.CurrencyRequest;
@@ -100,11 +100,11 @@ public class LoadDataFromServer extends IntentService {
                 return;
             }
             if(mode.equals(Constants.DATALOADER_MODE.DOCLIST.name())){
-                LoadDataFromServer();
+                loadData();
                 return;
             }
             if(mode.equals(Constants.DATALOADER_MODE.DOC.name())){
-                LoadDataFromServer();
+                loadData();
                 return;
             }
         }
@@ -207,6 +207,7 @@ public class LoadDataFromServer extends IntentService {
                 VehicleTypesList list = response.body();
                 MyHelper.getVehicleTypesDao().delete(MyHelper.getVehicleTypesDao().queryForAll());
                 list.save();
+                VehicleType.createStub();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -323,6 +324,7 @@ public class LoadDataFromServer extends IntentService {
                 TableUtils.dropTable(MyHelper.getCharactDao(), false);
                 TableUtils.createTable(MyHelper.getCharactDao());
                 list.save();
+                Charact.createStub();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -341,7 +343,7 @@ public class LoadDataFromServer extends IntentService {
                 UsersList list = response.body();
                 MyHelper.getUserDao().delete(MyHelper.getUserDao().queryForAll());
                 list.save();
-                Settings.renewCurrentUser();
+                SettingsOld.renewCurrentUser();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -361,6 +363,7 @@ public class LoadDataFromServer extends IntentService {
                 RoutesList list = response.body();
                 MyHelper.getRouteDao().delete(MyHelper.getRouteDao().queryForAll());
                 list.save();
+                Route.createStub();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -379,6 +382,7 @@ public class LoadDataFromServer extends IntentService {
                 StartingPointsList list = response.body();
                 MyHelper.getStartingPointDao().delete(MyHelper.getStartingPointDao().queryForAll());
                 list.save();
+                StartingPoint.createStub();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -394,7 +398,7 @@ public class LoadDataFromServer extends IntentService {
             filter = "?$filter=" + filter;
         }
 
-        Call<Integer> call = request.call(Settings.getInfoBaseName() + "/odata/standard.odata/" + object.getMaintainedTableName() + "/$count" + filter);
+        Call<Integer> call = request.call(SettingsOld.getInfoBaseName() + "/odata/standard.odata/" + object.getMaintainedTableName() + "/$count" + filter);
         Integer count = 0;
         try {
             Response<Integer> response = call.execute();
@@ -407,7 +411,7 @@ public class LoadDataFromServer extends IntentService {
     }
 
 
-    private void LoadDataFromServer() {
+    private void loadData() {
         Integer id = intent.getIntExtra("id", -1);
         String ref_Key = intent.getStringExtra("ref_Key");
 
@@ -428,9 +432,6 @@ public class LoadDataFromServer extends IntentService {
             doc.setForeignObjects();
 
         }
-
-
-
 
         sendServiceFinished();
 
@@ -461,6 +462,15 @@ public class LoadDataFromServer extends IntentService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        if(object instanceof Charact)
+            localRecordsCount --; //потому что одну характеристику заглушку мы всегда создаем локально
+        if(object instanceof VehicleType)
+            localRecordsCount--;
+        if(object instanceof Route)
+            localRecordsCount--;
+        if(object instanceof StartingPoint)
+            localRecordsCount--;
 
         String msg = object.getMaintainedTableName() + " локально " + localRecordsCount.toString() + " записей, на сервере " + serverRecordsCount.toString() + " записей";
         Log.d(TAG, "isLoadRequired: класс " + msg);

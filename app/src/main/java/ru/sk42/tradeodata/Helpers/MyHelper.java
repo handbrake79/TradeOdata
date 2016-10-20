@@ -29,35 +29,42 @@ import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
-import ru.sk42.tradeodata.Model.Documents.SaleRowProduct;
-import ru.sk42.tradeodata.Model.Documents.SaleRowService;
+import ru.sk42.tradeodata.Model.Documents.SaleRecordProduct;
+import ru.sk42.tradeodata.Model.Documents.SaleRecordService;
 import ru.sk42.tradeodata.Model.ProductInfo;
+import ru.sk42.tradeodata.Model.Settings;
 import ru.sk42.tradeodata.Model.Stock;
 
 
 public class MyHelper extends OrmLiteSqliteOpenHelper {
 
+    private Context context;
     private static MyHelper instance;
     private static Dao<ProductsList, Object> productsListDao;
 
     public MyHelper(Context context, String databaseName, int databaseVersion) {
         super(context, databaseName, null, databaseVersion);
+        this.context = context;
     }
 
     public MyHelper(Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion) {
         super(context, databaseName, factory, databaseVersion);
+        this.context = context;
     }
 
     public MyHelper(Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion, int configFileId) {
         super(context, databaseName, factory, databaseVersion, configFileId);
+        this.context = context;
     }
 
     public MyHelper(Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion, File configFile) {
         super(context, databaseName, factory, databaseVersion, configFile);
+        this.context = context;
     }
 
     public MyHelper(Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion, InputStream stream) {
         super(context, databaseName, factory, databaseVersion, stream);
+        this.context = context;
     }
 
 
@@ -76,6 +83,7 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
     public static void createTables() {
         try {
 
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, Settings.class);
 
             //Справочники
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Charact.class);
@@ -93,13 +101,13 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTableIfNotExists(getInstance().connectionSource, VehicleType.class);
 
 
-
             TableUtils.createTableIfNotExists(getInstance().connectionSource, DocSale.class);
-            TableUtils.createTableIfNotExists(getInstance().connectionSource, SaleRowProduct.class);
-            TableUtils.createTableIfNotExists(getInstance().connectionSource, SaleRowService.class);
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, SaleRecordProduct.class);
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, SaleRecordService.class);
 
             TableUtils.createTableIfNotExists(getInstance().connectionSource, ProductInfo.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Stock.class);
+
 
 
         } catch (SQLException e) {
@@ -107,7 +115,12 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public static Dao<DocSale, Object> getDocSaleDao(){
+    public static void dropAndCreateTables() {
+        getInstance().context.deleteDatabase("test.db");
+        createTables();
+    }
+
+    public static Dao<DocSale, Object> getDocSaleDao() {
         try {
             return getInstance().getDao(DocSale.class);
         } catch (SQLException e) {
@@ -116,7 +129,7 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public static Dao<DocSaleList, Object> getDocSaleListDao(){
+    public static Dao<DocSaleList, Object> getDocSaleListDao() {
         try {
             return getInstance().getDao(DocSaleList.class);
         } catch (SQLException e) {
@@ -125,25 +138,25 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public  static Dao<SaleRowProduct, Object> getSaleRowProductDao(){
+    public static Dao<SaleRecordProduct, Object> getSaleRowProductDao() {
         try {
-            return getInstance().getDao(SaleRowProduct.class);
+            return getInstance().getDao(SaleRecordProduct.class);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public static Dao<SaleRowService, Object> getSaleRowServiceDao(){
+    public static Dao<SaleRecordService, Object> getSaleRowServiceDao() {
         try {
-            return getInstance().getDao(SaleRowService.class);
+            return getInstance().getDao(SaleRecordService.class);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public static Dao<Store, Object> getStoreDao(){
+    public static Dao<Store, Object> getStoreDao() {
         try {
             return getInstance().getDao(Store.class);
         } catch (SQLException e) {
@@ -293,10 +306,10 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
     public void deleteDocSaleList() {
 
         try {
-            Dao<SaleRowProduct, Object> daop = getDao(SaleRowProduct.class);
+            Dao<SaleRecordProduct, Object> daop = getDao(SaleRecordProduct.class);
             daop.delete(daop.queryForAll());
 
-            Dao<SaleRowService, Object> daos = getDao(SaleRowService.class);
+            Dao<SaleRecordService, Object> daos = getDao(SaleRecordService.class);
             daos.delete(daos.queryForAll());
 
             Dao<DocSale, Object> daoD = getInstance().getDao(DocSale.class);
@@ -309,6 +322,14 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
 
     }
 
+    public static Dao<Settings, Object> getSettingsDao() {
+        try {
+            return getInstance().getDao(Settings.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
 
 

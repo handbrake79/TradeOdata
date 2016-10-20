@@ -51,7 +51,7 @@ public class RequisitesFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = (MyActivityFragmentInteractionInterface) getActivity();
-        mListener.onDetachFragment(this);
+        mListener.onFragmentDetached(this);
     }
 
 

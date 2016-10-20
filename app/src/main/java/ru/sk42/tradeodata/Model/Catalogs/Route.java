@@ -10,6 +10,7 @@ import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
+import ru.sk42.tradeodata.Model.Constants;
 
 /**
  * Created by я on 29.09.2016.
@@ -36,6 +37,16 @@ public class Route extends CDO
         this.ref_Key = ref_Key;
     }
 
+    public static void createStub() {
+        Route r = new Route(Constants.NULL_GUID);
+        r.setDescription("");
+        try {
+            r.save();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public String getRef_Key() { return this.ref_Key; }
 
@@ -52,7 +63,7 @@ public class Route extends CDO
 
     @Override
     public void save() throws SQLException {
-
+        MyHelper.getRouteDao().createOrUpdate(this);
     }
 
     @Override

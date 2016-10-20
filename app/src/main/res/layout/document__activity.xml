@@ -19,7 +19,15 @@
         android:layout_height="match_parent"
 
 
-        />
+        >
+
+        <FrameLayout
+            android:id="@+id/small_in_center_frame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </FrameLayout>
+    </FrameLayout>
 
     <!-- The navigation drawer -->
 

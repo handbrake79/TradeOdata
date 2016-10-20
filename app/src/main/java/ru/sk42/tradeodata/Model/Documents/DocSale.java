@@ -27,8 +27,6 @@ import ru.sk42.tradeodata.Model.Catalogs.Organisation;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
-import ru.sk42.tradeodata.Model.Catalogs.Store;
-import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
@@ -39,15 +37,17 @@ import ru.sk42.tradeodata.Model.Constants;
 @DatabaseTable
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DocSale extends CDO {
+
     private static final String TAG = "DocSale class";
+
     @JsonProperty("Товары")
     @ForeignCollectionField(eager = true, maxEagerLevel = 3)
 
-    private Collection<SaleRowProduct> products;
+    private Collection<SaleRecordProduct> products;
     @JsonProperty("Услуги")
     @ForeignCollectionField(eager = true, maxEagerLevel = 3)
 
-    private Collection<SaleRowService> services;
+    private Collection<SaleRecordService> services;
 
     @JsonProperty("Number")
     @DatabaseField
@@ -71,14 +71,16 @@ public class DocSale extends CDO {
 
     @JsonProperty("СтоимостьДоставки")
     @DatabaseField
-    private Float shippingCost;
+    private Integer shippingCost;
 
     @JsonProperty("НужнаДоставка")
     @DatabaseField
     private Boolean needShipping;
+
     @JsonProperty("НужнаРазгрузка")
     @DatabaseField
     private Boolean needUnload;
+
     @JsonProperty("Ref_Key")
     @DatabaseField(id = true)
     private String ref_Key;
@@ -86,76 +88,80 @@ public class DocSale extends CDO {
     @JsonProperty("ТипТС_Key")
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private VehicleType vehicleType;
+
     @JsonProperty("ВалютаДокумента_Key")
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Currency currency;
+
     @JsonProperty("АвтомобильДляПропуска")
     @DatabaseField
     private String passVehicle;
-    //@JsonIgnore
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("Ответственный_Key")
     private User author;
-//    @JsonIgnore
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("ДоговорКонтрагента_Key")
     private Contract contract;
-//    @JsonIgnore
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("Контрагент_Key")
     private Customer customer;
+
     @JsonProperty("Комментарий")
     @DatabaseField
     private String comment;
+
     @JsonProperty("СуммаДокумента")
     @DatabaseField
     private Float total;
+
     @JsonProperty("ДисконтнаяКарта_Key")
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private DiscountCard discountCard;
+
     @JsonProperty("Организация_Key")
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Organisation organisation;
 
-//    @JsonProperty("Контрагент_Key")
-//    @DatabaseField
-//    private String customer_Key;
-
-    //    @JsonProperty("Ответственный_Key")
-//    @DatabaseField
-//    private String author_Key;
     @JsonProperty("Вес")
     @DatabaseField
-    private Integer Weight;
+    private Integer weight;
 
 
-    //    @JsonProperty("ДоговорКонтрагента_Key")
-//    @DatabaseField
-//    private String contractRefKey;
     @JsonProperty("Объем")
     @DatabaseField
-    private Integer Volume;
+    private Integer volume;
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("Маршрут_Key")
     private Route route;
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("НачальнаяТочкаМаршрута_Key")
     private StartingPoint startingPoint;
+
     @JsonProperty("СтоимостьРазгрузки")
     @DatabaseField
     private Float unloadCost;
+
     @JsonProperty("АдресДоставки")
     @DatabaseField
     private String shippingAddress;
+
     @JsonProperty("КоличествоГрузчиков")
     @DatabaseField
     private Integer workersCount;
+
     @JsonProperty("ДатаДоставки")
     @DatabaseField
     private Date shippingDate;
+
     @JsonProperty("ВремяДоставкиС")
     @DatabaseField
     private Date shippingTimeFrom;
+
     @JsonProperty("ВремяДоставкиПо")
     @DatabaseField
     private Date shippingTimeTo;
@@ -276,11 +282,11 @@ public class DocSale extends CDO {
         this.total = total;
     }
 
-    public Float getShippingCost() {
+    public Integer getShippingCost() {
         return shippingCost;
     }
 
-    public void setShippingCost(Float shippingCost) {
+    public void setShippingCost(Integer shippingCost) {
         this.shippingCost = shippingCost;
     }
 
@@ -301,19 +307,19 @@ public class DocSale extends CDO {
     }
 
     public Integer getVolume() {
-        return Volume;
+        return volume;
     }
 
     public void setVolume(Integer volume) {
-        this.Volume = volume;
+        this.volume = volume;
     }
 
     public Integer getWeight() {
-        return Weight;
+        return weight;
     }
 
     public void setWeight(Integer weight) {
-        this.Weight = weight;
+        this.weight = weight;
     }
 
     public String getRef_Key() {
@@ -352,20 +358,49 @@ public class DocSale extends CDO {
     }
 
     @Override
-    public void save() throws SQLException{
-        for (SaleRowProduct row :
+    public void save() throws SQLException {
+        //для строки товаров и для строки услуг 1с не предоставляет уникальный ключ строки
+        //ключ состоит из номера строки  + гуид документа
+        //в ормлайте мы не можем сделать составной ключ
+        //так что для товаров и услуг в ормлайте устанавливаем авто-генерируемый айди
+        //перед сохранением удаляем все строки
+        //делаем новые записи в базу
+
+        deleteProductRecords();
+        deleteServiceRecords();
+
+
+        for (SaleRecordProduct row :
                 this.getProducts()) {
             row.setDocSale(this);
             row.save();
         }
-        for (SaleRowService row :
+        for (SaleRecordService row :
                 this.getServices()) {
             row.setDocSale(this);
             row.save();
         }
 
-        MyHelper.getDocSaleDao().create(this);
+        MyHelper.getDocSaleDao().createOrUpdate(this);
 
+    }
+
+    private void deleteProductRecords() {
+        try {
+            List<SaleRecordProduct> list = MyHelper.getSaleRowProductDao().queryForEq("ref_Key", getRef_Key());
+
+            MyHelper.getSaleRowProductDao().delete(list);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteServiceRecords() {
+        try {
+            MyHelper.getSaleRowServiceDao().delete(MyHelper.getSaleRowServiceDao().queryForEq("ref_Key", this.getRef_Key()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -426,68 +461,74 @@ public class DocSale extends CDO {
         this.passVehicle = passVehicle;
     }
 
-    public Collection<SaleRowProduct> getProducts() {
+    public Collection<SaleRecordProduct> getProducts() {
         return products;
     }
 
-    public void setProducts(Collection<SaleRowProduct> products) {
+    public void setProducts(Collection<SaleRecordProduct> products) {
         this.products = products;
     }
 
-    public ArrayList<SaleRowProduct> getProductsList() {
-        ArrayList<SaleRowProduct> list = new ArrayList<>();
+    public ArrayList<SaleRecordProduct> getProductsList() {
+        ArrayList<SaleRecordProduct> list = new ArrayList<>();
         list.addAll(products);
         return list;
     }
 
-    public ArrayList<SaleRowService> getServicesList() {
-        ArrayList<SaleRowService> list = new ArrayList<>();
+    public ArrayList<SaleRecordService> getServicesList() {
+        ArrayList<SaleRecordService> list = new ArrayList<>();
         list.addAll(services);
         return list;
     }
 
 
-    public Collection<SaleRowService> getServices() {
+    public Collection<SaleRecordService> getServices() {
         return services;
     }
 
-    public void setServices(Collection<SaleRowService> services) {
+    public void setServices(Collection<SaleRecordService> services) {
         this.services = services;
     }
 
     public void setForeignObjectsInProductsAndServices() {
-        Iterator<SaleRowProduct> iterator = getProducts().iterator();
+        Iterator<SaleRecordProduct> iterator = getProducts().iterator();
         while (iterator.hasNext()) {
             boolean save = false;
-            SaleRowProduct row = iterator.next();
+            SaleRecordProduct row = iterator.next();
             Product product = Product.getObject(Product.class, row.getProduct_Key());
             if (product != null) {
                 save = true;
                 row.setProduct(product);
             }
 
-            Unit unit = Unit.getObject(Unit.class, row.getProductUnit_Key());
-
-            if (unit != null) {
-                save = true;
-                row.setUnit(unit);
-            }
-
-            Store store = Store.getObject(Store.class, row.getStore_Key());
-            if (store != null) {
-                save = true;
-                row.setStore(store);
-            }
+//            Unit unit = Unit.getObject(Unit.class, row.getProductUnit_Key());
+//
+//            if (unit != null) {
+//                save = true;
+//                row.setUnit(unit);
+//            }
+//
+//            Store store = Store.getObject(Store.class, row.getStore_Key());
+//            if (store != null) {
+//                save = true;
+//                row.setStore(store);
+//            }
+//
+//            Charact charact = Charact.getObject(Charact.class, row.getCharact_Key());
+//            if (charact != null) {
+//                save = true;
+//                row.setCharact(charact);
+//            }
 
             if (save)
                 row.update();
         }
 
-        for (SaleRowService saleRowService : this.getServices()
+        for (SaleRecordService saleRecordService : this.getServices()
                 ) {
-            if (saleRowService.getProduct() == null) {
-                saleRowService.setProduct(Product.getObject(Product.class, saleRowService.getProduct_Key()));
-                saleRowService.update();
+            if (saleRecordService.getProduct() == null) {
+                saleRecordService.setProduct(Product.getObject(Product.class, saleRecordService.getProduct_Key()));
+                saleRecordService.update();
             }
 
         }
@@ -548,13 +589,6 @@ public class DocSale extends CDO {
         return this;
     }
 
-    public String getShippingDescription() {
-        if (needShipping)
-            return getShippingTotal().toString() + "руб. " + route.getDescription();
-        else
-            return "Нет";
-    }
-
     public void setForeignObjects() {
         this.setForeignObjectsInProductsAndServices();
         update();
@@ -577,11 +611,42 @@ public class DocSale extends CDO {
         update();
     }
 
-    void update(){
+    void update() {
         try {
             MyHelper.getDocSaleDao().update(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
+    public void reCalculateTotal() {
+
+        this.weight = 0;
+        this.volume = 0;
+        this.total = 0f;
+        if (this.needShipping) {
+            this.total = this.shippingTotal;
+        }
+        //вес, объем
+        for (SaleRecordProduct record : getProducts()
+                ) {
+
+            this.weight += (int) (record.getQty() * record.getUnit().getWeight());
+            this.volume += (int) (record.getQty() * record.getUnit().getVolume());
+
+            float total = record.getQty() * record.getPrice();
+            int discount = Math.max(record.getDiscountPercentAuto(), record.getDiscountPercentManual());
+            if (discount > 0) {
+                total += total / 100 * discount;
+            }
+            record.setTotal(total);
+            this.total += total;
+        }
+        for (SaleRecordService record : getServices()
+                ) {
+            record.setTotal(record.getQty() * record.getPrice());
+            this.total += total;
+        }
+    }
+
 }

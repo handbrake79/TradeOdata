@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
-import ru.sk42.tradeodata.Model.Catalogs.Charact;
-import ru.sk42.tradeodata.Model.Catalogs.Store;
 
 @DatabaseTable
 public class ProductInfo extends CDO {
@@ -30,21 +28,6 @@ public class ProductInfo extends CDO {
     private Collection<Stock> stocks;
 
     public ProductInfo() {
-    }
-
-    public static ProductInfo getStub() {
-        ProductInfo pi = new ProductInfo();
-        pi.setRef_Key(Constants.NULL_GUID);
-        pi.stocks = new ArrayList<Stock>();
-        Stock stock = new Stock();
-        Store store = new Store();
-        store.setDescription("НЕТ НА СКЛАДЕ");
-        stock.setStore(store);
-        stock.setCharact(Charact.getStub());
-        stock.setPrice(0f);
-        stock.setQty(0f);
-        pi.stocks.add(stock);
-        return pi;
     }
 
     public Collection<Stock> getStocks() {

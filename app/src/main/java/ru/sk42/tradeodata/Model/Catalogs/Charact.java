@@ -1,5 +1,7 @@
 package ru.sk42.tradeodata.Model.Catalogs;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
@@ -19,6 +21,7 @@ import ru.sk42.tradeodata.Model.Constants;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Chars")
 public class Charact extends CDO{
+    private static final String TAG = "Charact";
     @DatabaseField(id = true)
     @JsonProperty("Ref_Key")
     private String ref_Key;
@@ -37,8 +40,6 @@ public class Charact extends CDO{
     }
 
     public static <T> T getObject(Class<T> clazz, String key) {
-        if (key.equals(Constants.NULL_GUID))
-            return (T) getStub();
         try {
             List<Charact> list = MyHelper.getInstance().getDao(Charact.class).queryForEq("ref_Key", key);
             if (list.size() > 0)
@@ -50,15 +51,24 @@ public class Charact extends CDO{
         return null;
     }
 
-    public static Charact getStub() {
-        Charact p = new Charact();
-        p.setRef_Key(Constants.NULL_GUID);
-        p.setDescription("");
-        return p;
+
+    public static void createStub(){
+        Charact charact = new Charact(Constants.NULL_GUID);
+        charact.setOwner_Key(Constants.NULL_GUID);
+        charact.setDescription("характеристика не установлена");
+        try {
+            charact.save();
+        } catch (SQLException e) {
+            Log.e(TAG, "createStub: FAILED", e);
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public void save() throws SQLException {
+
+        MyHelper.getCharactDao().createOrUpdate(this);
 
     }
 

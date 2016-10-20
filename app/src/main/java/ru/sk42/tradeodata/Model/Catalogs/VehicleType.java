@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
+import ru.sk42.tradeodata.Model.Constants;
 
 /**
  * Created by я on 29.09.2016.
@@ -73,7 +74,7 @@ public class VehicleType extends CDO
 
     @Override
     public void save() throws SQLException {
-
+        MyHelper.getVehicleTypesDao().createOrUpdate(this);
     }
 
     @Override
@@ -95,5 +96,18 @@ public class VehicleType extends CDO
     @Override
     public String toString() {
         return getDescription();
+    }
+
+    public static void createStub() {
+        VehicleType v = new VehicleType(Constants.NULL_GUID);
+        v.setDescription("");
+        v.setCode("");
+        v.setMaxTonnage(0);
+        v.setMaxVolume(0);
+        try {
+            v.save();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

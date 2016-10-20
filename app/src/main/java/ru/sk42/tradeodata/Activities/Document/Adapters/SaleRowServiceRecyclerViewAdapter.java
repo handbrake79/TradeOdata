@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.Activities.Document;
+package ru.sk42.tradeodata.Activities.Document.Adapters;
 
 
 import android.graphics.Color;
@@ -12,25 +12,25 @@ import java.util.ArrayList;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Documents.SaleRowService;
+import ru.sk42.tradeodata.Model.Documents.SaleRecordService;
 import ru.sk42.tradeodata.R;
 
 /**
  * Created by test on 21.04.2016.
  */
-public class SaleRowServiceAdapter extends RecyclerView.Adapter<SaleRowServiceAdapter.ViewHolder> {
+public class SaleRowServiceRecyclerViewAdapter extends RecyclerView.Adapter<SaleRowServiceRecyclerViewAdapter.ViewHolder> {
 
     private int selectedItem;
-    private ArrayList<SaleRowService> mValues;
+    private ArrayList<SaleRecordService> mValues;
 
     private MyActivityFragmentInteractionInterface mListener;
 
-    public SaleRowServiceAdapter(ArrayList<SaleRowService> mValues, MyActivityFragmentInteractionInterface mListener) {
+    public SaleRowServiceRecyclerViewAdapter(ArrayList<SaleRecordService> mValues, MyActivityFragmentInteractionInterface mListener) {
         this.mListener = mListener;
         this.mValues = mValues;
     }
 
-    private SaleRowService getSelectedObject() {
+    private SaleRecordService getSelectedObject() {
         return mValues.get(selectedItem);
     }
 
@@ -72,7 +72,7 @@ public class SaleRowServiceAdapter extends RecyclerView.Adapter<SaleRowServiceAd
         public final TextView tvQty;
         public final TextView tvPrice;
         public final TextView tvTotal;
-        public SaleRowService mItem;
+        public SaleRecordService mItem;
 
         public ViewHolder(View view) {
             super(view);

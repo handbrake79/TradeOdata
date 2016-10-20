@@ -31,7 +31,6 @@ public class Stock extends CDO {
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("Charact_Key")
-    @JsonIgnore
     private Charact charact;
 
     @DatabaseField

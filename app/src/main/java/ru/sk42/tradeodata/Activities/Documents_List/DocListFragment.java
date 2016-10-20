@@ -27,7 +27,7 @@ public class DocListFragment extends android.support.v4.app.Fragment  {
     RecyclerView mRecyclerView;
     DocList_Adapter mAdapter;
     DocSaleList doc_list;
-    Date startDate;
+    Date startDate = new Date();
     MyActivityFragmentInteractionInterface mListener;
 
 
@@ -38,22 +38,23 @@ public class DocListFragment extends android.support.v4.app.Fragment  {
         // Required empty public constructor
     }
 
-    public static DocListFragment newInstance() {
+    public static DocListFragment newInstance(Bundle b) {
         DocListFragment fragment = new DocListFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
+        fragment.setArguments(b);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        startDate.setTime(getArguments().getLong("startDate"));
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.doc_list__frame, container, false);
 
@@ -77,16 +78,8 @@ public class DocListFragment extends android.support.v4.app.Fragment  {
 
 
 
-    Date getStartDate() {
-        DocList_Activity activity = (DocList_Activity) getActivity();
-        startDate = activity.getStartDate();
-        return startDate;
-
-    }
-
     String getFormattedStartDate() {
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-        startDate = getStartDate();
         String d1 = fmt.format(startDate.getTime());
         return d1;
     }
@@ -98,7 +91,7 @@ public class DocListFragment extends android.support.v4.app.Fragment  {
             mListener = (MyActivityFragmentInteractionInterface) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnQtyFragmentInteractionListener");
         }
     }
 

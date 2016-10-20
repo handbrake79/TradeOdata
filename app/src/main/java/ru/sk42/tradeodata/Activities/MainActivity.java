@@ -11,7 +11,7 @@ import android.widget.Toast;
 import ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Settings;
+import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.LoadDataFromServer;
 import ru.sk42.tradeodata.Services.MyResultReceiver;
@@ -33,9 +33,12 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
         progressDialog = new ProgressDialog(this);
 
         MyHelper.getInstance(getApplication());
+
+        //MyHelper.dropAndCreateTables();
         MyHelper.createTables();
-        Settings.setApplication(getApplication());
-        Settings.readSettings();
+
+        SettingsOld.setApplication(getApplication());
+        SettingsOld.readSettings();
         mReceiver = new MyResultReceiver(new Handler());
         mReceiver.setReceiver(this);
         Intent i = new Intent(this, LoadDataFromServer.class);

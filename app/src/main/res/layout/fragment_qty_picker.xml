@@ -1,0 +1,52 @@
+<RelativeLayout android:layout_width="match_parent"
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="150dp">
+        <Button
+            android:text="-"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/input_qty_minus_button" />
+
+        <EditText
+            android:layout_alignParentTop="true"
+            android:layout_height="wrap_content"
+            android:id="@+id/input_qty_number_edittext"
+            android:layout_centerInParent="true"
+            android:text="12345678.56"
+            android:layout_width="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title.Inverse"
+            android:singleLine="true"
+            android:selectAllOnFocus="true"
+            android:inputType="numberDecimal" />
+
+
+        <Button
+            android:text="+"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:id="@+id/input_qty_plus_button"
+            android:layout_alignParentRight="true"
+
+            />
+
+        <Button
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/input_qty_number_edittext"
+            android:text="OK"
+            android:id="@+id/input_qty_ok_button"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+            <!--android:layout_alignParentBottom="true"-->
+            android:layout_height="70dp"
+            android:layout_width="140dp" />
+
+    </RelativeLayout>
+

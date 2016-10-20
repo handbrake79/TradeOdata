@@ -7,7 +7,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Strings related to Settings -->
+    <!-- Strings related to SettingsOld -->
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>

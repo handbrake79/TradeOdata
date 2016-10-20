@@ -1,18 +1,23 @@
-package ru.sk42.tradeodata.Activities.Document;
+package ru.sk42.tradeodata.Activities.Document.Adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import ru.sk42.tradeodata.Activities.Document.ProductsFragment;
+import ru.sk42.tradeodata.Activities.Document.RequisitesFragment;
+import ru.sk42.tradeodata.Activities.Document.ServicesFragment;
+import ru.sk42.tradeodata.Activities.Document.ShippingFragment;
+
 /**
  * Created by test on 18.04.2016.
  */
-public class MyFragmentPageAdapter extends FragmentPagerAdapter {
+public class DocumentFragmentPageAdapter extends FragmentPagerAdapter {
 
     final int PAGE_COUNT = 4;
     private String tabTitles[] = new String[]{"Реквизиты", "Товары", "Услуги", "Доставка"};
 
-    public MyFragmentPageAdapter(FragmentManager fm) {
+    public DocumentFragmentPageAdapter(FragmentManager fm) {
         super(fm);
     }
 

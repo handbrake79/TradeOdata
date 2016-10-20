@@ -21,7 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
 import ru.sk42.tradeodata.Model.Printers;
-import ru.sk42.tradeodata.Model.Settings;
+import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
@@ -36,9 +36,9 @@ import ru.sk42.tradeodata.RetroRequests.UsersRequest;
  * the list of settings.
  * <p/>
  * See <a href="http://developer.android.com/design/patterns/settings.html">
- * Android Design: Settings</a> for design guidelines and the <a
- * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
- * API Guide</a> for more information on developing a Settings UI.
+ * Android Design: SettingsOld</a> for design guidelines and the <a
+ * href="http://developer.android.com/guide/topics/ui/settings.html">SettingsOld
+ * API Guide</a> for more information on developing a SettingsOld UI.
  */
 public class SettingsActivity extends PreferenceActivity {
 
@@ -117,7 +117,7 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onStop() {
         super.onStop();
 
-        Settings.readSettings();
+        SettingsOld.readSettings();
     }
 
     /**

@@ -17,51 +17,54 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 /**
  * Created by test on 31.03.2016.
  */
-@DatabaseTable(tableName = "SaleRowProduct")
+@DatabaseTable(tableName = "SaleRecordProduct")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SaleRowProduct {
+public class SaleRecordProduct {
 
-    @DatabaseField( generatedId = true)
+    @DatabaseField(generatedId = true)
     @JsonIgnore
-    Long id;
+    long id;
+
     @DatabaseField(foreign = true)
     DocSale docSale;
+
     @DatabaseField
     @JsonProperty("Номенклатура_Key")
     private String product_Key;
+
     @DatabaseField
     @JsonProperty("ПроцентСкидкиНаценки")
     private Integer discountPercentManual;
     @DatabaseField
     @JsonProperty("ПроцентАвтоматическихСкидок")
     private Integer discountPercentAuto;
-    @DatabaseField
-    @JsonProperty("Склад_Key")
-    private String store_Key;
+
     @DatabaseField
     @JsonProperty("Сумма")
     private Float total;
+
     @DatabaseField
     @JsonProperty("Ref_Key")
     private String ref_Key;
-    @DatabaseField()
+
+    @DatabaseField
     @JsonProperty("LineNumber")
-    private String lineNumber;
+    private int lineNumber;
+
     @DatabaseField
     @JsonProperty("Количество")
     private Float qty;
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonIgnore
+    @JsonProperty("ЕдиницаИзмерения_Key")
     private Unit unit;
 
-
-    @DatabaseField
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("ХарактеристикаНоменклатуры_Key")
-    private String charact_Key;
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonIgnore
     private Charact charact;
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("Склад_Key")
     private Store store;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
@@ -70,26 +73,24 @@ public class SaleRowProduct {
     @DatabaseField
     @JsonProperty("Цена")
     private Float price;
-    @DatabaseField
-    @JsonProperty("ЕдиницаИзмерения_Key")
-    private String productUnit_Key;
 
-    public SaleRowProduct() {
+    public SaleRecordProduct() {
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
+
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public String getLineNumber() {
+    public Integer getLineNumber() {
         return lineNumber;
     }
 
-    public void setLineNumber(String lineNumber) {
+    public void setLineNumber(Integer lineNumber) {
         this.lineNumber = lineNumber;
     }
 
@@ -110,7 +111,7 @@ public class SaleRowProduct {
     }
 
     public Integer getDiscountPercentAuto() {
-        return discountPercentAuto;
+        return discountPercentAuto.intValue();
     }
 
     public void setDiscountPercentAuto(Integer discountPercentAuto) {
@@ -149,13 +150,8 @@ public class SaleRowProduct {
         this.ref_Key = ref_Key;
     }
 
-    public String getStore_Key() {
-        return store_Key;
-    }
 
-    public void setStore_Key(String store_Key) {
-        this.store_Key = store_Key;
-    }
+
 
     public Float getTotal() {
         return total;
@@ -165,13 +161,6 @@ public class SaleRowProduct {
         this.total = total;
     }
 
-    public String getProductUnit_Key() {
-        return productUnit_Key;
-    }
-
-    public void setProductUnit_Key(String productUnit_Key) {
-        this.productUnit_Key = productUnit_Key;
-    }
 
     public String getProduct_Key() {
         return product_Key;
@@ -181,17 +170,9 @@ public class SaleRowProduct {
         this.product_Key = product_Key;
     }
 
-    public String getCharact_Key() {
-        return charact_Key;
-    }
 
-    public void setCharact_Key(String charact_Key) {
-        this.charact_Key = charact_Key;
-    }
 
     public Charact getCharact() {
-        if (charact == null)
-            charact = Charact.getObject(Charact.class, charact_Key);
         return charact;
     }
 
@@ -200,7 +181,7 @@ public class SaleRowProduct {
     }
 
     public Integer getDiscountPercentManual() {
-        return discountPercentManual;
+        return discountPercentManual.intValue();
     }
 
     public void setDiscountPercentManual(Integer discountPercentManual) {

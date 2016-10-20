@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
 
@@ -43,7 +44,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
 
         holder.itemView.setSelected(selectedItem == position);
         if (selectedItem == position)
-            holder.itemView.setBackgroundColor(Color.RED);
+            holder.itemView.setBackgroundColor(Constants.COLORS.SELECTED_COLOR);
         else
             holder.itemView.setBackgroundColor(Color.WHITE);
 
@@ -91,9 +92,10 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
                 @Override
                 public void onClick(View v) {
                     // Redraw the old selection and the new
+                    notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
-                    mListener.onItemSelection(mValues.get(selectedItem));
+                    //mListener.onItemSelection(mValues.get(selectedItem));
                 }
             });
         }

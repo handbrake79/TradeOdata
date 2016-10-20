@@ -15,23 +15,29 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
 /**
  * Created by test on 31.03.2016.
  */
-@DatabaseTable(tableName = "SaleRowService")
+@DatabaseTable(tableName = "SaleRecordService")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SaleRowService {
+public class SaleRecordService {
+
     @DatabaseField(foreign = true)
     DocSale docSale;
+
     @DatabaseField(generatedId = true)
     @JsonIgnore
-    Long id;
+    long id;
+
     @DatabaseField
     @JsonProperty("Сумма")
     private Float total;
+
     @DatabaseField
     @JsonProperty("Ref_Key")
     private String ref_Key;
+
     @DatabaseField
     @JsonProperty("LineNumber")
-    private String lineNumber;
+    private int lineNumber;
+
     @DatabaseField
     @JsonProperty("Количество")
     private Float qty;
@@ -51,7 +57,7 @@ public class SaleRowService {
     @JsonProperty("Содержание")
     private String productDescription;
 
-    public SaleRowService() {
+    public SaleRecordService() {
     }
 
     public Long getId() {
@@ -62,11 +68,11 @@ public class SaleRowService {
         this.id = id;
     }
 
-    public String getLineNumber() {
+    public int getLineNumber() {
         return lineNumber;
     }
 
-    public void setLineNumber(String lineNumber) {
+    public void setLineNumber(int lineNumber) {
         this.lineNumber = lineNumber;
     }
 

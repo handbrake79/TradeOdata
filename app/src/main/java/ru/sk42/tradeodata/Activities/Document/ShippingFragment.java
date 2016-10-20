@@ -1,6 +1,7 @@
 package ru.sk42.tradeodata.Activities.Document;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -42,6 +44,35 @@ public class ShippingFragment extends Fragment implements TextWatcher {
     /**
      * Formats a {@link Date} object to time string of format HH:mm e.g. 15:25
      */
+
+    public interface ShippingInterface {
+
+        void onShippingChanged(boolean needShipping);
+
+        void onUnloadChanged(boolean needUnload);
+
+        void onShippingCostChanged(int shippingCost);
+
+        void onUnloadCostChanged(int unloadCost);
+
+        void onWorkersChanged(int workers);
+
+        void onAddressChanged(String address);
+
+        void onShippingDateChanged(String shippingDate);
+
+        void onShippingTimeFromChanged(String timeFrom);
+
+        void onShippingTimeToChanged(String timeTo);
+
+        void onRouteChanged(String route);
+
+        void onStartingPointChanged(String startingPoint);
+
+        void onVehicleTypeChanged(String vehicleType);
+
+    }
+
     static String TAG = "shipping";
 
     ArrayAdapter mVehicleTypeArrayAdapter = null;
@@ -86,6 +117,21 @@ public class ShippingFragment extends Fragment implements TextWatcher {
 
 
     Calendar mTimeFrom, mTimeTo;
+
+
+    @Bind(R.id.btnVoiceAddress)
+    Button btnVoiceAddress;
+
+
+
+
+
+
+
+    @Bind(R.id.doc_page_shipping_workers_caption)
+    TextView docPageShippingWorkersCaption;
+
+
     private DocSale docSale;
     private MyActivityFragmentInteractionInterface mListener;
     private Calendar mShippingDate;
@@ -95,7 +141,7 @@ public class ShippingFragment extends Fragment implements TextWatcher {
     public void onDetach() {
         super.onDetach();
         mListener = (MyActivityFragmentInteractionInterface) getActivity();
-        mListener.onDetachFragment(this);
+        mListener.onFragmentDetached(this);
     }
 
 
@@ -190,12 +236,12 @@ public class ShippingFragment extends Fragment implements TextWatcher {
 
 
     @OnClick(R.id.input_route_text)
-    public void onClick() {
+    public void onClickRoute() {
         mRouteText.showDropDown();
     }
 
     @OnClick({R.id.input_time_from, R.id.input_time_to})
-    public void onClick(View view) {
+    public void onClickTime(View view) {
         Log.d(TAG, "onClick: v" + view.toString());
         long timeMillis = 0;
         try {
@@ -264,13 +310,54 @@ public class ShippingFragment extends Fragment implements TextWatcher {
         }
 
         CalendarDatePickerDialogFragment datePickerDialog = new CalendarDatePickerDialogFragment()
+                .setPreselectedDate(mShippingDate.get(Calendar.YEAR), mShippingDate.get(Calendar.MONTH), mShippingDate.get(Calendar.DAY_OF_MONTH))
                 .setOnDateSetListener(new OnDateSetListener())
+                .setFirstDayOfWeek(Calendar.MONDAY)
                 .setDoneText("Выбрать")
                 .setCancelText("Отмена")
                 .setThemeDark();
         datePickerDialog.show(getFragmentManager(), "date_picker_dialog_fragment");
 
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
+
+    @OnClick({R.id.input_need_shipping_checkbox, R.id.input_shipping_date, R.id.input_time_from, R.id.input_time_to, R.id.btnVoiceAddress, R.id.input_shipping_address, R.id.input_vehicle_type, R.id.input_starting_point, R.id.input_route_text, R.id.input_shipping_cost, R.id.input_need_unload_checkbox, R.id.input_workers_count, R.id.input_unload_cost})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.input_need_shipping_checkbox:
+
+                break;
+            case R.id.input_shipping_date:
+                break;
+            case R.id.input_time_from:
+                break;
+            case R.id.input_time_to:
+                break;
+            case R.id.btnVoiceAddress:
+                break;
+            case R.id.input_shipping_address:
+                break;
+            case R.id.input_vehicle_type:
+                break;
+            case R.id.input_starting_point:
+                break;
+            case R.id.input_route_text:
+                break;
+            case R.id.input_shipping_cost:
+                break;
+            case R.id.input_need_unload_checkbox:
+                break;
+            case R.id.input_workers_count:
+                break;
+            case R.id.input_unload_cost:
+                break;
+        }
     }
 
     class TimeFromListener implements RadialTimePickerDialogFragment.OnTimeSetListener {
@@ -291,5 +378,12 @@ public class ShippingFragment extends Fragment implements TextWatcher {
             setTimeToText(mTimeTo);
 
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+
     }
 }

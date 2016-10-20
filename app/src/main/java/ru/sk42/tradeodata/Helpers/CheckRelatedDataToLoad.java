@@ -12,11 +12,10 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
 import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
-import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
-import ru.sk42.tradeodata.Model.Documents.SaleRowProduct;
-import ru.sk42.tradeodata.Model.Documents.SaleRowService;
+import ru.sk42.tradeodata.Model.Documents.SaleRecordProduct;
+import ru.sk42.tradeodata.Model.Documents.SaleRecordService;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 
@@ -124,36 +123,36 @@ public class CheckRelatedDataToLoad {
         ArrayList<String> listStores = guidsToLoadMap.get(Store.class);
         ArrayList<String> listCharact = guidsToLoadMap.get(Charact.class);
 
-        for (SaleRowProduct row : docSale.getProducts()) {
+        for (SaleRecordProduct row : docSale.getProducts()) {
             Product product = Product.getObject(Product.class, row.getProduct_Key());
-            Charact charact = Charact.getObject(Charact.class, row.getCharact_Key());
-            Unit unit = Unit.getObject(Unit.class, row.getProductUnit_Key());
-            Store store = Store.getObject(Store.class, row.getStore_Key());
+//            Charact charact = Charact.getObject(Charact.class, row.getCharact_Key());
+//            Unit unit = Unit.getObject(Unit.class, row.getProductUnit_Key());
+//            Store store = Store.getObject(Store.class, row.getStore_Key());
 
             String guid = row.getProduct_Key();
             if (!listProducts.contains(guid) && product == null) {
                 listProducts.add(guid);
             }
 
-            guid = row.getCharact_Key();
-            if (!guid.equals(Constants.NULL_GUID)) {
-                if (!listCharact.contains(guid) && charact == null) {
-                    listCharact.add(guid);
-                }
-            }
-
-            guid = row.getStore_Key();
-            if (!listStores.contains(guid) && store == null) {
-                listStores.add(guid);
-            }
-
-            guid = row.getProductUnit_Key();
-            if (!listUnits.contains(guid) && unit == null) {
-                listUnits.add(guid);
-            }
+//            guid = row.getCharact_Key();
+//            if (!guid.equals(Constants.NULL_GUID)) {
+//                if (!listCharact.contains(guid) && charact == null) {
+//                    listCharact.add(guid);
+//                }
+//            }
+//
+//            guid = row.getStore_Key();
+//            if (!listStores.contains(guid) && store == null) {
+//                listStores.add(guid);
+//            }
+//
+//            guid = row.getProductUnit_Key();
+//            if (!listUnits.contains(guid) && unit == null) {
+//                listUnits.add(guid);
+//            }
 
         }
-        for (SaleRowService row : docSale.getServices()) {
+        for (SaleRecordService row : docSale.getServices()) {
             String guid = row.getProduct_Key();
             Product product = Product.getObject(Product.class, guid);
             if (!listProducts.contains(guid) && product == null) {
@@ -196,7 +195,7 @@ public class CheckRelatedDataToLoad {
         //получим имя таблицы в 1С, которой соответствует текущий класс
         ArrayList<String> urls = new ArrayList<>();
         StringBuilder url = new StringBuilder();
-        //String sConstUrl = Settings.getServerAddress() + Settings.getInfoBaseName() + "/odata/standard.odata/" + tableName + "?$format=json&$filter=";
+        //String sConstUrl = SettingsOld.getServerAddress() + SettingsOld.getInfoBaseName() + "/odata/standard.odata/" + tableName + "?$format=json&$filter=";
         String sConstUrl = "";
         url.append(sConstUrl);
         int iUrlCount = 0;

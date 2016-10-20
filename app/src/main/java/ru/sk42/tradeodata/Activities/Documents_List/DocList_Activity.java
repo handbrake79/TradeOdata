@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -15,9 +14,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,7 +30,7 @@ import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
-import ru.sk42.tradeodata.Model.Settings;
+import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.DocsRequest;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
@@ -40,7 +42,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
 
     private static final String TAG = "Doclist activity";
     public MyResultReceiver mReceiver;
-    Date startDate;
+    Date startDate = new Date();
     ProgressDialog progress;
 
     @Override
@@ -49,7 +51,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.documents__list_activity);
 
-        if(Settings.getCurrentUser() == null) {
+        if(SettingsOld.getCurrentUser() == null) {
             showToast("Dыберите пользователя в настройках");
             this.finish();
         }
@@ -63,7 +65,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        setStartDate(Settings.getStartDate());
+        startDate = SettingsOld.getStartDate();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -85,13 +87,35 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
     }
 
     private void selectDate() {
-        DialogFragment newFragment = new SelectDateFragment();
-        newFragment.show(getSupportFragmentManager(), "DatePicker");
+        class OnDateSetListener implements CalendarDatePickerDialogFragment.OnDateSetListener {
+            @Override
+            public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+                Calendar c = GregorianCalendar.getInstance();
+                c.set(year,monthOfYear,dayOfMonth);
+                startDate = c.getTime();
+                SettingsOld.setStartDate(startDate);
+                requestDocList();
+            }
+        }
+        int y,m,d;
+        y=startDate.getYear() + 1900;
+        m=startDate.getMonth();
+        d = startDate.getDate();
+
+        CalendarDatePickerDialogFragment datePickerDialog = new CalendarDatePickerDialogFragment()
+                .setPreselectedDate(y, m, d)
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setOnDateSetListener(new OnDateSetListener())
+                .setDoneText("Выбрать")
+                .setCancelText("Отмена")
+                .setThemeDark();
+        datePickerDialog.show(getSupportFragmentManager(), "date_picker_dialog_fragment");
     }
 
     void showListFragment() {
-
-        DocListFragment fragment = DocListFragment.newInstance();
+        Bundle b = new Bundle();
+        b.putLong("startDate", startDate.getTime());
+        DocListFragment fragment = DocListFragment.newInstance(b);
 
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -114,7 +138,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
     }
 
     @Override
-    public void onDetachFragment(Fragment fragment) {
+    public void onFragmentDetached(Fragment fragment) {
 
     }
 
@@ -123,15 +147,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         Toast.makeText(this, "STRANGE THINGS GOING ON! " + obj.getClass().getName().toString(), Toast.LENGTH_LONG).show();
     }
 
-    public Date getStartDate() {
-        return startDate;
-    }
 
-    void setStartDate(Date startDate) {
-        this.startDate = startDate;
-        Settings.setStartDate(startDate);
-        //requestDocList();
-    }
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
@@ -151,7 +167,6 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
 
     public void requestDocList(){
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        startDate = getStartDate();
         String d1 = fmt.format(startDate.getTime());
         Calendar c = Calendar.getInstance();
         c.setTime(startDate);
@@ -159,7 +174,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         String d2 = fmt.format(c.getTime());
 
         showProgress("Запрос к 1С", "Загружается список документов");
-        String filter = "Date gt datetime'" + d1 + "' and Date lt datetime'" + d2 + "'" + " and Контрагент_Key eq guid'" + Constants.CUSTOMER_GUID + "'" + " and Ответственный_Key eq guid'" + Settings.getCurrentUser().getRef_Key() + "'";
+        String filter = "Date gt datetime'" + d1 + "' and Date lt datetime'" + d2 + "'" + " and Контрагент_Key eq guid'" + Constants.CUSTOMER_GUID + "'" + " and Ответственный_Key eq guid'" + SettingsOld.getCurrentUser().getRef_Key() + "'";
 
 
         DocsRequest request = ServiceGenerator.createService(DocsRequest.class);

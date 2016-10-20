@@ -48,8 +48,7 @@ public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
     public ProductInfo_Fragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
+
     public static ProductInfo_Fragment newInstance(String refkey) {
         ProductInfo_Fragment fragment = new ProductInfo_Fragment();
         Bundle args = new Bundle();
@@ -127,19 +126,21 @@ public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
     public void onDetach() {
 
         super.onDetach();
-        mListener.onDetachFragment(this);
+        mListener.onFragmentDetached(this);
         mListener = null;
 
     }
 
 
     public void onStockSelected() {
+        if(productInfo.getStocks().size() == 0)
+            return;
         int pos = mAdapter.getSelectedItem();
         Stock stock = (Stock) productInfo.getStocks().toArray()[pos];
 
         mListener.onItemSelection(stock);
-    }
 
+    }
 
 
     public void showMessage(String title, String message) {

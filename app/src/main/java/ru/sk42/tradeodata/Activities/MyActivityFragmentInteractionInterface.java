@@ -9,7 +9,7 @@ import android.support.v4.app.Fragment;
 public interface MyActivityFragmentInteractionInterface {
         void onItemSelection(Object selectedObject); //stock?
 
-        void onDetachFragment(Fragment fragment);
+        void onFragmentDetached(Fragment fragment);
 
         void onAttachFragment(Fragment fragment);
 

@@ -31,6 +31,7 @@ import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.ProductInfo;
+import ru.sk42.tradeodata.Model.Settings;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.ProductInfoRequest;
 import ru.sk42.tradeodata.RetroRequests.ProductsRequest;
@@ -51,6 +52,8 @@ public class ProductsList_Fragment extends Fragment {
     private List<Product> productArrayList = new ArrayList<>();
     private ProductsListBrowser_Adapter mAdapter;
 
+    String lastViewedGroupKey;
+
     //ProgressDialog progressDialog;
 
     /**
@@ -60,15 +63,6 @@ public class ProductsList_Fragment extends Fragment {
     public ProductsList_Fragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static ProductsList_Fragment newInstance(int columnCount) {
-        ProductsList_Fragment fragment = new ProductsList_Fragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,7 +117,17 @@ public class ProductsList_Fragment extends Fragment {
                     });
             mRecyclerView.addOnItemTouchListener(touchListener);
 
-            showTopLevelProducts();
+            lastViewedGroupKey = Settings.getLastViewedProductGroupStatic();
+            if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.NULL_GUID)) {
+                Product lastViewedGroup = Product.getObject(Product.class, lastViewedGroupKey);
+                if (lastViewedGroup != null) {
+                    showChildrenProducts(lastViewedGroup);
+                }
+            } else {
+                showTopLevelProducts();
+            }
+
+
         }
 
         return view;
@@ -131,10 +135,13 @@ public class ProductsList_Fragment extends Fragment {
 
 
     public void onItemSelection(final Product product) {
-        if (product.isFolder())
-            ShowChildrenProducts(product);
-        else {
-            //progressDialog = ProgressDialog.show(getActivity(),"Please Wait", "Loading Data", true);
+        if (product.isFolder()) {
+            Settings.setLastViewedProductGroupStatic(product.getRef_Key());
+            showChildrenProducts(product);
+        } else {
+
+            Settings.setLastViewedProductGroupStatic(product.getParent_key());
+
             String guid = product.getRef_Key();
             ProductInfoRequest request = ServiceGenerator.createService(ProductInfoRequest.class);
             Call<ProductInfo> call = request.call(guid);
@@ -146,7 +153,7 @@ public class ProductsList_Fragment extends Fragment {
                         try {
                             MyHelper.getProductInfoDao().delete(MyHelper.getProductInfoDao().queryForAll());
                             MyHelper.getStockDao().delete(MyHelper.getStockDao().queryForAll());
-                        } catch (SQLException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         productInfo.save();
@@ -184,7 +191,7 @@ public class ProductsList_Fragment extends Fragment {
     }
 
     public void showParentProducts() {
-        if(currentCategory.isEmpty())
+        if (currentCategory.isEmpty())
             return;
         if (currentCategory.isFirstLevelCategory()) {
             showTopLevelProducts();
@@ -197,7 +204,7 @@ public class ProductsList_Fragment extends Fragment {
 
             testProduct = MyHelper.getInstance().getDao(Product.class).queryForEq("ref_key", guid).get(0);
             currentCategory = testProduct;
-            ShowChildrenProducts(currentCategory);
+            showChildrenProducts(currentCategory);
 
         } catch (Exception e) {
             Log.e(getClass().getName(), e.getMessage());
@@ -208,7 +215,7 @@ public class ProductsList_Fragment extends Fragment {
 
     }
 
-    private List<Product> getProductsByParent(String guid){
+    private List<Product> getProductsByParent(String guid) {
         Dao<Product, Object> dao = MyHelper.getProductDao();
         List<Product> list = null;
         try {
@@ -219,7 +226,7 @@ public class ProductsList_Fragment extends Fragment {
         return list;
     }
 
-    public void ShowChildrenProducts(Product product) {
+    public void showChildrenProducts(Product product) {
 
         if (!product.isFolder()) return; //это не группа, оставляем всё как есть
         String guid = product.getRef_Key();
@@ -228,13 +235,12 @@ public class ProductsList_Fragment extends Fragment {
         Dao<Product, Object> dao = MyHelper.getProductDao();
         List<Product> list = getProductsByParent(guid);
 
-        if(list == null || list.size() == 0) {
+        if (list == null || list.size() == 0) {
             Toast.makeText(this.getContext(), "DB Request", Toast.LENGTH_SHORT).show();
             final ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
             Call<ProductsList> call = request.call(RetroConstants.getMap("Parent_Key eq guid'" + guid + "'"));
             call.enqueue(new MyCallBack());
-        }
-        else
+        } else
             updateView(list);
 
 
@@ -243,14 +249,13 @@ public class ProductsList_Fragment extends Fragment {
     public void showTopLevelProducts() {
         currentCategory = Product.getStub();
         String guid = Constants.NULL_GUID;
-        List<Product> list  = getProductsByParent(guid);
-        if(list == null || list.size() == 0) {
+        List<Product> list = getProductsByParent(guid);
+        if (list == null || list.size() == 0) {
             Toast.makeText(this.getContext(), "DB Request", Toast.LENGTH_SHORT).show();
             final ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
             Call<ProductsList> call = request.call(RetroConstants.getMap("Parent_Key eq guid'" + guid + "'"));
             call.enqueue(new MyCallBack());
-        }
-        else
+        } else
             updateView(list);
 
     }
@@ -258,20 +263,19 @@ public class ProductsList_Fragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener.onDetachFragment(this);
+        mListener.onFragmentDetached(this);
         mListener = null;
         currentCategory = null;
     }
 
     public void updateView(Object list) {
         productArrayList.clear();
-        if(list instanceof ProductsList) {
+        if (list instanceof ProductsList) {
             ProductsList mlist = (ProductsList) list;
             productArrayList.addAll(mlist.getArrayList());
         }
-        if(list instanceof List)
-        {
-            productArrayList.addAll( (ArrayList<Product>) list);
+        if (list instanceof List) {
+            productArrayList.addAll((ArrayList<Product>) list);
         }
         class ProductComporator implements Comparator<Product> {
             public int compare(Product p1, Product p2) {
@@ -295,7 +299,6 @@ public class ProductsList_Fragment extends Fragment {
             Log.e("", "onResponse: " + t.toString());
         }
     }
-
 
 
 }
