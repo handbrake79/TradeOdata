@@ -327,11 +327,19 @@ public class ShippingFragment extends Fragment implements TextWatcher {
         ButterKnife.unbind(this);
     }
 
-    @OnClick({R.id.input_need_shipping_checkbox, R.id.input_shipping_date, R.id.input_time_from, R.id.input_time_to, R.id.btnVoiceAddress, R.id.input_shipping_address, R.id.input_vehicle_type, R.id.input_starting_point, R.id.input_route_text, R.id.input_shipping_cost, R.id.input_need_unload_checkbox, R.id.input_workers_count, R.id.input_unload_cost})
+    @OnClick({R.id.input_need_shipping_checkbox,
+            R.id.input_shipping_date,
+            R.id.input_time_from,
+            R.id.input_time_to,
+            R.id.btnVoiceAddress,
+            R.id.input_shipping_address,
+            R.id.input_shipping_cost,
+            R.id.input_need_unload_checkbox,
+            R.id.input_workers_count,
+            R.id.input_unload_cost})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.input_need_shipping_checkbox:
-
                 break;
             case R.id.input_shipping_date:
                 break;
@@ -342,12 +350,6 @@ public class ShippingFragment extends Fragment implements TextWatcher {
             case R.id.btnVoiceAddress:
                 break;
             case R.id.input_shipping_address:
-                break;
-            case R.id.input_vehicle_type:
-                break;
-            case R.id.input_starting_point:
-                break;
-            case R.id.input_route_text:
                 break;
             case R.id.input_shipping_cost:
                 break;
@@ -384,6 +386,15 @@ public class ShippingFragment extends Fragment implements TextWatcher {
     public void onAttach(Context context) {
         super.onAttach(context);
 
+        if(context instanceof ShippingInterface)
+        {
+
+        }
+        else
+        {
+            throw new RuntimeException(context.toString()
+                    + " must implement ShippingInterface");
+        }
 
     }
 }

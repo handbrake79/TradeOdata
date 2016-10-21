@@ -31,7 +31,7 @@ public class ContractsList {
 
     public void save() {
         try {
-            MyHelper.getContractDao().create(this.values);
+            MyHelper.getContractDao().create(this.getValues());
         } catch (SQLException e) {
             e.printStackTrace();
         }

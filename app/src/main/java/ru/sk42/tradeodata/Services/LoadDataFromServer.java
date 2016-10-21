@@ -28,6 +28,7 @@ import ru.sk42.tradeodata.Model.Catalogs.HelperLists.DiscountCardsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.OrganisationsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.RoutesList;
+import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ShippingRatesList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.StartingPointsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.StoreList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UnitsList;
@@ -44,6 +45,7 @@ import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
+import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.RetroRequests.CharRequest;
 import ru.sk42.tradeodata.RetroRequests.ContractsRequest;
@@ -57,6 +59,7 @@ import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 import ru.sk42.tradeodata.RetroRequests.RetroDataLoader;
 import ru.sk42.tradeodata.RetroRequests.RoutesRequest;
 import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
+import ru.sk42.tradeodata.RetroRequests.ShippingRatesRequest;
 import ru.sk42.tradeodata.RetroRequests.StartingPointsRequest;
 import ru.sk42.tradeodata.RetroRequests.StoresRequest;
 import ru.sk42.tradeodata.RetroRequests.UnitsRequest;
@@ -94,16 +97,16 @@ public class LoadDataFromServer extends IntentService {
         resultReceiver = intent.getParcelableExtra("receiverTag");
         String mode = intent.getStringExtra("mode");
         Log.d(TAG, "onHandleIntent: FROM = " + from);
-        if(mode != null){
-            if(mode.equals(Constants.DATALOADER_MODE.PRELOAD.name())){
+        if (mode != null) {
+            if (mode.equals(Constants.DATALOADER_MODE.PRELOAD.name())) {
                 Preload();
                 return;
             }
-            if(mode.equals(Constants.DATALOADER_MODE.DOCLIST.name())){
+            if (mode.equals(Constants.DATALOADER_MODE.DOCLIST.name())) {
                 loadData();
                 return;
             }
-            if(mode.equals(Constants.DATALOADER_MODE.DOC.name())){
+            if (mode.equals(Constants.DATALOADER_MODE.DOC.name())) {
                 loadData();
                 return;
             }
@@ -140,40 +143,61 @@ public class LoadDataFromServer extends IntentService {
 
         loadOrganisations();
 
+        loadShippingRates();
+
         sendServiceFinished();
+    }
+
+    private void loadShippingRates() {
+        ShippingRate object = new ShippingRate();
+
+        ShippingRatesRequest request = ServiceGenerator.createService(ShippingRatesRequest.class);
+        Call<ShippingRatesList> call = request.call(RetroConstants.getMap(""));
+        try {
+
+            Response<ShippingRatesList> response = call.execute();
+            ShippingRatesList list = response.body();
+
+            MyHelper.getShippingRouteDao().delete(MyHelper.getShippingRouteDao().queryForAll());
+
+            list.save();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void loadCustomers() {
         Customer object = new Customer();
         if (!isLoadRequired(object)) return;
-            CustomersRequest request = ServiceGenerator.createService(CustomersRequest.class);
+        CustomersRequest request = ServiceGenerator.createService(CustomersRequest.class);
         Call<CustomersList> call = request.call(RetroConstants.getMap(object.getRetroFilterString()));
-            try {
+        try {
 
-                Response<CustomersList> response = call.execute();
-                CustomersList list = response.body();
-                MyHelper.getCustomerDao().delete(MyHelper.getCustomerDao().queryForAll());
-                list.save();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Response<CustomersList> response = call.execute();
+            CustomersList list = response.body();
+            MyHelper.getCustomerDao().delete(MyHelper.getCustomerDao().queryForAll());
+            list.save();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadCurrency() {
         Currency object = new Currency();
         if (!isLoadRequired(object)) return;
 
-            CurrencyRequest request = ServiceGenerator.createService(CurrencyRequest.class);
-            Call<CurrencyList> call = request.call(RetroConstants.getMap(""));
-            try {
+        CurrencyRequest request = ServiceGenerator.createService(CurrencyRequest.class);
+        Call<CurrencyList> call = request.call(RetroConstants.getMap(""));
+        try {
 
-                Response<CurrencyList> response = call.execute();
-                CurrencyList list = response.body();
-                MyHelper.getCurrencyDao().delete(MyHelper.getCurrencyDao().queryForAll());
-                list.save();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Response<CurrencyList> response = call.execute();
+            CurrencyList list = response.body();
+            MyHelper.getCurrencyDao().delete(MyHelper.getCurrencyDao().queryForAll());
+            list.save();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadOrganisations() {
@@ -181,93 +205,89 @@ public class LoadDataFromServer extends IntentService {
 
         if (!isLoadRequired(object)) return;
 
-            OrganisationsRequest request = ServiceGenerator.createService(OrganisationsRequest.class);
+        OrganisationsRequest request = ServiceGenerator.createService(OrganisationsRequest.class);
         Call<OrganisationsList> call = request.call(RetroConstants.getMap(object.getRetroFilterString()));
-            try {
+        try {
 
-                Response<OrganisationsList> response = call.execute();
-                OrganisationsList list = response.body();
-                MyHelper.getOrganisationDao().delete(MyHelper.getOrganisationDao().queryForAll());
-                list.save();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Response<OrganisationsList> response = call.execute();
+            OrganisationsList list = response.body();
+            MyHelper.getOrganisationDao().delete(MyHelper.getOrganisationDao().queryForAll());
+            list.save();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
 
     private void loadVehicleTypes() {
         VehicleType object = new VehicleType();
 
         if (!isLoadRequired(object)) return;
-            VehicleTypesRequest request = ServiceGenerator.createService(VehicleTypesRequest.class);
+        VehicleTypesRequest request = ServiceGenerator.createService(VehicleTypesRequest.class);
         Call<VehicleTypesList> call = request.call(RetroConstants.getMap(object.getRetroFilterString()));
-            try {
+        try {
 
-                Response<VehicleTypesList> response = call.execute();
-                VehicleTypesList list = response.body();
-                MyHelper.getVehicleTypesDao().delete(MyHelper.getVehicleTypesDao().queryForAll());
-                list.save();
-                VehicleType.createStub();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Response<VehicleTypesList> response = call.execute();
+            VehicleTypesList list = response.body();
+            MyHelper.getVehicleTypesDao().delete(MyHelper.getVehicleTypesDao().queryForAll());
+            list.save();
+            VehicleType.createStub();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
+    }
 
 
     private void loadStores() {
         Store object = new Store();
 
         if (!isLoadRequired(object)) return;
-            StoresRequest request = ServiceGenerator.createService(StoresRequest.class);
+        StoresRequest request = ServiceGenerator.createService(StoresRequest.class);
         Call<StoreList> call = request.call(RetroConstants.getMap(RetroConstants.FILTERS.STORES));
-            try {
-                Response<StoreList> response = call.execute();
-                StoreList list = response.body();
-                MyHelper.getStoreDao().delete(MyHelper.getStoreDao().queryForAll());
-                list.save();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            Response<StoreList> response = call.execute();
+            StoreList list = response.body();
+            MyHelper.getStoreDao().delete(MyHelper.getStoreDao().queryForAll());
+            list.save();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
     private void loadUnits() {
         Unit object = new Unit();
 
         if (!isLoadRequired(object)) return;
         UnitsRequest request = ServiceGenerator.createService(UnitsRequest.class);
-            Call<UnitsList> call = request.call(RetroConstants.getMap(""));
-            try {
-                Response<UnitsList> response = call.execute();
-                UnitsList list = response.body();
-                TableUtils.dropTable(MyHelper.getUnitDao(), false);
-                TableUtils.createTable(MyHelper.getUnitDao());
-                MyHelper.getUnitDao().delete(MyHelper.getUnitDao().queryForAll());
-                list.save();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        Call<UnitsList> call = request.call(RetroConstants.getMap(""));
+        try {
+            Response<UnitsList> response = call.execute();
+            UnitsList list = response.body();
+            TableUtils.dropTable(MyHelper.getUnitDao(), false);
+            TableUtils.createTable(MyHelper.getUnitDao());
+            list.save();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
     private void loadContracts() {
         Contract object = new Contract();
 
         if (!isLoadRequired(object)) return;
 
-            ContractsRequest request = ServiceGenerator.createService(ContractsRequest.class);
-            Call<ContractsList> call = request.call(RetroConstants.getMap("Owner_Key eq guid'" + Constants.CUSTOMER_GUID + "'"));
-            try {
-                Response<ContractsList> response = call.execute();
-                ContractsList list = response.body();
-                TableUtils.dropTable(MyHelper.getContractDao(), false);
-                TableUtils.createTable(MyHelper.getContractDao());
-                MyHelper.getContractDao().delete(MyHelper.getContractDao().queryForAll());
-                list.save();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        ContractsRequest request = ServiceGenerator.createService(ContractsRequest.class);
+        Call<ContractsList> call = request.call(RetroConstants.getMap("Owner_Key eq guid'" + Constants.CUSTOMER_GUID + "'"));
+        try {
+            Response<ContractsList> response = call.execute();
+            ContractsList list = response.body();
+            TableUtils.dropTable(MyHelper.getContractDao(), false);
+            TableUtils.createTable(MyHelper.getContractDao());
+            list.save();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
+    }
 
 
     private void loadDiscountCards() {
@@ -279,16 +299,16 @@ public class LoadDataFromServer extends IntentService {
 
         DiscountCardsRequest request = ServiceGenerator.createService(DiscountCardsRequest.class);
         Call<DiscountCardsList> call = request.call(RetroConstants.getMap(object.getRetroFilterString()));
-            try {
-                Response<DiscountCardsList> response = call.execute();
-                DiscountCardsList list = response.body();
-                TableUtils.dropTable(MyHelper.getDiscountCardDao(), false);
-                TableUtils.createTable(MyHelper.getDiscountCardDao());
-                list.save();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            Response<DiscountCardsList> response = call.execute();
+            DiscountCardsList list = response.body();
+            TableUtils.dropTable(MyHelper.getDiscountCardDao(), false);
+            TableUtils.createTable(MyHelper.getDiscountCardDao());
+            list.save();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
 
     private void loadProducts() {
@@ -310,7 +330,6 @@ public class LoadDataFromServer extends IntentService {
     }
 
 
-
     private void loadCharacts() {
         Charact object = new Charact();
 
@@ -318,17 +337,17 @@ public class LoadDataFromServer extends IntentService {
 
         CharRequest request1 = ServiceGenerator.createService(CharRequest.class);
         Call<CharList> call1 = request1.call(RetroConstants.getMap(object.getRetroFilterString()));
-            try {
-                Response<CharList> response = call1.execute();
-                CharList list = response.body();
-                TableUtils.dropTable(MyHelper.getCharactDao(), false);
-                TableUtils.createTable(MyHelper.getCharactDao());
-                list.save();
-                Charact.createStub();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            Response<CharList> response = call1.execute();
+            CharList list = response.body();
+            TableUtils.dropTable(MyHelper.getCharactDao(), false);
+            TableUtils.createTable(MyHelper.getCharactDao());
+            list.save();
+            Charact.createStub();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
     private void loadUsers() {
         User object = new User();
@@ -338,16 +357,16 @@ public class LoadDataFromServer extends IntentService {
 
         UsersRequest request1 = ServiceGenerator.createService(UsersRequest.class);
         Call<UsersList> call1 = request1.call(RetroConstants.getMap(object.getRetroFilterString()));
-            try {
-                Response<UsersList> response = call1.execute();
-                UsersList list = response.body();
-                MyHelper.getUserDao().delete(MyHelper.getUserDao().queryForAll());
-                list.save();
-                SettingsOld.renewCurrentUser();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            Response<UsersList> response = call1.execute();
+            UsersList list = response.body();
+            MyHelper.getUserDao().delete(MyHelper.getUserDao().queryForAll());
+            list.save();
+            SettingsOld.renewCurrentUser();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
 
     private void loadRoutes() {
@@ -358,16 +377,16 @@ public class LoadDataFromServer extends IntentService {
 
         RoutesRequest request1 = ServiceGenerator.createService(RoutesRequest.class);
         Call<RoutesList> call1 = request1.call(RetroConstants.getMap(object.getRetroFilterString()));
-            try {
-                Response<RoutesList> response = call1.execute();
-                RoutesList list = response.body();
-                MyHelper.getRouteDao().delete(MyHelper.getRouteDao().queryForAll());
-                list.save();
-                Route.createStub();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            Response<RoutesList> response = call1.execute();
+            RoutesList list = response.body();
+            MyHelper.getRouteDao().delete(MyHelper.getRouteDao().queryForAll());
+            list.save();
+            Route.createStub();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
     private void loadStartingPoints() {
         StartingPoint object = new StartingPoint();
@@ -377,16 +396,16 @@ public class LoadDataFromServer extends IntentService {
 
         StartingPointsRequest request1 = ServiceGenerator.createService(StartingPointsRequest.class);
         Call<StartingPointsList> call1 = request1.call(RetroConstants.getMap(object.getRetroFilterString()));
-            try {
-                Response<StartingPointsList> response = call1.execute();
-                StartingPointsList list = response.body();
-                MyHelper.getStartingPointDao().delete(MyHelper.getStartingPointDao().queryForAll());
-                list.save();
-                StartingPoint.createStub();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            Response<StartingPointsList> response = call1.execute();
+            StartingPointsList list = response.body();
+            MyHelper.getStartingPointDao().delete(MyHelper.getStartingPointDao().queryForAll());
+            list.save();
+            StartingPoint.createStub();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
 
     private Integer getRecordsCountFromServer(CDO object) {
@@ -403,7 +422,7 @@ public class LoadDataFromServer extends IntentService {
         try {
             Response<Integer> response = call.execute();
             count = response.body();
-            return  count;
+            return count;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -416,16 +435,14 @@ public class LoadDataFromServer extends IntentService {
         String ref_Key = intent.getStringExtra("ref_Key");
 
         Class clazz = null;
-        if(id != -1) {
+        if (id != -1) {
             clazz = DocSaleList.class;
             RetroDataLoader.LoadMissingDataForObject(null, clazz);
             for (DocSale docSale :
                     DocSaleList.getList().getValues()) {
                 docSale.setForeignObjects();
             }
-        }
-        else
-        {
+        } else {
             DocSale doc = DocSale.getDocument(ref_Key);
             clazz = DocSale.class;
             RetroDataLoader.LoadMissingDataForObject(doc, clazz);
@@ -438,9 +455,9 @@ public class LoadDataFromServer extends IntentService {
     }
 
 
-    void sendMessage(String message){
+    void sendMessage(String message) {
         Bundle b = new Bundle();
-        b.putString("Message",message);
+        b.putString("Message", message);
         resultReceiver.send(0, b);
 
     }
@@ -463,13 +480,13 @@ public class LoadDataFromServer extends IntentService {
             e.printStackTrace();
         }
 
-        if(object instanceof Charact)
-            localRecordsCount --; //потому что одну характеристику заглушку мы всегда создаем локально
-        if(object instanceof VehicleType)
+        if (object instanceof Charact)
+            localRecordsCount--; //потому что одну характеристику заглушку мы всегда создаем локально
+        if (object instanceof VehicleType)
             localRecordsCount--;
-        if(object instanceof Route)
+        if (object instanceof Route)
             localRecordsCount--;
-        if(object instanceof StartingPoint)
+        if (object instanceof StartingPoint)
             localRecordsCount--;
 
         String msg = object.getMaintainedTableName() + " локально " + localRecordsCount.toString() + " записей, на сервере " + serverRecordsCount.toString() + " записей";
@@ -478,8 +495,7 @@ public class LoadDataFromServer extends IntentService {
         if (serverRecordsCount.intValue() != localRecordsCount.intValue()) {
             sendMessage(msg);
             return true;
-        }
-        else
+        } else
             return false;
 
     }

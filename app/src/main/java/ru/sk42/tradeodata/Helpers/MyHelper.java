@@ -31,6 +31,7 @@ import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.DocSaleList;
 import ru.sk42.tradeodata.Model.Documents.SaleRecordProduct;
 import ru.sk42.tradeodata.Model.Documents.SaleRecordService;
+import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Settings;
 import ru.sk42.tradeodata.Model.Stock;
@@ -108,6 +109,7 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTableIfNotExists(getInstance().connectionSource, ProductInfo.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Stock.class);
 
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, ShippingRate.class);
 
 
         } catch (SQLException e) {
@@ -329,6 +331,17 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Dao<ShippingRate, Object> getShippingRouteDao() {
+        try {
+            return getInstance().getDao(ShippingRate.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+
     }
 }
 
