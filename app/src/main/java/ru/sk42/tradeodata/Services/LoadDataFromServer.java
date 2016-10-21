@@ -157,8 +157,9 @@ public class LoadDataFromServer extends IntentService {
 
             Response<ShippingRatesList> response = call.execute();
             ShippingRatesList list = response.body();
+            TableUtils.dropTable(MyHelper.getShippingRouteDao(), false);
+            TableUtils.createTable(MyHelper.getShippingRouteDao());
 
-            MyHelper.getShippingRouteDao().delete(MyHelper.getShippingRouteDao().queryForAll());
 
             list.save();
         } catch (Exception e) {

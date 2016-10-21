@@ -7,6 +7,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
@@ -89,5 +90,17 @@ public class Route extends CDO
     @Override
     public String toString() {
         return Description;
+    }
+
+    public static Route getObjectByName(String route) {
+        try {
+            List<Route> list = MyHelper.getRouteDao().queryForEq("description", route);
+            if(list.size() > 0){
+                return list.get(0);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

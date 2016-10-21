@@ -28,31 +28,42 @@
             android:src="@drawable/dotted_underline" />
 
         <!--DATE-->
+        <TextView
+            android:id="@+id/tvShippingDate1"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="Дата доставки"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
+
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp">
+            android:padding="5dp"
+            android:layout_marginTop="30dp">
 
+            <android.support.design.widget.TextInputLayout
+                android:hint="dd/mm/yyyy"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:elevation="6dp"
+                android:orientation="horizontal"
+                style="@style/Widget.Design.TextInputLayout"
+                android:id="@+id/tilRoute">
+                <TextView
 
-            <TextView
-                android:id="@+id/tvShippingDate"
+                    android:id="@+id/input_shipping_date"
 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:ems="10"
+                    android:hint="Дата доставки"
+                    android:inputType="date" />
 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Дата доставки" />
-
-            <TextView
-
-                android:id="@+id/input_shipping_date"
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:ems="10"
-                android:hint="Дата доставки"
-                android:inputType="date" />
+            </android.support.design.widget.TextInputLayout>
 
         </RelativeLayout>
         <!--TIME-->

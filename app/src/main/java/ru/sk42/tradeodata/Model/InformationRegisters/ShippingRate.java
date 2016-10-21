@@ -4,9 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.SelectArg;
+import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
@@ -126,5 +131,32 @@ public class ShippingRate extends CDO {
     @Override
     public Dao<ShippingRate, Object> getDao() {
         return MyHelper.getShippingRouteDao();
+    }
+
+    public static int getCost(StartingPoint startingPoint, Route route, VehicleType vehicleType) {
+
+        try {
+            Dao<ShippingRate, Object> dao = MyHelper.getShippingRouteDao();
+            QueryBuilder<ShippingRate, Object> queryBuilder = dao.queryBuilder();
+            Where<ShippingRate, Object> where = queryBuilder.where();
+            where.eq("startingPoint", startingPoint);
+            where.and();
+            where.eq("route", route);
+            where.and();
+            where.eq("vehicleType", vehicleType);
+            PreparedQuery<ShippingRate> preparedQuery = queryBuilder.prepare();
+            List<ShippingRate> list = dao.query(preparedQuery);
+            if(list.isEmpty()){
+                return 0;
+            }
+            else {
+                return list.get(0).getCost();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        return 0;
     }
 }

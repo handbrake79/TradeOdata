@@ -3,6 +3,7 @@ package ru.sk42.tradeodata.Activities.Document;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -40,38 +41,9 @@ import static ru.sk42.tradeodata.Model.Constants.TIME_FORMATTER;
 
 
 // In this case, the fragment displays simple text based on the page
-public class ShippingFragment extends Fragment implements TextWatcher {
-    /**
-     * Formats a {@link Date} object to time string of format HH:mm e.g. 15:25
-     */
+public class ShippingFragment extends Fragment implements TextWatcher, ErrorInterface {
 
-    public interface ShippingInterface {
-
-        void onShippingChanged(boolean needShipping);
-
-        void onUnloadChanged(boolean needUnload);
-
-        void onShippingCostChanged(int shippingCost);
-
-        void onUnloadCostChanged(int unloadCost);
-
-        void onWorkersChanged(int workers);
-
-        void onAddressChanged(String address);
-
-        void onShippingDateChanged(String shippingDate);
-
-        void onShippingTimeFromChanged(String timeFrom);
-
-        void onShippingTimeToChanged(String timeTo);
-
-        void onRouteChanged(String route);
-
-        void onStartingPointChanged(String startingPoint);
-
-        void onVehicleTypeChanged(String vehicleType);
-
-    }
+    ShippingInterface mListenerShipping;
 
     static String TAG = "shipping";
 
@@ -123,13 +95,11 @@ public class ShippingFragment extends Fragment implements TextWatcher {
     Button btnVoiceAddress;
 
 
-
-
-
-
-
     @Bind(R.id.doc_page_shipping_workers_caption)
     TextView docPageShippingWorkersCaption;
+
+    @Bind(R.id.tilRoute)
+    TextInputLayout tilRoute;
 
 
     private DocSale docSale;
@@ -226,11 +196,12 @@ public class ShippingFragment extends Fragment implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+        Log.d(TAG, "onTextChanged: !" + charSequence);
     }
 
     @Override
     public void afterTextChanged(Editable editable) {
+        Log.d(TAG, "afterTextChanged: !" + editable.toString());
 
     }
 
@@ -362,6 +333,11 @@ public class ShippingFragment extends Fragment implements TextWatcher {
         }
     }
 
+    @Override
+    public void onError(int resourceID, String error) {
+
+    }
+
     class TimeFromListener implements RadialTimePickerDialogFragment.OnTimeSetListener {
         @Override
         public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
@@ -386,15 +362,32 @@ public class ShippingFragment extends Fragment implements TextWatcher {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if(context instanceof ShippingInterface)
-        {
+        if (context instanceof ShippingInterface) {
+            mListenerShipping = (ShippingInterface) context;
 
-        }
-        else
-        {
+        } else {
             throw new RuntimeException(context.toString()
                     + " must implement ShippingInterface");
         }
 
     }
+
+    class RouteTextChangeListener implements TextWatcher {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            mListenerShipping.onRouteChanged(charSequence.toString(), ShippingFragment.this, tilRoute);
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    }
+
 }

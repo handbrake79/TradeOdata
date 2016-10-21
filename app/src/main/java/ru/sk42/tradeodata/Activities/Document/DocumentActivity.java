@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import java.sql.SQLException;
@@ -22,9 +24,11 @@ import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductInfo.ProductInfo_Fragment;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsList_Fragment;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
+import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.SaleRecordProduct;
+import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
@@ -34,7 +38,7 @@ import ru.sk42.tradeodata.Services.MyResultReceiver;
 public class DocumentActivity extends AppCompatActivity implements MyActivityFragmentInteractionInterface,
         MyResultReceiver.Receiver,
         QtyPickerFragment.OnQtyFragmentInteractionListener,
-        ShippingFragment.ShippingInterface
+        ShippingInterface
 {
 
     private static final String TAG = "Document ACTIVITY";
@@ -258,8 +262,21 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     }
 
     @Override
-    public void onRouteChanged(String route) {
-
+    public void onRouteChanged(String mRoute, ErrorInterface fragment, TextInputLayout til) {
+        Route route = Route.getObjectByName(mRoute);
+        docSale.setRoute(route);
+        int routeCost = ShippingRate.getCost(docSale.getStartingPoint(), route, docSale.getVehicleType());
+        if(routeCost > 0){
+            docSale.setShippingCost(routeCost);
+        }
+        else{
+            String error = "Стоимость неизвестна!";
+            til.setError(error);
+            til.setErrorEnabled(true);
+        }
+        String error = "Стоимость неизвестна!";
+        til.setError(error);
+        til.setErrorEnabled(true);
     }
 
     @Override
