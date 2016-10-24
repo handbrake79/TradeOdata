@@ -108,7 +108,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
                 .setOnDateSetListener(new OnDateSetListener())
                 .setDoneText("Выбрать")
                 .setCancelText("Отмена")
-                .setThemeDark();
+                .setThemeLight();
         datePickerDialog.show(getSupportFragmentManager(), "date_picker_dialog_fragment");
     }
 

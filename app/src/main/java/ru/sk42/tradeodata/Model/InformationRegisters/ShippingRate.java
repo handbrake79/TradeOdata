@@ -139,11 +139,11 @@ public class ShippingRate extends CDO {
             Dao<ShippingRate, Object> dao = MyHelper.getShippingRouteDao();
             QueryBuilder<ShippingRate, Object> queryBuilder = dao.queryBuilder();
             Where<ShippingRate, Object> where = queryBuilder.where();
-            where.eq("startingPoint", startingPoint);
+            where.eq("startingPoint_id", startingPoint);
             where.and();
-            where.eq("route", route);
+            where.eq("route_id", route);
             where.and();
-            where.eq("vehicleType", vehicleType);
+            where.eq("vehicleType_id", vehicleType);
             PreparedQuery<ShippingRate> preparedQuery = queryBuilder.prepare();
             List<ShippingRate> list = dao.query(preparedQuery);
             if(list.isEmpty()){

@@ -269,14 +269,10 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
         if(routeCost > 0){
             docSale.setShippingCost(routeCost);
         }
-        else{
-            String error = "Стоимость неизвестна!";
-            til.setError(error);
-            til.setErrorEnabled(true);
-        }
-        String error = "Стоимость неизвестна!";
-        til.setError(error);
-        til.setErrorEnabled(true);
+            if(mRoute.isEmpty() && docSale.getNeedShipping()){
+                til.setHintEnabled(true);
+                til.setHint("Укажите маршрут");
+            }
     }
 
     @Override

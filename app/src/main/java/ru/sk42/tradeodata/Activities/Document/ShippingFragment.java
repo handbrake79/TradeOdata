@@ -41,7 +41,7 @@ import static ru.sk42.tradeodata.Model.Constants.TIME_FORMATTER;
 
 
 // In this case, the fragment displays simple text based on the page
-public class ShippingFragment extends Fragment implements TextWatcher, ErrorInterface {
+public class ShippingFragment extends Fragment implements ErrorInterface {
 
     ShippingInterface mListenerShipping;
 
@@ -101,6 +101,8 @@ public class ShippingFragment extends Fragment implements TextWatcher, ErrorInte
     @Bind(R.id.tilRoute)
     TextInputLayout tilRoute;
 
+    @Bind(R.id.tilDate)
+    TextInputLayout tilDate;
 
     private DocSale docSale;
     private MyActivityFragmentInteractionInterface mListener;
@@ -165,7 +167,7 @@ public class ShippingFragment extends Fragment implements TextWatcher, ErrorInte
         mStartingPointSpinner.setSelection(getIndexOfSpinnerValue(mStartingPointSpinner, docSale.getStartingPoint().toString()));
 
         mRouteText.setAdapter(mRouteArrayAdapter);
-        mRouteText.addTextChangedListener(this);
+        mRouteText.addTextChangedListener(new RouteTextChangeListener());
         mRouteText.setText(docSale.getRoute().toString());
 
         mShippingAddress.setText(docSale.getShippingAddress());
@@ -188,22 +190,6 @@ public class ShippingFragment extends Fragment implements TextWatcher, ErrorInte
         mShippingDateText.setText(Constants.DATE_FORMATTER.format(mShippingDate.getTime()).toString());
     }
 
-
-    @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        Log.d(TAG, "onTextChanged: !" + charSequence);
-    }
-
-    @Override
-    public void afterTextChanged(Editable editable) {
-        Log.d(TAG, "afterTextChanged: !" + editable.toString());
-
-    }
 
 
     @OnClick(R.id.input_route_text)
@@ -234,7 +220,7 @@ public class ShippingFragment extends Fragment implements TextWatcher, ErrorInte
                 .setStartTime(Calendar.HOUR_OF_DAY, Calendar.MINUTE)
                 .setDoneText("Выбрать")
                 .setCancelText("Отмена")
-                .setThemeDark();
+                .setThemeLight();
         rtpd.show(getFragmentManager(), "time_picker_dialog_fragment");
 
 
@@ -286,7 +272,7 @@ public class ShippingFragment extends Fragment implements TextWatcher, ErrorInte
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setDoneText("Выбрать")
                 .setCancelText("Отмена")
-                .setThemeDark();
+                .setThemeLight();
         datePickerDialog.show(getFragmentManager(), "date_picker_dialog_fragment");
 
 

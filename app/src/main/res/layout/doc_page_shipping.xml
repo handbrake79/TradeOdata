@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -13,6 +14,7 @@
 
 
         <CheckBox
+            android:layout_marginTop="30dp"
             android:id="@+id/input_need_shipping_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,8 +31,8 @@
 
         <!--DATE-->
         <TextView
+            android:layout_marginTop="16dp"
             android:id="@+id/tvShippingDate1"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -41,17 +43,19 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:layout_marginTop="30dp">
+            android:layout_marginTop="30dp"
+            android:padding="5dp">
 
             <android.support.design.widget.TextInputLayout
-                android:hint="dd/mm/yyyy"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:elevation="6dp"
-                android:orientation="horizontal"
+                android:id="@+id/tilDate"
                 style="@style/Widget.Design.TextInputLayout"
-                android:id="@+id/tilRoute">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="6dp"
+                android:hint="dd/mm/yyyy"
+                android:orientation="horizontal"
+                app:hintEnabled="true">
+
                 <TextView
 
                     android:id="@+id/input_shipping_date"
@@ -70,6 +74,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:padding="5dp">
 
             <TextView
@@ -112,10 +117,18 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp">
+            android:padding="5dp"
+            android:layout_marginTop="32dp">
 
+            <TextView
+                android:text="Адрес доставки"
+                android:id="@+id/caption_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <Button
+                android:layout_marginTop="16dp"
+                android:layout_below="@+id/caption_address"
                 android:id="@+id/btnVoiceAddress"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="45dp"
@@ -123,12 +136,14 @@
                 android:background="@mipmap/microphone" />
 
             <EditText
+                android:layout_below="@+id/caption_address"
                 android:id="@+id/input_shipping_address"
 
                 android:layout_width="wrap_content"
 
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:layout_marginTop="16dp"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/btnVoiceAddress"
                 android:layout_weight="7"
@@ -146,6 +161,7 @@
             android:src="@drawable/dotted_underline" />
 
         <RelativeLayout
+            android:layout_marginTop="30dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp">
@@ -170,6 +186,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:layout_marginTop="30dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp">
@@ -204,26 +221,20 @@
             android:layout_marginTop="5dp"
             android:padding="5dp">
 
-            <TextView
-                android:id="@+id/doc_page_shipping_route_caption"
-                android:layout_width="wrap_content"
-
-
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilRoute"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:inputType="textPersonName"
-                android:text="Маршрут" />
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true">
 
-            <AutoCompleteTextView
-                android:id="@+id/input_route_text"
 
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/doc_page_shipping_route_caption"
-                android:layout_alignParentRight="true"
-                android:clickable="false"
-                android:hint="Набрать или нажать" />
+                <AutoCompleteTextView
+                    android:id="@+id/input_route_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                     />
+            </android.support.design.widget.TextInputLayout>
 
         </RelativeLayout>
 
