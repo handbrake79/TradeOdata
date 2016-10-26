@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
+
         if(resultCode == 1)
         {
             progressDialog.dismiss();

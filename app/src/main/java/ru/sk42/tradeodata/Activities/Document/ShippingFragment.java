@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -33,11 +34,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Helpers.MyHelper;
-import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.R;
 
-import static ru.sk42.tradeodata.Model.Constants.TIME_FORMATTER;
+import static ru.sk42.tradeodata.Helpers.Uttils.TIME_FORMATTER;
 
 
 // In this case, the fragment displays simple text based on the page
@@ -61,13 +62,13 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     Spinner mStartingPointSpinner;
 
     @Bind(R.id.input_time_from)
-    TextView mTimeFromText;
+    EditText mTimeFromText;
 
     @Bind(R.id.input_time_to)
-    TextView mTimeToText;
+    EditText mTimeToText;
 
     @Bind(R.id.input_shipping_date)
-    TextView mShippingDateText;
+    EditText mShippingDateText;
 
     @Bind(R.id.input_shipping_address)
     EditText mShippingAddress;
@@ -82,13 +83,15 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     EditText mWorkersCountEditText;
 
     @Bind(R.id.input_need_shipping_checkbox)
-    CheckBox mNeedShippingCheckBox;
+    SwitchCompat mNeedShippingSwitch;
 
     @Bind(R.id.input_need_unload_checkbox)
     CheckBox mNeedUnloadCheckBox;
 
 
-    Calendar mTimeFrom, mTimeTo;
+    Calendar mTimeFrom = GregorianCalendar.getInstance();
+
+    Calendar mTimeTo = GregorianCalendar.getInstance();
 
 
     @Bind(R.id.btnVoiceAddress)
@@ -101,12 +104,10 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     @Bind(R.id.tilRoute)
     TextInputLayout tilRoute;
 
-    @Bind(R.id.tilDate)
-    TextInputLayout tilDate;
 
     private DocSale docSale;
     private MyActivityFragmentInteractionInterface mListener;
-    private Calendar mShippingDate;
+    private Calendar mShippingDate = GregorianCalendar.getInstance();
 
 
     @Override
@@ -125,20 +126,26 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         View view = inflater.inflate(R.layout.doc_page_shipping, container, false);
         ButterKnife.bind(this, view);
 
+        initView();
+
+
+        return view;
+
+    }
+
+    private void initView() {
+
         DocumentActivity activity = (DocumentActivity) getActivity();
         docSale = activity.getDocSale();
 
-        mTimeFrom = GregorianCalendar.getInstance();
-        mTimeTo = GregorianCalendar.getInstance();
+        mShippingDate.setTime(docSale.getShippingDate());
+        setShippingDateText(mShippingDate);
 
         mTimeFrom.setTime(docSale.getShippingTimeFrom());
-        mTimeTo.setTime(docSale.getShippingTimeTo());
-
-        mShippingDate = GregorianCalendar.getInstance();
-        mShippingDate.setTime(docSale.getShippingDate());
         setTimeFromText(mTimeFrom);
+
+        mTimeTo.setTime(docSale.getShippingTimeTo());
         setTimeToText(mTimeTo);
-        setShippingDateText(mShippingDate);
 
         try {
             mStartingPointArrayAdapter = new ArrayAdapter(this.getContext(),
@@ -171,8 +178,16 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         mRouteText.setText(docSale.getRoute().toString());
 
         mShippingAddress.setText(docSale.getShippingAddress());
+        mShippingDateText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if(hasFocus){
+                    onShippingDateClick(view);
+                }
+            }
+        });
 
-        mNeedShippingCheckBox.setChecked(docSale.getNeedShipping());
+        mNeedShippingSwitch.setChecked(docSale.getNeedShipping());
 
         mNeedUnloadCheckBox.setChecked(docSale.getNeedUnload());
 
@@ -181,15 +196,16 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         mUnloadCostEditText.setText(docSale.getUnloadCost().toString());
 
         mWorkersCountEditText.setText(docSale.getWorkersCount().toString());
-
-        return view;
-
     }
 
-    private void setShippingDateText(Calendar mShippingDate) {
-        mShippingDateText.setText(Constants.DATE_FORMATTER.format(mShippingDate.getTime()).toString());
+    private void setShippingDateText(Calendar mShippingDate){
+        mShippingDateText.setText(Uttils.DATE_FORMATTER.format(mShippingDate.getTime()).toString());
     }
 
+    private void onShippingDateChanged(Calendar mShippingDate) {
+        setShippingDateText(mShippingDate);
+        mListenerShipping.onShippingDateChanged(mShippingDate, mShippingDateText);
+    }
 
 
     @OnClick(R.id.input_route_text)
@@ -250,7 +266,7 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     public void onShippingDateClick(View v) {
         long dateMillis = 0;
         try {
-            Date date = Constants.DATE_FORMATTER.parse(((TextView) v).getText().toString());
+            Date date = Uttils.DATE_FORMATTER.parse(((TextView) v).getText().toString());
             dateMillis = date.getTime();
         } catch (ParseException e) {
             Log.e(getTag(), "Error converting input time to Date object");
@@ -262,12 +278,21 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
             @Override
             public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
                 mShippingDate.set(year, monthOfYear, dayOfMonth);
-                setShippingDateText(mShippingDate);
+                onShippingDateChanged(mShippingDate);
             }
         }
 
+        Calendar preselectedDate = GregorianCalendar.getInstance();
+        preselectedDate.set(1,1,1);
+
+        if(!preselectedDate.before(mShippingDate)) {
+            preselectedDate = GregorianCalendar.getInstance();
+        }else {
+            preselectedDate = mShippingDate;
+        }
+
         CalendarDatePickerDialogFragment datePickerDialog = new CalendarDatePickerDialogFragment()
-                .setPreselectedDate(mShippingDate.get(Calendar.YEAR), mShippingDate.get(Calendar.MONTH), mShippingDate.get(Calendar.DAY_OF_MONTH))
+                .setPreselectedDate(preselectedDate.get(Calendar.YEAR), preselectedDate.get(Calendar.MONTH), preselectedDate.get(Calendar.DAY_OF_MONTH))
                 .setOnDateSetListener(new OnDateSetListener())
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setDoneText("Выбрать")
@@ -297,6 +322,7 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.input_need_shipping_checkbox:
+                onNeedShippingChanged();
                 break;
             case R.id.input_shipping_date:
                 break;
@@ -319,6 +345,26 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         }
     }
 
+    private void onNeedShippingChanged() {
+            toggleShippingElements(mNeedShippingSwitch.isActivated());
+    }
+
+    private void toggleShippingElements(boolean state) {
+        mShippingDateText.setEnabled(state);
+        mTimeFromText.setEnabled(state);
+        mTimeToText.setEnabled(state);
+        mShippingAddress.setEnabled(state);
+        mStartingPointSpinner.setEnabled(state);
+        mRouteText.setEnabled(state);
+        mVehicleTypeSpinner.setEnabled(state);
+        mStartingPointSpinner.setEnabled(state);
+        mUnloadCostEditText.setEnabled(state);
+        mShippingCostEditText.setEnabled(state);
+        mWorkersCountEditText.setEnabled(state);
+        mNeedUnloadCheckBox.setEnabled(state);
+
+    }
+
     @Override
     public void onError(int resourceID, String error) {
 
@@ -329,19 +375,28 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
             mTimeFrom.set(Calendar.HOUR_OF_DAY, hourOfDay);
             mTimeFrom.set(Calendar.MINUTE, minute);
-            setTimeFromText(mTimeFrom);
-
+            onTimeFromChanged();
         }
     }
+
 
     class TimeToListener implements RadialTimePickerDialogFragment.OnTimeSetListener {
         @Override
         public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
             mTimeTo.set(Calendar.HOUR_OF_DAY, hourOfDay);
             mTimeTo.set(Calendar.MINUTE, minute);
-            setTimeToText(mTimeTo);
-
+            onTimeToChanged(mTimeTo);
         }
+    }
+
+    private void onTimeFromChanged() {
+        setTimeFromText(mTimeFrom);
+        mListenerShipping.onShippingTimeFromChanged(mTimeFrom, mTimeFromText);
+    }
+
+    private void onTimeToChanged(Calendar mTimeTo) {
+        setTimeToText(mTimeTo);
+        mListenerShipping.onShippingTimeFromChanged(mTimeTo, mTimeToText);
     }
 
     @Override
@@ -367,7 +422,25 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            mListenerShipping.onRouteChanged(charSequence.toString(), ShippingFragment.this, tilRoute);
+            mListenerShipping.onRouteChanged(charSequence.toString(), ShippingFragment.this, mRouteText);
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    }
+
+    class ShippingDateTextChangeListener implements TextWatcher {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            mListenerShipping.onRouteChanged(charSequence.toString(), ShippingFragment.this, mRouteText);
         }
 
         @Override

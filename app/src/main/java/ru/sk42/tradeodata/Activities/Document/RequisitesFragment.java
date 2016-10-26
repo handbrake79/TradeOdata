@@ -12,7 +12,7 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
-import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.R;
 
@@ -74,7 +74,7 @@ public class RequisitesFragment extends Fragment {
         docPageReqContractText.setText(docSale.getContract().toString());
         docPageReqCustomerText.setText(docSale.getCustomer().toString());
         docPageReqNumberText.setText(docSale.getNumber());
-        docPageReqDateText.setText(Constants.DATE_FORMATTER.format(docSale.getDate()));
+        docPageReqDateText.setText(Uttils.DATE_FORMATTER.format(docSale.getDate()));
         docPageReqShippingCostText.setText(docSale.getShippingCost().toString());
         docPageReqUnloadCostText.setText(docSale.getUnloadCost().toString());
         docPageReqTotalText.setText(docSale.getTotal().toString());

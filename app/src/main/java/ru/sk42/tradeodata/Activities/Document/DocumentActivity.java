@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
@@ -15,14 +14,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductInfo.ProductInfo_Fragment;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsList_Fragment;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Constants;
@@ -247,22 +248,40 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     }
 
     @Override
-    public void onShippingDateChanged(String shippingDate) {
-
+    public void onShippingDateChanged(Calendar shippingDate, EditText editText) {
+        if(Uttils.isShippingDateValid(shippingDate)) {
+            docSale.setShippingDate(shippingDate.getTime());
+            editText.setError(null);
+        }
+        else{
+            editText.setError("Проверьте дату!");
+        }
     }
 
     @Override
-    public void onShippingTimeFromChanged(String timeFrom) {
+    public void onShippingTimeFromChanged(Calendar timeFrom, EditText editText) {
+        docSale.setShippingTimeFrom(timeFrom.getTime());
+        if(Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())){
 
+        }
+        else {
+            editText.setError("Проверьте время доставки!");
+        }
     }
 
     @Override
-    public void onShippingTimeToChanged(String timeTo) {
+    public void onShippingTimeToChanged(Calendar timeTo, EditText editText) {
+        docSale.setShippingTimeTo(timeTo.getTime());
+        if(Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())){
 
+        }
+        else {
+            editText.setError("Проверьте время доставки!");
+        }
     }
 
     @Override
-    public void onRouteChanged(String mRoute, ErrorInterface fragment, TextInputLayout til) {
+    public void onRouteChanged(String mRoute, ErrorInterface fragment, EditText til) {
         Route route = Route.getObjectByName(mRoute);
         docSale.setRoute(route);
         int routeCost = ShippingRate.getCost(docSale.getStartingPoint(), route, docSale.getVehicleType());
@@ -270,8 +289,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
             docSale.setShippingCost(routeCost);
         }
             if(mRoute.isEmpty() && docSale.getNeedShipping()){
-                til.setHintEnabled(true);
-                til.setHint("Укажите маршрут");
+                til.setError("Укажите маршрут");
             }
     }
 
@@ -357,7 +375,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
     private void setActionBarTitle() {
         ActionBar actionBar = getSupportActionBar();
-        String title = docSale.getNumber() + " от " + Constants.DATE_FORMATTER.format(docSale.getDate());
+        String title = docSale.getNumber() + " от " + Uttils.DATE_FORMATTER.format(docSale.getDate());
         actionBar.setTitle(title);
         actionBar.setWindowTitle("WindowTitle");
         actionBar.setSubtitle((!docSale.getRef_Key().equals(Constants.NULL_GUID) ? "записан, " : "не записан, ") + (docSale.getPosted() ? " проведен" : "не проведен"));

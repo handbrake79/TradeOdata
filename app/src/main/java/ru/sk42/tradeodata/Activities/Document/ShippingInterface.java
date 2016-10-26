@@ -2,6 +2,9 @@ package ru.sk42.tradeodata.Activities.Document;
 
 import android.support.design.widget.TextInputLayout;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+
+import java.util.Calendar;
 
 /**
  * Created by хрюн моржов on 21.10.2016.
@@ -19,13 +22,13 @@ public interface ShippingInterface {
 
     void onAddressChanged(String address);
 
-    void onShippingDateChanged(String shippingDate);
+    void onShippingDateChanged(Calendar shippingDate, EditText editText);
 
-    void onShippingTimeFromChanged(String timeFrom);
+    void onShippingTimeFromChanged(Calendar timeFrom, EditText editText);
 
-    void onShippingTimeToChanged(String timeTo);
+    void onShippingTimeToChanged(Calendar timeTo, EditText editText);
 
-    void onRouteChanged(String route, ErrorInterface fragment, TextInputLayout til);
+    void onRouteChanged(String route, ErrorInterface fragment, EditText til);
 
     void onStartingPointChanged(String startingPoint);
 

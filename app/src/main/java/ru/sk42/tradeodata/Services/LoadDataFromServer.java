@@ -143,13 +143,12 @@ public class LoadDataFromServer extends IntentService {
 
         loadOrganisations();
 
-        loadShippingRates();
+//        loadShippingRates();
 
         sendServiceFinished();
     }
 
     private void loadShippingRates() {
-        ShippingRate object = new ShippingRate();
 
         ShippingRatesRequest request = ServiceGenerator.createService(ShippingRatesRequest.class);
         Call<ShippingRatesList> call = request.call(RetroConstants.getMap(""));

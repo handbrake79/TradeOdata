@@ -15,8 +15,6 @@ public class Constants {
     public static final String CUSTOMER_GUID = "b779d1b9-be4f-4bfa-a65b-10641c5d1370";
     public static final String CURRENCY_GUID = "e8a12aca-26fe-11e1-b72e-984be1645106";
     public static final String ACTION_DOCLIST_SET_FOREIGN_OBJECTS = "ACTION_DOCLIST_SET_FOREIGN_OBJECTS";
-    public final static DateFormat DATE_FORMATTER = new SimpleDateFormat("dd-MM-yyyy");
-    public final static DateFormat TIME_FORMATTER = new SimpleDateFormat("HH:mm");
     public static int ModeNewOrder = 0;
     public static int ModeExistingOrder = 1;
 
