@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.SaleRecordService;
 import ru.sk42.tradeodata.R;
@@ -54,9 +55,9 @@ public class SaleRowServiceRecyclerViewAdapter extends RecyclerView.Adapter<Sale
         holder.mItem = mValues.get(position);
 
         holder.tvProduct.setText(holder.mItem.getProduct().getDescription());
-        holder.tvQty.setText(holder.mItem.getQty().toString());
-        holder.tvPrice.setText(holder.mItem.getPrice().toString());
-        holder.tvTotal.setText(holder.mItem.getTotal().toString());
+        holder.tvQty.setText(Uttils.fd(holder.mItem.getQty()));
+        holder.tvPrice.setText(Uttils.fd(holder.mItem.getPrice()));
+        holder.tvTotal.setText(Uttils.fd(holder.mItem.getTotal()));
 
     }
 

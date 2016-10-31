@@ -3,6 +3,7 @@ package ru.sk42.tradeodata.Activities.Document;
 import android.support.design.widget.TextInputLayout;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.Calendar;
 
@@ -10,27 +11,34 @@ import java.util.Calendar;
  * Created by хрюн моржов on 21.10.2016.
  */
 public interface ShippingInterface {
-    void onShippingChanged(boolean needShipping);
 
-    void onUnloadChanged(boolean needUnload);
+    void onSubmit(ShippingFragment fragment);
 
-    void onShippingCostChanged(int shippingCost);
+    void onPassPersonChanged(String mPassPerson);
 
-    void onUnloadCostChanged(int unloadCost);
+    void onPassVehicleChanged(String mPassVehicle);
+
+    void onNeedShippingChanged(boolean needShipping);
+
+    void onNeedUnloadChanged(boolean needUnload);
+
+    void onShippingCostChanged(int shippingCost, TextInputLayout til);
+
+    void onUnloadCostChanged(int unloadCost, TextInputLayout til);
 
     void onWorkersChanged(int workers);
 
     void onAddressChanged(String address);
 
-    void onShippingDateChanged(Calendar shippingDate, EditText editText);
+    void onDateChanged(Calendar shippingDate, EditText editText);
 
-    void onShippingTimeFromChanged(Calendar timeFrom, EditText editText);
+    void onTimeFromChanged(Calendar timeFrom, EditText editText);
 
-    void onShippingTimeToChanged(Calendar timeTo, EditText editText);
+    void onTimeToChanged(Calendar timeTo, EditText editText);
 
-    void onRouteChanged(String route, ErrorInterface fragment, EditText til);
+    void onRouteChanged(String route, TextView textView);
 
-    void onStartingPointChanged(String startingPoint);
+    void onStartingPointChanged(String startingPoint, TextView textView);
 
-    void onVehicleTypeChanged(String vehicleType);
+    void onVehicleTypeChanged(String vehicleType, TextView textView);
 }

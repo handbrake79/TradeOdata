@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.sql.SQLException;
@@ -26,6 +28,8 @@ import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsList_Fragment;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
+import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
+import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.Model.Documents.SaleRecordProduct;
@@ -39,10 +43,9 @@ import ru.sk42.tradeodata.Services.MyResultReceiver;
 public class DocumentActivity extends AppCompatActivity implements MyActivityFragmentInteractionInterface,
         MyResultReceiver.Receiver,
         QtyPickerFragment.OnQtyFragmentInteractionListener,
-        ShippingInterface
-{
+        ShippingInterface {
 
-    private static final String TAG = "Document ACTIVITY";
+    private static final String TAG = "Document ACTIVITY***";
 
     boolean exit = false;
 
@@ -53,6 +56,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     ProductsList_Fragment productsList_fragment;
     QtyPickerFragment qtyPickerFragment;
     ProductInfo_Fragment productInfo_Fragment;
+    ShippingFragment shippingFragment;
     //fragments
 
 
@@ -168,6 +172,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
             Log.d(TAG, "onFragmentDetached: finish!");
             onBackPressed();
         } else {
+            Log.d(TAG, "onFragmentDetached: " + fragment.getTag());
             showProductsPage();
         }
     }
@@ -215,91 +220,165 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     }
 
     @Override
-    public void onShippingChanged(boolean needShipping) {
+    public void onSubmit(ShippingFragment shippingFragment) {
+        docSale.setShippingCost(Integer.valueOf(shippingFragment.mShippingCostEditText.getText().toString()));
+        docSale.setUnloadCost(Integer.valueOf(shippingFragment.mUnloadCostEditText.getText().toString()));
+        docSale.setWorkersCount(Integer.valueOf(shippingFragment.mWorkersCountEditText.getText().toString()));
+        docSale.setShippingAddress(shippingFragment.mShippingAddressEditText.getText().toString());
 
+        docSale.reCalculateTotal();
+
+        //check for errors here?
     }
 
     @Override
-    public void onUnloadChanged(boolean needUnload) {
-
+    public void onPassPersonChanged(String mPassPerson) {
+        docSale.setPassPerson(mPassPerson);
     }
 
     @Override
-    public void onShippingCostChanged(int shippingCost) {
-        docSale.setShippingCost(shippingCost);
+    public void onPassVehicleChanged(String mPassVehicle) {
+        docSale.setPassVehicle(mPassVehicle);
+    }
+
+    @Override
+    public void onNeedShippingChanged(boolean needShipping) {
+        docSale.setNeedShipping(needShipping);
+        recalc();
+    }
+
+    private void recalc() {
         docSale.reCalculateTotal();
         mainFragment.refreshTotal();
-
     }
 
     @Override
-    public void onUnloadCostChanged(int unloadCost) {
+    public void onNeedUnloadChanged(boolean needUnload) {
+        docSale.setNeedUnload(needUnload);
+        recalc();
+    }
+
+    @Override
+    public void onShippingCostChanged(int shippingCost, TextInputLayout til) {
+
+        docSale.setShippingCost(shippingCost);
+        if (shippingCost == 0 || shippingCost < docSale.getReferenceShipingCost()) {
+            til.setError("Проверьте стоимость!");
+        } else {
+            til.setError(null);
+        }
+        recalc();
+    }
+
+    @Override
+    public void onUnloadCostChanged(int unloadCost, TextInputLayout til) {
+        docSale.setUnloadCost(unloadCost);
+        if (unloadCost == 0 || docSale.getNeedUnload()) {
+            til.setError("Проверьте стоимость!");
+        } else {
+            til.setError(null);
+        }
+        recalc();
 
     }
 
     @Override
     public void onWorkersChanged(int workers) {
-
+        docSale.setWorkersCount(workers);
+        recalc();
     }
 
     @Override
     public void onAddressChanged(String address) {
-
+        docSale.setShippingAddress(address);
     }
 
     @Override
-    public void onShippingDateChanged(Calendar shippingDate, EditText editText) {
-        if(Uttils.isShippingDateValid(shippingDate)) {
+    public void onDateChanged(Calendar shippingDate, EditText editText) {
+        if (Uttils.isShippingDateValid(shippingDate)) {
             docSale.setShippingDate(shippingDate.getTime());
             editText.setError(null);
-        }
-        else{
+        } else {
             editText.setError("Проверьте дату!");
         }
     }
 
     @Override
-    public void onShippingTimeFromChanged(Calendar timeFrom, EditText editText) {
+    public void onTimeFromChanged(Calendar timeFrom, EditText editText) {
         docSale.setShippingTimeFrom(timeFrom.getTime());
-        if(Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())){
-
-        }
-        else {
+        if (Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())) {
+            editText.setError(null);
+        } else {
             editText.setError("Проверьте время доставки!");
         }
     }
 
     @Override
-    public void onShippingTimeToChanged(Calendar timeTo, EditText editText) {
+    public void onTimeToChanged(Calendar timeTo, EditText editText) {
         docSale.setShippingTimeTo(timeTo.getTime());
-        if(Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())){
-
-        }
-        else {
+        if (Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())) {
+            editText.setError(null);
+        } else {
             editText.setError("Проверьте время доставки!");
         }
     }
 
     @Override
-    public void onRouteChanged(String mRoute, ErrorInterface fragment, EditText til) {
+    public void onRouteChanged(String mRoute, TextView textView) {
+        if (!docSale.getNeedShipping()) {
+            return;
+        }
         Route route = Route.getObjectByName(mRoute);
         docSale.setRoute(route);
-        int routeCost = ShippingRate.getCost(docSale.getStartingPoint(), route, docSale.getVehicleType());
-        if(routeCost > 0){
-            docSale.setShippingCost(routeCost);
+
+        if (mRoute.isEmpty() && docSale.getNeedShipping()) {
+            textView.setError("Укажите маршрут");
+        } else {
+            textView.setError(null);
         }
-            if(mRoute.isEmpty() && docSale.getNeedShipping()){
-                til.setError("Укажите маршрут");
+        recalc();
+    }
+
+    @Override
+    public void onStartingPointChanged(String mStartingPoint, TextView textView) {
+        if (!docSale.getNeedShipping()) {
+            return;
+        }
+        StartingPoint startingPoint = StartingPoint.getObjectByName(mStartingPoint);
+        docSale.setStartingPoint(startingPoint);
+
+        recalc();
+
+        if (textView != null) {
+            if (mStartingPoint.isEmpty() && docSale.getNeedShipping()) {
+                textView.setError("Укажите начальную точку маршрута!");
+            } else {
+                if (textView != null) {
+                    textView.setError(null);
+                }
             }
-    }
-
-    @Override
-    public void onStartingPointChanged(String startingPoint) {
+        }
 
     }
 
     @Override
-    public void onVehicleTypeChanged(String vehicleType) {
+    public void onVehicleTypeChanged(String mVehicleType, TextView textView) {
+        if (!docSale.getNeedShipping()) {
+            return;
+        }
+        VehicleType vehicleType = VehicleType.getObjectByName(mVehicleType);
+        docSale.setVehicleType(vehicleType);
+
+        recalc();
+
+        if (textView != null) {
+            if (mVehicleType.isEmpty() && docSale.getNeedShipping()) {
+                textView.setError("Укажите тип ТС!");
+            } else {
+                textView.setError(null);
+            }
+        }
+
 
     }
 
@@ -363,7 +442,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     }
 
     private void showQtyPickerFragment(SaleRecordProduct rowProduct) {
-        qtyPickerFragment = QtyPickerFragment.newInstance(rowProduct.getQty().floatValue(), rowProduct.getLineNumber());
+        qtyPickerFragment = QtyPickerFragment.newInstance(rowProduct.getQty(), rowProduct.getActualPrice(), rowProduct.getLineNumber());
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, qtyPickerFragment, qtyPickerFragment.getClass().getName())
@@ -411,27 +490,25 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
 
     @Override
-    public void onQtyFragmentInteraction(float qty, int lineNumber) {
-        getSupportFragmentManager().popBackStack();
-        showProductsPage();
+    public void onQtyFragmentInteraction(double qty, int lineNumber) {
         for (SaleRecordProduct row : docSale.getProducts()
                 ) {
-            if (row.getLineNumber().intValue() == lineNumber)
+            if (row.getLineNumber().intValue() == lineNumber) {
                 row.setQty(qty);
-
-        }
-        docSale.reCalculateTotal();
-        mainFragment.viewPager.post(new Runnable() {
-            @Override
-            public void run() {
-                mainFragment.viewPager.setCurrentItem(1);
+                docSale.reCalculateTotal();
             }
-        });
-
+        }
+        getSupportFragmentManager().popBackStack();
+        showProductsPage();
 
     }
 
     public void saveLocal() {
+        //что у нас не сохраняется сразу?
+        //уберем setOnFocusListener
+        //будем сохранять адрес, стоимость, грузчиков и т.п.
+        //т.е. всё что не спиннеры и не дата время
+        //shipp
         try {
             docSale.save();
         } catch (SQLException e) {

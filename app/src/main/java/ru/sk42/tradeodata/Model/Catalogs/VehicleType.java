@@ -8,6 +8,7 @@ import com.j256.ormlite.field.types.StringType;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
@@ -18,8 +19,7 @@ import ru.sk42.tradeodata.Model.Constants;
  */
 @DatabaseTable
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VehicleType extends CDO
-{
+public class VehicleType extends CDO {
     @DatabaseField(id = true)
     @JsonProperty("Ref_Key")
     private String ref_Key;
@@ -45,31 +45,51 @@ public class VehicleType extends CDO
     }
 
     @Override
-    public String getRef_Key() { return this.ref_Key; }
+    public String getRef_Key() {
+        return this.ref_Key;
+    }
 
     @Override
-    public void setRef_Key(String Ref_Key) { this.ref_Key = Ref_Key; }
+    public void setRef_Key(String Ref_Key) {
+        this.ref_Key = Ref_Key;
+    }
 
-    public String getCode() { return this.Code; }
+    public String getCode() {
+        return this.Code;
+    }
 
-    public void setCode(String Code) { this.Code = Code; }
+    public void setCode(String Code) {
+        this.Code = Code;
+    }
 
-    public String getDescription() { return this.Description; }
+    public String getDescription() {
+        return this.Description;
+    }
 
-    public void setDescription(String Description) { this.Description = Description; }
+    public void setDescription(String Description) {
+        this.Description = Description;
+    }
 
-    public Integer getMaxVolume() { return this.maxVolume; }
+    public Integer getMaxVolume() {
+        return this.maxVolume;
+    }
 
-    public void setMaxVolume(Integer maxVolume) { this.maxVolume = maxVolume; }
+    public void setMaxVolume(Integer maxVolume) {
+        this.maxVolume = maxVolume;
+    }
 
     @Override
     public Dao<VehicleType, Object> getDao() {
         return MyHelper.getVehicleTypesDao();
     }
 
-    public Integer getMaxTonnage() { return this.maxTonnage; }
+    public Integer getMaxTonnage() {
+        return this.maxTonnage;
+    }
 
-    public void setMaxTonnage(Integer maxTonnage) { this.maxTonnage = maxTonnage; }
+    public void setMaxTonnage(Integer maxTonnage) {
+        this.maxTonnage = maxTonnage;
+    }
 
 
     @Override
@@ -109,5 +129,17 @@ public class VehicleType extends CDO
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static VehicleType getObjectByName(String mVehicleType) {
+        try {
+            List<VehicleType> list = MyHelper.getVehicleTypesDao().queryForEq("description", mVehicleType);
+            if (list.size() > 0) {
+                return list.get(0);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

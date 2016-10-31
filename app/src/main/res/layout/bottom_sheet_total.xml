@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="?attr/colorAccent"
+    android:orientation="vertical"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="60dp"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <TextView
+        android:id="@+id/doc_footer_total_text"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:text="Итого"
+        android:textColor="@android:color/white" />
+
+
+    <LinearLayout
+        android:id="@+id/doc_total_footer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+
+                android:id="@+id/footer_total_products_caption"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Стоимость товаров" />
+
+            <TextView
+                android:id="@+id/footer_total_products_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toLeftOf="@+id/footer_total_products_caption2"
+                android:text="10000,00" />
+
+            <TextView
+                android:id="@+id/footer_total_products_caption2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:text="руб." />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+
+                android:id="@+id/footer_total_services_caption"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Стоимость услуг" />
+
+            <TextView
+                android:id="@+id/footer_total_services_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toLeftOf="@+id/footer_total_services_caption2"
+                android:text="10000,00" />
+
+            <TextView
+                android:id="@+id/footer_total_services_caption2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:text="руб." />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_marginTop="15dp"
+            android:id="@+id/shipping_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+
+                android:id="@+id/doc_total_need_shipping_text"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Доставка" />
+
+            <TextView
+                android:id="@+id/doc_total_shipping_rub_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:text="руб." />
+
+            <TextView
+                android:id="@+id/doc_total_shipping_cost_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toLeftOf="@id/doc_total_shipping_rub_caption"
+                android:text="10000,00" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/unload_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+
+                android:id="@+id/doc_total_need_unload_text"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Разгрузка" />
+
+            <TextView
+                android:id="@+id/doc_total_unload_cost_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toLeftOf="@+id/doc_total_unload_rub_caption"
+                android:text="10000.00" />
+
+            <TextView
+                android:id="@+id/doc_total_unload_rub_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:text="руб." />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/workers_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!--4 строка-->
+            <!--Грузчики-->
+            <TextView
+
+                android:id="@+id/doc_total_workers_caption"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Грузчики" />
+
+
+            <TextView
+
+                android:id="@+id/doc_total_workers_count_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toLeftOf="@+id/doc_total_workers_man_text"
+                android:text="10000,00" />
+
+            <TextView
+                android:id="@+id/doc_total_workers_man_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+
+                android:text="чел." />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/total_shipping_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+
+                android:id="@+id/doc_total_shipping_total_caption"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="Итого доставка" />
+
+            <TextView
+                android:id="@+id/doc_total_shipping_total_rub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:text="руб." />
+
+            <TextView
+
+                android:id="@+id/doc_total_shipping_total_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toLeftOf="@id/doc_total_shipping_total_rub"
+                android:text="10000,00" />
+            android:textStyle="bold" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

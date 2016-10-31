@@ -145,6 +145,8 @@ public class LoadDataFromServer extends IntentService {
 
 //        loadShippingRates();
 
+        loadProducts();
+
         sendServiceFinished();
     }
 
@@ -312,20 +314,25 @@ public class LoadDataFromServer extends IntentService {
 
 
     private void loadProducts() {
-        Product object = new Product();
+        Product shipping = Product.getObject(Product.class, Constants.SHIPPING_GUID);
+        Product unload = Product.getObject(Product.class, Constants.SHIPPING_GUID);
+        if (shipping == null || unload == null) {
 
-        if (!isLoadRequired(object)) return;
-
-        ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
-        Call<ProductsList> call = request.call(RetroConstants.getMap(object.getRetroFilterString()));
-        try {
-            Response<ProductsList> response = call.execute();
-            ProductsList list = response.body();
-            TableUtils.dropTable(object.getDao(), false);
-            TableUtils.createTable(object.getDao());
-            list.save();
-        } catch (Exception e) {
-            e.printStackTrace();
+            ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
+            Call<ProductsList> call = request.call(RetroConstants.getMap("Ref_Key eq guid'" + Constants.SHIPPING_GUID + "'" + " or Ref_Key eq guid'" + Constants.UNLOAD_GUID + "'"));
+            try {
+                Response<ProductsList> response = call.execute();
+                ProductsList list = response.body();
+                list.save();
+                Constants.SHIPPING_SERVICE = Product.getObject(Product.class, Constants.SHIPPING_GUID);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            Constants.SHIPPING_SERVICE = shipping;
+            Constants.UNLOAD_SERVICE = unload;
         }
     }
 

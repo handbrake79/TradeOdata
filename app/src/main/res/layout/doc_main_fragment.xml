@@ -1,235 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/llDocMainFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cardview_light_background"
-    android:gravity="bottom"
-    android:orientation="vertical">
+    android:layout_weight="10"
+    android:orientation="vertical"
+    android:padding="5dp">
 
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <com.astuetz.PagerSlidingTabStrip
         android:id="@+id/tabs"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="100dp"
+        android:layout_weight="5"
         app:pstsShouldExpand="true"
-        app:pstsTextAllCaps="true" />
+        app:pstsTextAllCaps="true"
+        android:elevation="5dp"
+        android:layout_margin="5dp"
+        android:padding="5dp"
+        android:fillViewport="true" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="7"
         android:background="@android:color/white" />
-
-
-    <LinearLayout
-        android:id="@+id/doc_total_footer_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/holo_blue_bright"
-
-        android:orientation="vertical">
-
-        <!--Всего-->
-
-        <!--колво товаров-->
-
-        <RelativeLayout
-            android:id="@+id/shipping_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-
-                android:id="@+id/doc_total_need_shipping_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Доставка" />
-
-            <TextView
-                android:id="@+id/doc_total_shipping_rub_caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
-                android:text="руб." />
-
-            <TextView
-                android:id="@+id/doc_total_shipping_cost_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_toLeftOf="@id/doc_total_shipping_rub_caption"
-                android:text="0" />
-
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/unload_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-
-                android:id="@+id/doc_total_need_unload_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Разгрузка" />
-
-            <TextView
-                android:id="@+id/doc_total_unload_rub_caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
-                android:text="руб." />
-
-
-            <TextView
-                android:id="@+id/doc_total_unload_cost_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_toLeftOf="@id/doc_total_unload_rub_caption"
-                android:text="0" />
-
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/workers_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!--4 строка-->
-            <!--Грузчики-->
-            <TextView
-
-                android:id="@+id/doc_total_workers_caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Грузчики" />
-
-            <TextView
-                android:id="@+id/doc_total_workers_man_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
-
-                android:text="чел." />
-
-            <TextView
-
-                android:id="@+id/doc_total_workers_count_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_toLeftOf="@id/doc_total_workers_man_text"
-                android:text="0" />
-
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/total_shipping_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-
-                android:id="@+id/doc_total_shipping_total_caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Итого доставка" />
-
-            <TextView
-                android:id="@+id/doc_total_shipping_total_rub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
-                android:text="руб." />
-
-            <TextView
-
-                android:id="@+id/doc_total_shipping_total_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_toLeftOf="@id/doc_total_shipping_total_rub"
-                android:text="0"
-                android:textStyle="bold" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/total_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorFooter"
-            android:padding="5dp"
-
-            >
-
-            <TextView
-                android:id="@+id/doc_total_products_count_caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
-                android:text="товаров"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/doc_total_products_count_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_toLeftOf="@+id/doc_total_products_count_caption"
-                android:text="0"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/doc_total_total_caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="Всего"
-                android:textStyle="bold" />
-
-            <TextView
-
-                android:id="@+id/doc_total_total_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/doc_total_rub_caption"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/doc_total_total_caption"
-                android:text="0"
-                android:textSize="18dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/doc_total_rub_caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/doc_total_total_text"
-                android:text="руб."
-                android:textStyle="bold" />
-
-
-        </RelativeLayout>
     </LinearLayout>
 
+    <include layout="@layout/bottom_sheet_total" />
 
-    <!--5 строка-->
-    <!--shipping total-->
-
-
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

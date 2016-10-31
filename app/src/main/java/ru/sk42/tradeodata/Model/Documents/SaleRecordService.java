@@ -28,7 +28,7 @@ public class SaleRecordService {
 
     @DatabaseField
     @JsonProperty("Сумма")
-    private Float total;
+    private double total;
 
     @DatabaseField
     @JsonProperty("Ref_Key")
@@ -40,7 +40,7 @@ public class SaleRecordService {
 
     @DatabaseField
     @JsonProperty("Количество")
-    private Float qty;
+    private double qty;
 
     @JsonProperty("Номенклатура_Key")
     @DatabaseField
@@ -51,7 +51,7 @@ public class SaleRecordService {
 
     @DatabaseField
     @JsonProperty("Цена")
-    private Float price;
+    private double price;
 
     @DatabaseField
     @JsonProperty("Содержание")
@@ -84,11 +84,11 @@ public class SaleRecordService {
         this.product = product;
     }
 
-    public Float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -101,11 +101,11 @@ public class SaleRecordService {
         this.productDescription = productDescription;
     }
 
-    public Float getQty() {
+    public double getQty() {
         return qty;
     }
 
-    public void setQty(Float qty) {
+    public void setQty(double qty) {
         this.qty = qty;
     }
 
@@ -117,11 +117,11 @@ public class SaleRecordService {
         this.ref_Key = ref_Key;
     }
 
-    public Float getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(Float total) {
+    public void setTotal(double total) {
         this.total = total;
     }
 

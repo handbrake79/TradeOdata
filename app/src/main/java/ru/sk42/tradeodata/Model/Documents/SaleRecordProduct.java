@@ -41,7 +41,7 @@ public class SaleRecordProduct {
 
     @DatabaseField
     @JsonProperty("Сумма")
-    private Float total;
+    private double total;
 
     @DatabaseField
     @JsonProperty("Ref_Key")
@@ -53,7 +53,7 @@ public class SaleRecordProduct {
 
     @DatabaseField
     @JsonProperty("Количество")
-    private Float qty;
+    private double qty;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("ЕдиницаИзмерения_Key")
@@ -72,7 +72,7 @@ public class SaleRecordProduct {
 
     @DatabaseField
     @JsonProperty("Цена")
-    private Float price;
+    private double price;
 
     public SaleRecordProduct() {
     }
@@ -126,19 +126,19 @@ public class SaleRecordProduct {
         this.docSale = docSale;
     }
 
-    public Float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
-    public Float getQty() {
+    public double getQty() {
         return qty;
     }
 
-    public void setQty(Float qty) {
+    public void setQty(double qty) {
         this.qty = qty;
     }
 
@@ -153,11 +153,11 @@ public class SaleRecordProduct {
 
 
 
-    public Float getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(Float total) {
+    public void setTotal(double total) {
         this.total = total;
     }
 
@@ -211,5 +211,9 @@ public class SaleRecordProduct {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public double getActualPrice() {
+        return Math.round(this.total / this.qty * 100) / 100;
     }
 }

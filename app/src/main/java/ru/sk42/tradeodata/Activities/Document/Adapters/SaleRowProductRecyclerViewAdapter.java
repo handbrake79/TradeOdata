@@ -2,6 +2,7 @@ package ru.sk42.tradeodata.Activities.Document.Adapters;
 
 
 import android.graphics.Color;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
@@ -18,6 +19,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Documents.SaleRecordProduct;
 import ru.sk42.tradeodata.R;
@@ -54,7 +56,7 @@ public class SaleRowProductRecyclerViewAdapter extends RecyclerView.Adapter<Sale
 
         holder.itemView.setSelected(selectedItem == position);
         if (selectedItem == position)
-            holder.itemView.setBackgroundColor(Constants.COLORS.SELECTED_COLOR);
+            holder.itemView.setBackgroundColor(Constants.COLORS.SELECTED_COLOR); //without theme);
         else
             holder.itemView.setBackgroundColor(Color.WHITE);
 
@@ -65,9 +67,10 @@ public class SaleRowProductRecyclerViewAdapter extends RecyclerView.Adapter<Sale
 
         holder.tvDocSaleProductsProduct.setText(holder.mItem.getProduct().getDescription());
         holder.tvDocSaleProductsCharact.setText(holder.mItem.getCharact().getDescription());
-        holder.tvDocSaleProductsQty.setText(holder.mItem.getQty().toString());
-        holder.tvDocSaleProductsPrice.setText(holder.mItem.getPrice().toString());
-        holder.tvDocSaleProductsTotal.setText(holder.mItem.getTotal().toString());
+
+        holder.tvDocSaleProductsQty.setText(Uttils.fd(holder.mItem.getQty()));
+        holder.tvDocSaleProductsPrice.setText(Uttils.fd(holder.mItem.getPrice()));
+        holder.tvDocSaleProductsTotal.setText(Uttils.fd(holder.mItem.getTotal()));
         holder.tvDocSaleProductsUnit.setText(holder.mItem.getUnit().getDescription());
         holder.tvDocSaleProductsStore.setText(holder.mItem.getStore().getDescription());
         holder.tvDocSaleProductsDiscountPercentAuto.setText("Авт. скидка %" + holder.mItem.getDiscountPercentAuto().toString());

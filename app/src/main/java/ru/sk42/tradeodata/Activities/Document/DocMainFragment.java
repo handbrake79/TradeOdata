@@ -16,6 +16,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.R;
 
@@ -23,15 +24,13 @@ import ru.sk42.tradeodata.R;
 public class DocMainFragment extends Fragment {
     private MyActivityFragmentInteractionInterface mListener;
 
-    FragmentPagerAdapter fragmentPagerAdapter ;
+    FragmentPagerAdapter fragmentPagerAdapter;
     public ViewPager viewPager;
     PagerSlidingTabStrip pagerSlidingTabStrip;
 
-    @Bind(R.id.doc_total_total_text)
+    @Bind(R.id.doc_footer_total_text)
     TextView mTotalText;
 
-    @Bind(R.id.doc_total_products_count_text)
-    TextView mProductsCount;
 
     @Bind(R.id.doc_total_need_shipping_text)
     TextView mNeedShippingText;
@@ -56,15 +55,18 @@ public class DocMainFragment extends Fragment {
         DocumentActivity activity = (DocumentActivity) getActivity();
         DocSale docSale = activity.getDocSale();
 
-        mTotalText.setText(docSale.getTotal().toString());
+        String total = "Итого " + Uttils.fd(docSale.getTotal()) + " руб, вес "
+                + Uttils.fd(docSale.getWeight()) + " кг, объем "
+                + Uttils.fd(docSale.getVolume()) + " м3, "
+                + docSale.getProducts().size() + " товаров";
 
-        mProductsCount.setText(String.valueOf(docSale.getProducts().size()));
+        mTotalText.setText(total);
 
-        mNeedShippingText.setText(docSale.getNeedShipping() ? "Нужна доставка" : "Самовывоз");
+        mNeedShippingText.setText(docSale.getNeedShipping() ? "Доставка" : "Самовывоз");
 
         mShippingCostText.setText(docSale.getShippingCost().toString());
 
-        mNeedUnloadText.setText(docSale.getNeedUnload() ? "Наши грузчики" : "Без разгрузки");
+        mNeedUnloadText.setText(docSale.getNeedUnload() ? "Грузчики" : "Без разгрузки");
 
         mUnloadCostText.setText(docSale.getUnloadCost().toString());
 
@@ -90,7 +92,7 @@ public class DocMainFragment extends Fragment {
         return v;
     }
 
-    public void setCurrentPage(int page){
+    public void setCurrentPage(int page) {
         viewPager.setCurrentItem(page);
     }
 
@@ -104,7 +106,7 @@ public class DocMainFragment extends Fragment {
         viewPager.setAdapter(fragmentPagerAdapter);
 
         // Give the PagerSlidingTabStrip the ViewPager
-         pagerSlidingTabStrip = (PagerSlidingTabStrip) view.findViewById(R.id.tabs);
+        pagerSlidingTabStrip = (PagerSlidingTabStrip) view.findViewById(R.id.tabs);
         // Attach the view pager to the tab strip
         pagerSlidingTabStrip.setViewPager(viewPager);
     }

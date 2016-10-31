@@ -9,5 +9,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="speech_prompt">Произнесите вслух адрес доставки</string>
+    <string name="speech_not_supported">Распознавание речи не поддерживается!</string>
 
 </resources>

@@ -14,6 +14,7 @@ import java.util.List;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
+import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.R;
 
 
@@ -57,7 +58,7 @@ public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsLi
     public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position) {
         TextView textView = (TextView) holder.itemView;
         Product product = getItem(position);
-        holder.itemView.setBackgroundColor(getRandomColor());
+        holder.itemView.setBackgroundColor(Constants.COLORS.ENABLED);
 
         if (product.isFirstLevelCategory()) {
             textView.setText("Номенклатура");
@@ -84,12 +85,12 @@ public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsLi
         //textView.setText(String.valueOf(product.getDescription().charAt(0)));
     }
 
-    private int getRandomColor() {
-        SecureRandom rgen = new SecureRandom();
-        return Color.HSVToColor(150, new float[]{
-                rgen.nextInt(359), 1, 1
-        });
-    }
+//    private int getRandomColor() {
+//        SecureRandom rgen = new SecureRandom();
+//        return Color.HSVToColor(150, new float[]{
+//                rgen.nextInt(359), 1, 1
+//        });
+//    }
 
     public Product getItem(int position) {
         return items.get(position);
@@ -109,7 +110,7 @@ public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsLi
         holder.tvCode.setText(items.get(position).getCode());
         holder.tvDescription.setText(items.get(position).getDescription());
         if (holder.mItem.isFolder()) {
-            holder.mView.setBackgroundColor(Color.LTGRAY);
+            holder.mView.setBackgroundColor(Constants.COLORS.SELECTED_COLOR);
         } else {
             holder.mView.setBackgroundColor(Color.TRANSPARENT);
         }

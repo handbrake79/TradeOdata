@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,22 +28,27 @@ public class QtyPickerFragment extends DialogFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String tagQty = "tagQty";
+    private static final String tagPrice = "tagPrice";
     private static final String tagLineNumber = "tagLineNumber";
 
-    @Bind(R.id.input_qty_minus_button)
+    @Bind(R.id.qty_fragment_minus)
     Button inputQtyMinusButton;
 
-    @Bind(R.id.input_qty_number_edittext)
+    @Bind(R.id.qty_fragment_input_qty)
     EditText inputQtyNumberEdittext;
 
-    @Bind(R.id.input_qty_plus_button)
+    @Bind(R.id.qty_fragment_plus)
     Button inputQtyPlusButton;
 
-    @Bind(R.id.input_qty_ok_button)
+    @Bind(R.id.qty_fragment_ok)
     Button inputQtyOkButton;
 
+    @Bind(R.id.qty_fragment_total)
+    TextView mTotal;
+
     // TODO: Rename and change types of parameters
-    private float mQty;
+    private double mQty;
+    private double mPrice;
     private int mLineNumber;
 
     private OnQtyFragmentInteractionListener mListener;
@@ -58,10 +64,11 @@ public class QtyPickerFragment extends DialogFragment {
      * @return A new instance of fragment QtyPickerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static QtyPickerFragment newInstance(float mQty, int lineNumber) {
+    public static QtyPickerFragment newInstance(double mQty, double mPrice, int lineNumber) {
         QtyPickerFragment fragment = new QtyPickerFragment();
         Bundle args = new Bundle();
-        args.putFloat(tagQty, mQty);
+        args.putDouble(tagQty, mQty);
+        args.putDouble(tagPrice, mPrice);
         args.putInt(tagLineNumber, lineNumber);
         fragment.setArguments(args);
         return fragment;
@@ -71,7 +78,8 @@ public class QtyPickerFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mQty = getArguments().getFloat(tagQty);
+            mQty = getArguments().getDouble(tagQty);
+            mPrice = getArguments().getDouble(tagPrice);
             mLineNumber = getArguments().getInt(tagLineNumber);
         }
     }
@@ -85,8 +93,6 @@ public class QtyPickerFragment extends DialogFragment {
 
         initViewData();
 
-
-
         return view;
 
     }
@@ -94,7 +100,8 @@ public class QtyPickerFragment extends DialogFragment {
     private void initViewData() {
 
         inputQtyNumberEdittext.setText(String.valueOf(mQty));
-
+        double total = mQty * mPrice;
+        mTotal.setText("На сумму " + String.valueOf(total));
     }
 
 
@@ -121,27 +128,24 @@ public class QtyPickerFragment extends DialogFragment {
         ButterKnife.unbind(this);
     }
 
-    @OnClick({R.id.input_qty_minus_button, R.id.input_qty_plus_button, R.id.input_qty_ok_button})
+    @OnClick({R.id.qty_fragment_minus, R.id.qty_fragment_plus, R.id.qty_fragment_ok})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.input_qty_minus_button:
-                if(mQty > 0)
-                {
-                    if(mQty < 1)
-                    {
+            case R.id.qty_fragment_minus:
+                if (mQty > 0) {
+                    if (mQty < 1) {
                         mQty = 0;
-                    }
-                    else {
+                    } else {
                         mQty--;
                     }
 
                 }
                 break;
-            case R.id.input_qty_plus_button:
+            case R.id.qty_fragment_plus:
                 mQty++;
                 break;
 
-            case R.id.input_qty_ok_button:
+            case R.id.qty_fragment_ok:
 
                 try {
                     mQty = Float.valueOf(inputQtyNumberEdittext.getText().toString());
@@ -168,6 +172,6 @@ public class QtyPickerFragment extends DialogFragment {
      */
     public interface OnQtyFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onQtyFragmentInteraction(float qty, int lineNumber);
+        void onQtyFragmentInteraction(double qty, int lineNumber);
     }
 }

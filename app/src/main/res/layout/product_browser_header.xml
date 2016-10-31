@@ -2,8 +2,16 @@
 
 
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_marginLeft="15dp"
     android:id="@+id/tvProductBrowserHeader"
-    android:gravity="center">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:text="НОМЕНКЛАТУРА"
+    android:textColor="?android:attr/textColorLink"
+    android:textSize="30sp"
 
-</TextView>
+
+    android:textStyle="bold" />
+

@@ -30,6 +30,7 @@ import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
 
 /**
  * Created by test on 31.03.2016.
@@ -67,7 +68,7 @@ public class DocSale extends CDO {
 
     @JsonProperty("СуммаДоставки")
     @DatabaseField
-    private Float shippingTotal;
+    private Integer shippingTotal;
 
     @JsonProperty("СтоимостьДоставки")
     @DatabaseField
@@ -115,7 +116,7 @@ public class DocSale extends CDO {
 
     @JsonProperty("СуммаДокумента")
     @DatabaseField
-    private Float total;
+    private Double total;
 
     @JsonProperty("ДисконтнаяКарта_Key")
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
@@ -144,7 +145,7 @@ public class DocSale extends CDO {
 
     @JsonProperty("СтоимостьРазгрузки")
     @DatabaseField
-    private Float unloadCost;
+    private Integer unloadCost;
 
     @JsonProperty("АдресДоставки")
     @DatabaseField
@@ -165,6 +166,13 @@ public class DocSale extends CDO {
     @JsonProperty("ВремяДоставкиПо")
     @DatabaseField
     private Date shippingTimeTo;
+
+
+    public int getReferenceShipingCost() {
+        return referenceShipingCost;
+    }
+
+    private int referenceShipingCost;
 
     public DocSale() {
     }
@@ -274,11 +282,11 @@ public class DocSale extends CDO {
         this.date = date;
     }
 
-    public Float getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(Float total) {
+    public void setTotal(double total) {
         this.total = total;
     }
 
@@ -290,19 +298,19 @@ public class DocSale extends CDO {
         this.shippingCost = shippingCost;
     }
 
-    public Float getShippingTotal() {
+    public Integer getShippingTotal() {
         return shippingTotal;
     }
 
-    public void setShippingTotal(Float shippingTotal) {
+    public void setShippingTotal(int shippingTotal) {
         this.shippingTotal = shippingTotal;
     }
 
-    public Float getUnloadCost() {
+    public Integer getUnloadCost() {
         return unloadCost;
     }
 
-    public void setUnloadCost(Float unloadCost) {
+    public void setUnloadCost(Integer unloadCost) {
         this.unloadCost = unloadCost;
     }
 
@@ -619,14 +627,91 @@ public class DocSale extends CDO {
         }
     }
 
+    private void removeShippingFromServicesCollection() {
+        for (SaleRecordService rec :
+                this.getServices()) {
+            String ref_key = rec.getRef_Key();
+            if (ref_key == null) {
+                continue;
+            }
+            if (ref_key.equals(Constants.SHIPPING_GUID)) {
+                this.getServices().remove(rec);
+            }
+        }
+    }
+
+    private void removeUnloadFromServicesCollection() {
+        for (SaleRecordService rec :
+                this.getServices()) {
+            String ref_key = rec.getRef_Key();
+            if (ref_key == null) {
+                continue;
+            }
+            if (ref_key.equals(Constants.SHIPPING_GUID) || ref_key.equals(Constants.UNLOAD_GUID)) {
+                this.getServices().remove(rec);
+            }
+        }
+
+    }
+
+    private void addShippingToServicesCollection() {
+
+        removeShippingFromServicesCollection();
+
+        SaleRecordService rec = new SaleRecordService();
+        rec.setDocSale(this);
+        rec.setLineNumber(getServices().size() + 1);
+        rec.setPrice(this.shippingCost);
+        rec.setQty(1);
+        rec.setProduct(Constants.SHIPPING_SERVICE);
+        this.getServices().add(rec);
+    }
+
+    private void addUnloadToServicesCollection() {
+
+        removeUnloadFromServicesCollection();
+
+        SaleRecordService rec = new SaleRecordService();
+        rec.setDocSale(this);
+        rec.setLineNumber(getServices().size() + 1);
+        rec.setPrice(this.unloadCost);
+        rec.setQty(1);
+        rec.setProduct(Constants.UNLOAD_SERVICE);
+        this.getServices().add(rec);
+    }
+
     public void reCalculateTotal() {
+        if (needShipping) {
+
+            int routeCost = ShippingRate.getCost(this.getStartingPoint(), route, this.getVehicleType());
+            this.referenceShipingCost = routeCost;
+            this.setShippingCost(routeCost);
+
+            addShippingToServicesCollection();
+
+        } else {
+
+            removeShippingFromServicesCollection();
+
+            setShippingCost(0);
+            setUnloadCost(0);
+            setNeedUnload(false);
+        }
+        if (needUnload) {
+
+            addUnloadToServicesCollection();
+
+        } else {
+            setUnloadCost(0);
+
+            removeUnloadFromServicesCollection();
+        }
+
+        setShippingTotal(shippingCost + unloadCost);
 
         this.weight = 0;
         this.volume = 0;
-        this.total = 0f;
-        if (this.needShipping) {
-            this.total = this.shippingTotal;
-        }
+        this.total = 0d;
         //вес, объем
         for (SaleRecordProduct record : getProducts()
                 ) {
@@ -634,19 +719,20 @@ public class DocSale extends CDO {
             this.weight += (int) (record.getQty() * record.getUnit().getWeight());
             this.volume += (int) (record.getQty() * record.getUnit().getVolume());
 
-            float total = record.getQty() * record.getPrice();
-            int discount = Math.max(record.getDiscountPercentAuto(), record.getDiscountPercentManual());
+            double recTotal = record.getQty() * record.getPrice();
+            int discount = record.getDiscountPercentAuto() + record.getDiscountPercentManual();
             if (discount > 0) {
-                total += total / 100 * discount;
+                recTotal = recTotal / 100 * (100 - discount);
             }
-            record.setTotal(total);
-            this.total += total;
+            record.setTotal(recTotal);
+            this.total += recTotal;
         }
         for (SaleRecordService record : getServices()
                 ) {
             record.setTotal(record.getQty() * record.getPrice());
-            this.total += total;
+            this.total += record.getTotal();
         }
-    }
 
+        this.total = Math.round(this.total * 100.0) / 100.0;
+    }
 }

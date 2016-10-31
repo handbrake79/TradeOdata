@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Documents.DocSale;
 import ru.sk42.tradeodata.R;
 
@@ -52,7 +53,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         holder.mDate.setText(holder.mItem.getFormattedDate());
         holder.mNumber.setText(holder.mItem.getNumber());
         holder.mAuthor.setText(holder.mItem.getAuthor().getDescription());
-        holder.mTotal.setText(holder.mItem.getTotal().toString());
+        holder.mTotal.setText(Uttils.fd(holder.mItem.getTotal()));
         holder.mPosted.setText(holder.mItem.getPostedDescr());
         holder.mContract.setText(holder.mItem.getContract().getDescription());
         Integer productsCount, servicesCount;

@@ -7,7 +7,8 @@
         android:id="@+id/rl_order_product_row"
         android:layout_width="match_parent"
         android:layout_height="107dp"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:theme="@style/AppTheme">
 
         <TextView
             android:id="@+id/tv_DocSale_Products_Product"
