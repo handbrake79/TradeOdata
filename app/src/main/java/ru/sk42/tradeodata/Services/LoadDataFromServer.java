@@ -315,7 +315,7 @@ public class LoadDataFromServer extends IntentService {
 
     private void loadProducts() {
         Product shipping = Product.getObject(Product.class, Constants.SHIPPING_GUID);
-        Product unload = Product.getObject(Product.class, Constants.SHIPPING_GUID);
+        Product unload = Product.getObject(Product.class, Constants.UNLOAD_GUID);
         if (shipping == null || unload == null) {
 
             ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);

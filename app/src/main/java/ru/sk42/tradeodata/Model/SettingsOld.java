@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
@@ -121,8 +122,13 @@ public class SettingsOld {
         return preferences;
     }
 
-    public static Date getStartDate() {
-        return startDate;
+    public static Calendar getStartDate() {
+        Calendar c = GregorianCalendar.getInstance();
+        c.setTime(startDate);
+        c.set(Calendar.HOUR_OF_DAY,0);
+        c.set(Calendar.MINUTE,0);
+        c.set(Calendar.SECOND,0);
+        return c;
     }
 
     public static void setStartDate(Date mDate) {

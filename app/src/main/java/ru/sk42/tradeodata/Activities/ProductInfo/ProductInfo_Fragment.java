@@ -83,7 +83,7 @@ public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
         tvProductDescription.setText(productInfo.getDescription());
 
         View rvView = view.findViewById(R.id.rvStock);
-        Button btnSelect = (Button) view.findViewById(R.id.btnSelect);
+        Button btnSelect = (Button) view.findViewById(R.id.btnSelectStock);
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

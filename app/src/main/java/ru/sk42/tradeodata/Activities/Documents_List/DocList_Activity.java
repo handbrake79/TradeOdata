@@ -43,7 +43,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
 
     private static final String TAG = "Doclist activity";
     public MyResultReceiver mReceiver;
-    Date startDate = new Date();
+    Calendar startDate = GregorianCalendar.getInstance();
     ProgressDialog progress;
 
     @Override
@@ -52,7 +52,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.documents__list_activity);
 
-        if(SettingsOld.getCurrentUser() == null) {
+        if (SettingsOld.getCurrentUser() == null) {
             showToast("Dыберите пользователя в настройках");
             this.finish();
         }
@@ -91,17 +91,15 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         class OnDateSetListener implements CalendarDatePickerDialogFragment.OnDateSetListener {
             @Override
             public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-                Calendar c = GregorianCalendar.getInstance();
-                c.set(year,monthOfYear,dayOfMonth);
-                startDate = c.getTime();
-                SettingsOld.setStartDate(startDate);
+                startDate.set(year, monthOfYear, dayOfMonth, 0,0,0);
+                SettingsOld.setStartDate(startDate.getTime());
                 requestDocList();
             }
         }
-        int y,m,d;
-        y=startDate.getYear() + 1900;
-        m=startDate.getMonth();
-        d = startDate.getDate();
+        int y, m, d;
+        y = startDate.get(Calendar.YEAR);
+        m = startDate.get(Calendar.MONTH);
+        d = startDate.get(Calendar.DATE);
 
         CalendarDatePickerDialogFragment datePickerDialog = new CalendarDatePickerDialogFragment()
                 .setPreselectedDate(y, m, d)
@@ -115,7 +113,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
 
     void showListFragment() {
         Bundle b = new Bundle();
-        b.putLong("startDate", startDate.getTime());
+        b.putLong("startDate", startDate.getTimeInMillis());
         DocListFragment fragment = DocListFragment.newInstance(b);
 
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
@@ -149,7 +147,6 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
     }
 
 
-
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
         progress.hide();
@@ -161,16 +158,16 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         i.putExtra("id", 0);
         i.putExtra("mode", Constants.DATALOADER_MODE.DOCLIST.name());
         i.putExtra("receiverTag", mReceiver);
-        i.putExtra("from","DocList");
+        i.putExtra("from", "DocList");
         startService(i);
     }
 
 
-    public void requestDocList(){
+    public void requestDocList() {
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String d1 = fmt.format(startDate.getTime());
         Calendar c = Calendar.getInstance();
-        c.setTime(startDate);
+        c.setTime(startDate.getTime());
         c.add(Calendar.DATE, 1);  // number of days to add
         String d2 = fmt.format(c.getTime());
 
@@ -185,19 +182,18 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
             @Override
             public void onResponse(Call<DocSaleList> call, Response<DocSaleList> response) {
                 DocSaleList list = response.body();
-                if(list == null) {
+                if (list == null) {
                     Log.wtf(TAG, "onResponse: DocSaleList is null", new Exception());
                     return;
                 }
-                showProgress("Persist to DB","Получено " + list.size() + " документов, сохраняем в БД.");
+                showProgress("Persist to DB", "Получено " + list.size() + " документов, сохраняем в БД.");
 
                 MyHelper.getInstance().deleteDocSaleList();
 
                 try {
                     list.save();
-                }
-                catch (Exception e){
-                    Log.w(TAG, "onResponse: " + e.toString() );
+                } catch (Exception e) {
+                    Log.w(TAG, "onResponse: " + e.toString());
                 }
 
                 callDataLoaderService();
@@ -212,12 +208,11 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         });
 
 
-
     }
 
 
-    void showToast(String message){
-        Log.d(TAG, "toast: "+ Constants.getCurrentTimeStamp() + " - " + message);
+    void showToast(String message) {
+        Log.d(TAG, "toast: " + Constants.getCurrentTimeStamp() + " - " + message);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
@@ -227,9 +222,10 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         //showRequestsCount();
 
 //        progress.setIndeterminate(true);
-        if(progress == null){
+        if (progress == null) {
             progress = new ProgressDialog(this);
-            progress.setIndeterminate(true);}
+            progress.setIndeterminate(true);
+        }
         progress.setTitle(title);
         progress.setMessage(message);
 //        progress.show();

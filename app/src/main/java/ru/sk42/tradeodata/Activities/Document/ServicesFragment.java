@@ -29,6 +29,7 @@ public class ServicesFragment extends Fragment {
     RecyclerView mServicesRecyclerView;
     private DocSale docSale;
     private MyActivityFragmentInteractionInterface mListener;
+    View view;
 
     @Override
     public void onDetach() {
@@ -37,6 +38,12 @@ public class ServicesFragment extends Fragment {
         mListener.onFragmentDetached(this);
     }
 
+    public View getView(){
+        servicesAdapter = new SaleRowServiceRecyclerViewAdapter(docSale.getServicesList(), (MyActivityFragmentInteractionInterface) getActivity());
+        mServicesRecyclerView.setAdapter(servicesAdapter);
+        servicesAdapter.notifyDataSetChanged();
+        return view;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,7 +52,7 @@ public class ServicesFragment extends Fragment {
         DocumentActivity activity = (DocumentActivity) getActivity();
         docSale = activity.getDocSale();
 
-        View view = inflater.inflate(R.layout.doc_page_services, container, false);
+        view = inflater.inflate(R.layout.doc_page_services, container, false);
         ButterKnife.bind(this, view);
 
         mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));

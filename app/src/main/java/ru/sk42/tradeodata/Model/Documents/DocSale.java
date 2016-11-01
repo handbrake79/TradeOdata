@@ -630,7 +630,7 @@ public class DocSale extends CDO {
     private void removeShippingFromServicesCollection() {
         for (SaleRecordService rec :
                 this.getServices()) {
-            String ref_key = rec.getRef_Key();
+            String ref_key = rec.getProduct_Key();
             if (ref_key == null) {
                 continue;
             }
@@ -643,11 +643,11 @@ public class DocSale extends CDO {
     private void removeUnloadFromServicesCollection() {
         for (SaleRecordService rec :
                 this.getServices()) {
-            String ref_key = rec.getRef_Key();
+            String ref_key = rec.getProduct_Key();
             if (ref_key == null) {
                 continue;
             }
-            if (ref_key.equals(Constants.SHIPPING_GUID) || ref_key.equals(Constants.UNLOAD_GUID)) {
+            if (ref_key.equals(Constants.UNLOAD_GUID)) {
                 this.getServices().remove(rec);
             }
         }
@@ -659,6 +659,8 @@ public class DocSale extends CDO {
         removeShippingFromServicesCollection();
 
         SaleRecordService rec = new SaleRecordService();
+        rec.setRef_Key(this.getRef_Key());
+        rec.setProduct_Key(Constants.SHIPPING_GUID);
         rec.setDocSale(this);
         rec.setLineNumber(getServices().size() + 1);
         rec.setPrice(this.shippingCost);
@@ -673,6 +675,8 @@ public class DocSale extends CDO {
 
         SaleRecordService rec = new SaleRecordService();
         rec.setDocSale(this);
+        rec.setRef_Key(this.getRef_Key());
+        rec.setProduct_Key(Constants.UNLOAD_GUID);
         rec.setLineNumber(getServices().size() + 1);
         rec.setPrice(this.unloadCost);
         rec.setQty(1);
@@ -734,5 +738,22 @@ public class DocSale extends CDO {
         }
 
         this.total = Math.round(this.total * 100.0) / 100.0;
+    }
+
+    public double getProductsTotal() {
+        double t = 0;
+        for (SaleRecordProduct rec :
+                getProducts()) {
+            t+= rec.getTotal();
+        }
+        return t;
+    }
+    public double getServicesTotal() {
+        double t = 0;
+        for (SaleRecordService rec :
+                getServices()) {
+            t+= rec.getTotal();
+        }
+        return t;
     }
 }

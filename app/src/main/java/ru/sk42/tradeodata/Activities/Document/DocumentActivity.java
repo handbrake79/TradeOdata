@@ -56,7 +56,6 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     ProductsList_Fragment productsList_fragment;
     QtyPickerFragment qtyPickerFragment;
     ProductInfo_Fragment productInfo_Fragment;
-    ShippingFragment shippingFragment;
     //fragments
 
 
@@ -159,7 +158,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
         docSale.getProducts().add(row);
 
-        reloadDocSale();
+        //reloadDocSale();
         //showDocumentFragment();
 
 
@@ -262,7 +261,8 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     public void onShippingCostChanged(int shippingCost, TextInputLayout til) {
 
         docSale.setShippingCost(shippingCost);
-        if (shippingCost == 0 || shippingCost < docSale.getReferenceShipingCost()) {
+        if (docSale.getNeedShipping() &&
+                (shippingCost == 0 || shippingCost < docSale.getReferenceShipingCost())) {
             til.setError("Проверьте стоимость!");
         } else {
             til.setError(null);
@@ -273,7 +273,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     @Override
     public void onUnloadCostChanged(int unloadCost, TextInputLayout til) {
         docSale.setUnloadCost(unloadCost);
-        if (unloadCost == 0 || docSale.getNeedUnload()) {
+        if (unloadCost == 0 && docSale.getNeedUnload()) {
             til.setError("Проверьте стоимость!");
         } else {
             til.setError(null);

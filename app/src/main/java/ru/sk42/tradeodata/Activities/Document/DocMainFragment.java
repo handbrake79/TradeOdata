@@ -50,6 +50,12 @@ public class DocMainFragment extends Fragment {
     @Bind(R.id.doc_total_shipping_total_text)
     TextView mShippingTotalText;
 
+    @Bind(R.id.footer_total_products_value)
+    TextView mProductsTotalText;
+
+    @Bind(R.id.footer_total_services_value)
+    TextView mServicesTotalText;
+
 
     public void refreshTotal() {
         DocumentActivity activity = (DocumentActivity) getActivity();
@@ -61,6 +67,10 @@ public class DocMainFragment extends Fragment {
                 + docSale.getProducts().size() + " товаров";
 
         mTotalText.setText(total);
+
+        mProductsTotalText.setText(Uttils.fd(docSale.getProductsTotal()));
+
+        mServicesTotalText.setText(Uttils.fd(docSale.getServicesTotal()));
 
         mNeedShippingText.setText(docSale.getNeedShipping() ? "Доставка" : "Самовывоз");
 

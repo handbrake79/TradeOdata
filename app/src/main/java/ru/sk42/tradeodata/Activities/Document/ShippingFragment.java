@@ -10,6 +10,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +76,6 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     RelativeLayout rlUnloadLayout;
 
 
-
     @Bind(R.id.input_route_text)
     AutoCompleteTextView mRouteText;
 
@@ -115,8 +115,6 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     @Bind(R.id.input_need_unload_checkbox)
     SwitchCompat mNeedUnloadSwitch;
 
-    @Bind(R.id.input_submit_shipping)
-    Button submitButton;
 
     @Bind(R.id.til_unload_cost)
     TextInputLayout tilUnloadCost;
@@ -200,7 +198,7 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         mVehicleTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                if(mVehicleTypeSpinner.getSelectedView() == null){
+                if (mVehicleTypeSpinner.getSelectedView() == null) {
 
                 }
                 mListenerShipping.onVehicleTypeChanged(adapterView.getItemAtPosition(position).toString(), (TextView) mVehicleTypeSpinner.getSelectedView());
@@ -246,6 +244,16 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
             }
         });
         mShippingAddressEditText.setText(docSale.getShippingAddress());
+        mShippingAddressEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+                if (mShippingAddressEditText.getText() != null) {
+                    mListenerShipping.onAddressChanged(mShippingAddressEditText.getText().toString());
+                }
+                return false;
+            }
+        });
 
 
         mNeedShippingSwitch.setChecked(docSale.getNeedShipping());
@@ -260,22 +268,25 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         mWorkersCountEditText.setText(docSale.getWorkersCount().toString());
 
         mNeedShippingSwitch.requestFocus();
+
+        toggleShippingElements(docSale.getNeedShipping());
+
+        toggleUnload(docSale.getNeedUnload());
     }
 
     private void setShippingCostText() {
         mShippingCostEditText.setText(docSale.getShippingCost().toString());
         String hint = "Стоимость доставки";
-        if(docSale.getReferenceShipingCost() > 0){
+        if (docSale.getReferenceShipingCost() > 0) {
             hint += " (мин.цена по выбранному маршруту " + String.valueOf(docSale.getReferenceShipingCost() + " руб)");
         }
         tilShippingCost.setHint(hint);
     }
 
     private void setShippingDateText(Calendar mShippingDate) {
-        if(Uttils.dateIsNotSet(mShippingDate)){
+        if (Uttils.dateIsNotSet(mShippingDate)) {
             mShippingDateText.setText(null);
-        }
-        else {
+        } else {
             mShippingDateText.setText(Uttils.DATE_FORMATTER.format(mShippingDate.getTime()).toString());
 
         }
@@ -315,12 +326,10 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
                 .setDoneText("Выбрать")
                 .setCancelText("Отмена")
                 .setThemeLight();
-        if(view.getId() == R.id.input_time_from){
+        if (view.getId() == R.id.input_time_from) {
             rtpd.setStartTime(9, 00);
 
-        }
-        else
-        {
+        } else {
             rtpd.setStartTime(18, 00);
 
         }
@@ -404,8 +413,8 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
             R.id.input_shipping_cost,
             R.id.input_need_unload_checkbox,
             R.id.input_workers_count,
-            R.id.input_unload_cost,
-            R.id.input_submit_shipping})
+            R.id.input_unload_cost
+    })
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.input_need_shipping_checkbox:
@@ -427,9 +436,6 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
             case R.id.input_workers_count:
                 break;
             case R.id.input_unload_cost:
-                break;
-            case R.id.input_submit_shipping:
-                submit();
                 break;
         }
     }
@@ -497,10 +503,11 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         mRouteText.setEnabled(state);
         mVehicleTypeSpinner.setEnabled(state);
         mStartingPointSpinner.setEnabled(state);
-        mUnloadCostEditText.setEnabled(state);
         mShippingCostEditText.setEnabled(state);
-        mWorkersCountEditText.setEnabled(state);
+
         mNeedUnloadSwitch.setEnabled(state);
+//        mWorkersCountEditText.setEnabled(state);
+//        mUnloadCostEditText.setEnabled(state);
         //submitButton.setEnabled(state);
 
     }
