@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.HashMap;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
-import ru.sk42.tradeodata.Model.Documents.DocSale;
-import ru.sk42.tradeodata.Model.Documents.DocSaleList;
+import ru.sk42.tradeodata.Model.Document.DocSale;
+import ru.sk42.tradeodata.Model.Document.DocSaleList;
 import ru.sk42.tradeodata.R;
 
 

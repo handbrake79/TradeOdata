@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.Model.Documents;
+package ru.sk42.tradeodata.Model.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

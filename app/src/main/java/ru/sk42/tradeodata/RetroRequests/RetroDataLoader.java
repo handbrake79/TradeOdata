@@ -16,7 +16,7 @@ import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.StoreList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UnitsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
-import ru.sk42.tradeodata.Model.Documents.DocSaleList;
+import ru.sk42.tradeodata.Model.Document.DocSaleList;
 
 /**
  * Created by я on 19.08.2016.

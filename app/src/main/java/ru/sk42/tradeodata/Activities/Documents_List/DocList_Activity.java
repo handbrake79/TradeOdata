@@ -8,7 +8,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,7 +18,6 @@ import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialo
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import retrofit2.Call;
@@ -29,8 +27,8 @@ import ru.sk42.tradeodata.Activities.Document.DocumentActivity;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Documents.DocSale;
-import ru.sk42.tradeodata.Model.Documents.DocSaleList;
+import ru.sk42.tradeodata.Model.Document.DocSale;
+import ru.sk42.tradeodata.Model.Document.DocSaleList;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.DocsRequest;

@@ -11,7 +11,7 @@ import java.util.List;
 
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
-import ru.sk42.tradeodata.Model.Documents.DocSale;
+import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
 
 /**

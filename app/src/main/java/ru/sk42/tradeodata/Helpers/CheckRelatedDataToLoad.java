@@ -12,10 +12,10 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
 import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
-import ru.sk42.tradeodata.Model.Documents.DocSale;
-import ru.sk42.tradeodata.Model.Documents.DocSaleList;
-import ru.sk42.tradeodata.Model.Documents.SaleRecordProduct;
-import ru.sk42.tradeodata.Model.Documents.SaleRecordService;
+import ru.sk42.tradeodata.Model.Document.DocSale;
+import ru.sk42.tradeodata.Model.Document.DocSaleList;
+import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
+import ru.sk42.tradeodata.Model.Document.SaleRecordService;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 

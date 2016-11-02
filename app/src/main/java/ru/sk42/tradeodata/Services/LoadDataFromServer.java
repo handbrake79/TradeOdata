@@ -1,6 +1,8 @@
 package ru.sk42.tradeodata.Services;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.os.ResultReceiver;
@@ -43,10 +45,10 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Documents.DocSale;
-import ru.sk42.tradeodata.Model.Documents.DocSaleList;
-import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
+import ru.sk42.tradeodata.Model.Document.DocSale;
+import ru.sk42.tradeodata.Model.Document.DocSaleList;
 import ru.sk42.tradeodata.Model.SettingsOld;
+import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.CharRequest;
 import ru.sk42.tradeodata.RetroRequests.ContractsRequest;
 import ru.sk42.tradeodata.RetroRequests.CurrencyRequest;
@@ -75,7 +77,7 @@ import ru.sk42.tradeodata.RetroRequests.VehicleTypesRequest;
  */
 public class LoadDataFromServer extends IntentService {
 
-
+    NotificationManager manager;
     final String TAG = "Service ***";
     ResultReceiver resultReceiver;
     Intent intent;
@@ -117,7 +119,7 @@ public class LoadDataFromServer extends IntentService {
 
     private void Preload() {
 
-
+        sendFeedback("Начата предварительная загрузка");
         //loadProducts();
         loadCustomers();
 
@@ -143,7 +145,7 @@ public class LoadDataFromServer extends IntentService {
 
         loadOrganisations();
 
-//        loadShippingRates();
+        loadShippingRates();
 
         loadProducts();
 
@@ -152,17 +154,33 @@ public class LoadDataFromServer extends IntentService {
 
     private void loadShippingRates() {
 
+        int count = 0;
+
+        try {
+            count = MyHelper.getShippingRouteDao().queryForAll().size();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if(count > 0){
+            return;
+        }
+
+        sendFeedback("Начата загрузка тарифов на доставку");
+
         ShippingRatesRequest request = ServiceGenerator.createService(ShippingRatesRequest.class);
         Call<ShippingRatesList> call = request.call(RetroConstants.getMap(""));
         try {
 
             Response<ShippingRatesList> response = call.execute();
             ShippingRatesList list = response.body();
+            sendFeedback("Сохраняем " + String.valueOf(list.getValues().size()) + " записей");
             TableUtils.dropTable(MyHelper.getShippingRouteDao(), false);
             TableUtils.createTable(MyHelper.getShippingRouteDao());
 
 
             list.save();
+            sendFeedback("Тарифы загружены");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -325,12 +343,11 @@ public class LoadDataFromServer extends IntentService {
                 ProductsList list = response.body();
                 list.save();
                 Constants.SHIPPING_SERVICE = Product.getObject(Product.class, Constants.SHIPPING_GUID);
+                Constants.UNLOAD_SERVICE = Product.getObject(Product.class, Constants.UNLOAD_GUID);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        else
-        {
+        } else {
             Constants.SHIPPING_SERVICE = shipping;
             Constants.UNLOAD_SERVICE = unload;
         }
@@ -462,7 +479,9 @@ public class LoadDataFromServer extends IntentService {
     }
 
 
-    void sendMessage(String message) {
+    void sendFeedback(String message) {
+        sendNotification(message);
+
         Bundle b = new Bundle();
         b.putString("Message", message);
         resultReceiver.send(0, b);
@@ -474,6 +493,7 @@ public class LoadDataFromServer extends IntentService {
     }
 
     private void sendServiceFinished() {
+        sendFeedback("Предварительная загрузка завершена");
         resultReceiver.send(1, null);
     }
 
@@ -500,11 +520,22 @@ public class LoadDataFromServer extends IntentService {
         Log.d(TAG, "isLoadRequired: класс " + msg);
 
         if (serverRecordsCount.intValue() != localRecordsCount.intValue()) {
-            sendMessage(msg);
+            sendFeedback(msg);
             return true;
         } else
             return false;
 
+    }
+
+    void sendNotification(String msg) {
+
+        Notification noti = new Notification.Builder(getApplicationContext())
+                .setContentTitle("TradeOdata")
+                .setContentText(msg)
+                .setSmallIcon(R.drawable.notification_icon)
+                .build();
+        manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.notify(0, noti);
     }
 
 }

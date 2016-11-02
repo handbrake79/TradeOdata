@@ -2,7 +2,6 @@ package ru.sk42.tradeodata.Activities.Document.Adapters;
 
 
 import android.graphics.Color;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
@@ -21,7 +20,7 @@ import butterknife.OnClick;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Documents.SaleRecordProduct;
+import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
 import ru.sk42.tradeodata.R;
 
 /**

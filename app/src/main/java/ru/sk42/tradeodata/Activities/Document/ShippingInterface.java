@@ -12,7 +12,6 @@ import java.util.Calendar;
  */
 public interface ShippingInterface {
 
-    void onSubmit(ShippingFragment fragment);
 
     void onPassPersonChanged(String mPassPerson);
 

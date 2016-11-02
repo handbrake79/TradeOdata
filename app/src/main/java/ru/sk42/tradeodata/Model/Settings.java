@@ -4,6 +4,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
@@ -24,6 +25,17 @@ public class Settings {
     @DatabaseField
     String lastViewedProductGroup;
 
+    @DatabaseField
+    Date shippingRatesDate;
+
+    public Date getShippingRatesDate() {
+        return shippingRatesDate;
+    }
+
+    public void setShippingRatesDate(Date shippingRatesDate) {
+        this.shippingRatesDate = shippingRatesDate;
+    }
+
     public int getId() {
         return 0;
     }
@@ -39,6 +51,7 @@ public class Settings {
     public void setLastViewedProductGroup(String lastViewedProductGroup) {
         this.lastViewedProductGroup = lastViewedProductGroup;
     }
+
 
     public static String getLastViewedProductGroupStatic(){
         String mLastViewedProductGroup = Constants.NULL_GUID;

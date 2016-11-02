@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.Model.Documents;
+package ru.sk42.tradeodata.Model.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,7 +19,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
  */
 @DatabaseTable(tableName = "SaleRecordProduct")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SaleRecordProduct {
+public class SaleRecordProduct extends SaleRecord {
 
     @DatabaseField(generatedId = true)
     @JsonIgnore

@@ -46,7 +46,7 @@ public class QtyPickerFragment extends DialogFragment {
     @Bind(R.id.qty_fragment_total)
     TextView mTotal;
 
-    // TODO: Rename and change types of parameters
+    Object record;
     private double mQty;
     private double mPrice;
     private int mLineNumber;
@@ -64,7 +64,7 @@ public class QtyPickerFragment extends DialogFragment {
      * @return A new instance of fragment QtyPickerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static QtyPickerFragment newInstance(double mQty, double mPrice, int lineNumber) {
+    public static QtyPickerFragment newInstance(Object record, double mQty, double mPrice, int lineNumber) {
         QtyPickerFragment fragment = new QtyPickerFragment();
         Bundle args = new Bundle();
         args.putDouble(tagQty, mQty);
@@ -152,7 +152,7 @@ public class QtyPickerFragment extends DialogFragment {
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
-                mListener.onQtyFragmentInteraction(mQty, mLineNumber);
+                mListener.onQtyFragmentInteraction(record, mQty, mLineNumber);
                 //getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
                 break;
         }
@@ -172,6 +172,6 @@ public class QtyPickerFragment extends DialogFragment {
      */
     public interface OnQtyFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onQtyFragmentInteraction(double qty, int lineNumber);
+        void onQtyFragmentInteraction(Object record, double qty, int lineNumber);
     }
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.QueryMap;
-import ru.sk42.tradeodata.Model.Documents.DocSaleList;
+import ru.sk42.tradeodata.Model.Document.DocSaleList;
 
 /**
  * Created by я on 12.09.2016.

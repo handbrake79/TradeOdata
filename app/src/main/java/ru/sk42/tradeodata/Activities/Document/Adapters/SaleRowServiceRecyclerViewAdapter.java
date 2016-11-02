@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Documents.SaleRecordService;
+import ru.sk42.tradeodata.Model.Document.SaleRecordService;
 import ru.sk42.tradeodata.R;
 
 /**

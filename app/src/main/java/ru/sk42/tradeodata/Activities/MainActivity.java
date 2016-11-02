@@ -23,18 +23,17 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
     ProgressDialog progressDialog;
 
     String TAG = "*** MainAct";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-
-
         progressDialog = new ProgressDialog(this);
 
         MyHelper.getInstance(getApplication());
 
-        //MyHelper.dropAndCreateTables();
+//        MyHelper.dropAndCreateTables();
         MyHelper.createTables();
 
         SettingsOld.setApplication(getApplication());
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
         mReceiver = new MyResultReceiver(new Handler());
         mReceiver.setReceiver(this);
         Intent i = new Intent(this, LoadDataFromServer.class);
-        i.putExtra("from","MainAct");
+        i.putExtra("from", "MainAct");
         i.putExtra("mode", Constants.DATALOADER_MODE.PRELOAD.name());
         i.putExtra("receiverTag", mReceiver);
         startService(i);
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
-
 
 
     @Override
@@ -84,8 +82,7 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
 
-        if(resultCode == 1)
-        {
+        if (resultCode == 1) {
             progressDialog.dismiss();
             showToast("Предварительная загрузка завершена");
 
@@ -94,18 +91,19 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
 
         String message = resultData.getString("Message");
 
-        if(message != null)
-        {
+        if (message != null) {
             progressDialog.setIndeterminate(true);
             progressDialog.setTitle("Предзагрузка");
             progressDialog.setMessage(message);
-            if(!progressDialog.isShowing())
+            if (!progressDialog.isShowing())
                 progressDialog.show();
         }
 
 
     }
 
-    void showToast(String s){Toast.makeText(this, s, Toast.LENGTH_SHORT).show();}
+    void showToast(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+    }
 
 }
