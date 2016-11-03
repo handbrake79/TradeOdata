@@ -10,8 +10,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
+import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
 
@@ -21,18 +22,13 @@ import ru.sk42.tradeodata.R;
 public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHolder> {
     private List<DocSale> mValues;
 
-    private MyActivityFragmentInteractionInterface mListener;
-    private int selectedItem;
+    private InteractionInterface mListener;
 
-    public DocList_Adapter(ArrayList<DocSale> items, MyActivityFragmentInteractionInterface listenerInterface) {
+    public DocList_Adapter(ArrayList<DocSale> items, InteractionInterface listenerInterface) {
         mValues = items;
         mListener = listenerInterface;
     }
 
-
-    private DocSale getSelectedObject() {
-        return mValues.get(selectedItem);
-    }
 
     public void setmValues(List<DocSale> mValues) {
         this.mValues = mValues;
@@ -55,16 +51,22 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         holder.mNumber.setText(holder.mItem.getNumber());
         holder.mAuthor.setText(holder.mItem.getAuthor().getDescription());
         holder.mTotal.setText(Uttils.fd(holder.mItem.getTotal()));
+
+        if (holder.mItem.getPosted()) {
+            holder.mPosted.setTextColor(android.graphics.Color.argb(255, 0, 176, 255));
+        } else {
+            holder.mPosted.setTextColor(android.graphics.Color.argb(255, 128, 128, 128));
+        }
         holder.mPosted.setText(holder.mItem.getPostedDescr());
+
         holder.mContract.setText(holder.mItem.getContract().getDescription());
         Integer productsCount, servicesCount;
         productsCount = holder.mItem.getProducts().size();
         servicesCount = holder.mItem.getServices().size();
         holder.mProductCount.setText("Товаров " + productsCount.toString() + ", услуг " + servicesCount.toString());
-        if(holder.mItem.getNeedShipping()) {
+        if (holder.mItem.getNeedShipping()) {
             holder.mShipping.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             holder.mShipping.setVisibility(View.GONE);
 
         }
@@ -74,7 +76,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onItemSelection(holder.mItem);
+                mListener.onItemSelected(holder.mItem);
             }
         });
 

@@ -1,14 +1,16 @@
 package ru.sk42.tradeodata.Activities.Documents_List;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -16,25 +18,35 @@ import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import ru.sk42.tradeodata.Activities.Document.DocumentActivity;
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
+import ru.sk42.tradeodata.Model.Document.DocSaleList;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.LoadDataFromServer;
 import ru.sk42.tradeodata.Services.MyResultReceiver;
 
-public class DocList_Activity extends AppCompatActivity implements MyActivityFragmentInteractionInterface, MyResultReceiver.Receiver {
+public class DocList_Activity extends AppCompatActivity implements InteractionInterface, MyResultReceiver.Receiver, OnDocumentSaved {
 
     private static final String TAG = "***Doclist activity";
+
     public MyResultReceiver mReceiver;
+
     Calendar startDate = GregorianCalendar.getInstance();
+
     ProgressDialog progress;
+
+    RecyclerView mRecyclerView;
+
+    DocList_Adapter mAdapter;
+    DocSaleList doc_list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +86,40 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         });
 
 
-        selectDate();
+        View rvView = findViewById(R.id.rvDocList);
+
+        //create RecyclerView
+        if (rvView instanceof RecyclerView) {
+            Context context = rvView.getContext();
+            mRecyclerView = (RecyclerView) rvView;
+            mRecyclerView.setSelected(true);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+            setAdapter();
+            setActionBarTitle();
+
+        }
+//        selectDate();
     }
+
+    private void setActionBarTitle() {
+        ActionBar actionBar = getSupportActionBar();
+        String title = Uttils.DATE_FORMATTER.format(startDate.getTime());
+        if (doc_list != null)
+            title += " документов " + doc_list.size().toString() + "";
+        else
+            title += " документов еще нет";
+        actionBar.setTitle(title);
+
+    }
+
+    private void setAdapter() {
+        mAdapter = new DocList_Adapter(new ArrayList<DocSale>(), this);
+        doc_list = DocSaleList.getList();
+        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.setmValues(doc_list.getArrayList());
+        mAdapter.notifyDataSetChanged();
+    }
+
 
     private void selectDate() {
         class OnDateSetListener implements CalendarDatePickerDialogFragment.OnDateSetListener {
@@ -101,34 +145,26 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         datePickerDialog.show(getSupportFragmentManager(), "date_picker_dialog_fragment");
     }
 
-    void showListFragment() {
-        Bundle b = new Bundle();
-        b.putLong("startDate", startDate.getTimeInMillis());
-        DocListFragment fragment = DocListFragment.newInstance(b);
-
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.doc_list__fragment, fragment, String.valueOf(R.id.doc_list__fragment));
-        fragmentTransaction.addToBackStack(fragment.getClass().getName());
-        fragmentTransaction.commit();
-
-    }
 
     @Override
-    public void onItemSelection(Object selectedObject) {
+    public void onItemSelected(Object selectedObject) {
         //это может быть выбор документа из списка
         if (selectedObject instanceof DocSale) {
 
             Intent intent = new Intent(this, DocumentActivity.class);
             intent.putExtra("mode", Constants.ModeExistingOrder);
             intent.putExtra("ref_Key", ((DocSale) selectedObject).getRef_Key());
-            startActivity(intent);
+            startActivityForResult(intent, 0);
+            mAdapter.notifyDataSetChanged();
         }
     }
 
     @Override
-    public void onFragmentDetached(Fragment fragment) {
-
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 0){
+            //закрылся документ
+            setAdapter();
+        }
     }
 
     @Override
@@ -141,7 +177,7 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
     public void onReceiveResult(int resultCode, Bundle resultData) {
         if (resultCode == 1) {
             progress.hide();
-            showListFragment();
+            setAdapter();
         }
         if (resultCode == 0) {
             String message = resultData.getString("Message");
@@ -178,5 +214,9 @@ public class DocList_Activity extends AppCompatActivity implements MyActivityFra
         progress.show();
     }
 
+    @Override
+    public void onDocumentSaved() {
+        mAdapter.notifyDataSetChanged();
+    }
 
 }

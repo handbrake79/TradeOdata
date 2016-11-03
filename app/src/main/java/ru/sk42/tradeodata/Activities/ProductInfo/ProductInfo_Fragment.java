@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.ProductInfo;
@@ -24,7 +24,7 @@ import ru.sk42.tradeodata.R;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link MyActivityFragmentInteractionInterface}
+ * Activities containing this fragment MUST implement the {@link InteractionInterface}
  * interface.
  */
 public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
@@ -35,7 +35,7 @@ public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
     RecyclerView mRecyclerView;
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private MyActivityFragmentInteractionInterface mListener;
+    private InteractionInterface mListener;
     private ProductInfo_Adapter mAdapter;
     private ProgressDialog progress;
 
@@ -113,12 +113,11 @@ public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MyActivityFragmentInteractionInterface) {
-            mListener = (MyActivityFragmentInteractionInterface) context;
-            mListener.onAttachFragment(this);
+        if (context instanceof InteractionInterface) {
+            mListener = (InteractionInterface) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement MyActivityFragmentInteractionInterface");
+                    + " must implement InteractionInterface");
         }
     }
 
@@ -126,7 +125,6 @@ public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
     public void onDetach() {
 
         super.onDetach();
-        mListener.onFragmentDetached(this);
         mListener = null;
 
     }
@@ -138,7 +136,7 @@ public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
         int pos = mAdapter.getSelectedItem();
         Stock stock = (Stock) productInfo.getStocks().toArray()[pos];
 
-        mListener.onItemSelection(stock);
+        mListener.onItemSelected(stock);
 
     }
 

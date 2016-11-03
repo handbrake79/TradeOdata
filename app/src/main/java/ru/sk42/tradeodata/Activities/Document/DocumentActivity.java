@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -28,7 +27,8 @@ import java.util.Calendar;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.Documents_List.OnDocumentSaved;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductInfo.ProductInfo_Fragment;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsList_Fragment;
 import ru.sk42.tradeodata.Helpers.Uttils;
@@ -46,12 +46,22 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.LoadDataFromServer;
 import ru.sk42.tradeodata.Services.MyResultReceiver;
 
-public class DocumentActivity extends AppCompatActivity implements MyActivityFragmentInteractionInterface,
+public class DocumentActivity extends AppCompatActivity implements InteractionInterface,
         MyResultReceiver.Receiver,
         QtyPickerFragment.OnQtyFragmentInteractionListener,
         ShippingInterface {
 
     private static final String TAG = "Document ACTIVITY***";
+
+    ProductsList_Fragment productsList_fragment;
+
+    public static DocumentActivity newInstance(OnDocumentSaved mListener){
+        DocumentActivity activity = new DocumentActivity();
+        activity.mListener = mListener;
+        return activity;
+    }
+
+    OnDocumentSaved mListener;
 
     DocumentFragmentPageAdapter fragmentPagerAdapter;
     ViewPager viewPager;
@@ -63,7 +73,6 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     public MyResultReceiver mReceiver;
 
     //Fragments
-    ProductsList_Fragment productsList_fragment;
     QtyPickerFragment qtyPickerFragment;
     ProductInfo_Fragment productInfo_Fragment;
     //fragments
@@ -106,16 +115,8 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
         return docRef_Key;
     }
 
-    public void setDocRef_Key(String docRef_Key) {
-        this.docRef_Key = docRef_Key;
-    }
-
     public DocSale getDocSale() {
         return docSale;
-    }
-
-    public void setDocSale(DocSale docSale) {
-        this.docSale = docSale;
     }
 
     @Override
@@ -143,8 +144,6 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
         pagerSlidingTabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         // Attach the view pager to the tab strip
         pagerSlidingTabStrip.setViewPager(viewPager);
-
-//        mainFragment = new DocMainFragment();
 
         mReceiver = new MyResultReceiver(new Handler());
         mReceiver.setReceiver(this);
@@ -174,7 +173,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
     }
 
     @Override
-    public void onItemSelection(Object object) {
+    public void onItemSelected(Object object) {
         //это внутри фрагмента СтокИнфо при выборе строки склада
         if (object instanceof Stock) {
             getSupportFragmentManager().popBackStack();
@@ -211,23 +210,8 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
         docSale.getProducts().add(row);
 
-        //reloadDocSale();
-        //showDocumentFragment();
-
-
     }
 
-    @Override
-    public void onFragmentDetached(Fragment fragment) {
-////        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, mainFragment).commit();
-//        if (fragment instanceof DocMainFragment) {
-//            Log.d(TAG, "onFragmentDetached: finish!");
-//            onBackPressed();
-//        } else {
-//            Log.d(TAG, "onFragmentDetached: " + fragment.getTag());
-//            showProductsPage();
-//        }
-    }
 
     private void showProductsPage() {
         viewPager.post(new Runnable() {

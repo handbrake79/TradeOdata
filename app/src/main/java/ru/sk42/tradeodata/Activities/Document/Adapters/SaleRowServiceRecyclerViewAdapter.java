@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.SaleRecordService;
@@ -24,9 +24,9 @@ public class SaleRowServiceRecyclerViewAdapter extends RecyclerView.Adapter<Sale
     private int selectedItem;
     private ArrayList<SaleRecordService> mValues;
 
-    private MyActivityFragmentInteractionInterface mListener;
+    private InteractionInterface mListener;
 
-    public SaleRowServiceRecyclerViewAdapter(ArrayList<SaleRecordService> mValues, MyActivityFragmentInteractionInterface mListener) {
+    public SaleRowServiceRecyclerViewAdapter(ArrayList<SaleRecordService> mValues, InteractionInterface mListener) {
         this.mListener = mListener;
         this.mValues = mValues;
     }
@@ -94,7 +94,7 @@ public class SaleRowServiceRecyclerViewAdapter extends RecyclerView.Adapter<Sale
                     notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
-                    mListener.onItemSelection(getSelectedObject());
+                    mListener.onItemSelected(getSelectedObject());
                 }
             });
         }

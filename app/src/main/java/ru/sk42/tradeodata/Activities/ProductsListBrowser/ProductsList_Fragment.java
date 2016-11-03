@@ -25,7 +25,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
@@ -47,7 +47,7 @@ public class ProductsList_Fragment extends Fragment {
     Product testProduct;
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private MyActivityFragmentInteractionInterface mListener;
+    private InteractionInterface mListener;
     private Product currentCategory = new Product();
     private List<Product> productArrayList = new ArrayList<>();
     private ProductsListBrowser_Adapter mAdapter;
@@ -176,18 +176,12 @@ public class ProductsList_Fragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MyActivityFragmentInteractionInterface) {
-            mListener = (MyActivityFragmentInteractionInterface) context;
-            mListener.onAttachFragment(this);
+        if (context instanceof InteractionInterface) {
+            mListener = (InteractionInterface) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement MyActivityFragmentInteractionInterface");
+                    + " must implement InteractionInterface");
         }
-
-        //manager = getSpiceManager();
-
-        //showTopLevelProducts();
-
     }
 
     public void showParentProducts() {
@@ -263,8 +257,8 @@ public class ProductsList_Fragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener.onFragmentDetached(this);
-        mListener = null;
+//        mListener.onFragmentDetached(this);
+//        mListener = null;
         currentCategory = null;
     }
 

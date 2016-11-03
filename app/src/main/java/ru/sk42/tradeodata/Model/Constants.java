@@ -23,7 +23,6 @@ public class Constants {
     public static final String ORGANISATION_GUID = "2dbd363a-d053-4721-801b-c45a27de99a3";
     public static final String CUSTOMER_GUID = "b779d1b9-be4f-4bfa-a65b-10641c5d1370";
     public static final String CURRENCY_GUID = "e8a12aca-26fe-11e1-b72e-984be1645106";
-    public static final String ACTION_DOCLIST_SET_FOREIGN_OBJECTS = "ACTION_DOCLIST_SET_FOREIGN_OBJECTS";
     public static int ModeNewOrder = 0;
     public static int ModeExistingOrder = 1;
 
@@ -41,7 +40,9 @@ public class Constants {
     }
 
     public class COLORS {
-        public static final int SELECTED_COLOR = 15878042;
+        public static final int SELECTED_COLOR = 45311;
+        public static final int REGULAR_COLOR = 13882323;
+
         public static final int DISABLED = 0x939393;
         public static final int ENABLED = 0xffff;
     }

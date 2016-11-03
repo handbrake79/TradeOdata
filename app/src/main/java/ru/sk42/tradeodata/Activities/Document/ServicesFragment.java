@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.SaleRowServiceRecyclerViewAdapter;
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
 
 import ru.sk42.tradeodata.Model.Document.DocSale;
@@ -28,14 +28,13 @@ public class ServicesFragment extends Fragment {
     @Bind(R.id.rvDocPageServices)
     RecyclerView mServicesRecyclerView;
     private DocSale docSale;
-    private MyActivityFragmentInteractionInterface mListener;
+    private InteractionInterface mListener;
     View view;
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = (MyActivityFragmentInteractionInterface) getActivity();
-        mListener.onFragmentDetached(this);
+        mListener = (InteractionInterface) getActivity();
     }
 
     @Override
@@ -51,7 +50,7 @@ public class ServicesFragment extends Fragment {
         mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
         mServicesRecyclerView.setSelected(true);
         mServicesRecyclerView.setLayoutManager(new LinearLayoutManager(mServicesRecyclerView.getContext()));
-        adapter = new SaleRowServiceRecyclerViewAdapter(docSale.getServicesList(), (MyActivityFragmentInteractionInterface) getActivity());
+        adapter = new SaleRowServiceRecyclerViewAdapter(docSale.getServicesList(), (InteractionInterface) getActivity());
         mServicesRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 

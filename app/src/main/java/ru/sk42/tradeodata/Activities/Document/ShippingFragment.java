@@ -38,7 +38,7 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
@@ -59,7 +59,7 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     private Calendar mTimeTo = GregorianCalendar.getInstance();
 
     private DocSale docSale;
-    private MyActivityFragmentInteractionInterface mListener;
+    private InteractionInterface mListener;
 
     static String TAG = "shipping";
     private static final int REQ_CODE_SPEECH_INPUT = 100;
@@ -121,8 +121,7 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = (MyActivityFragmentInteractionInterface) getActivity();
-        mListener.onFragmentDetached(this);
+        mListener = (InteractionInterface) getActivity();
     }
 
 

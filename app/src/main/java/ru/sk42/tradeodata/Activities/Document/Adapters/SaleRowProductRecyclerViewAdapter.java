@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
@@ -31,9 +31,9 @@ public class SaleRowProductRecyclerViewAdapter extends RecyclerView.Adapter<Sale
     private int selectedItem;
     private ArrayList<SaleRecordProduct> mValues;
 
-    private MyActivityFragmentInteractionInterface mListener;
+    private InteractionInterface mListener;
 
-    public SaleRowProductRecyclerViewAdapter(ArrayList<SaleRecordProduct> mValues, MyActivityFragmentInteractionInterface mListener) {
+    public SaleRowProductRecyclerViewAdapter(ArrayList<SaleRecordProduct> mValues, InteractionInterface mListener) {
         this.mListener = mListener;
         this.mValues = mValues;
     }
@@ -136,7 +136,7 @@ public class SaleRowProductRecyclerViewAdapter extends RecyclerView.Adapter<Sale
                     notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
-                    mListener.onItemSelection(getSelectedObject());
+                    mListener.onItemSelected(getSelectedObject());
                 }
             });
         }

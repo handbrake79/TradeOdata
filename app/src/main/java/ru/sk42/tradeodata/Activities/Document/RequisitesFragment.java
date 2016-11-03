@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
@@ -55,13 +55,12 @@ public class RequisitesFragment extends Fragment {
     EditText mComment;
 
     private DocSale docSale;
-    private MyActivityFragmentInteractionInterface mListener;
+    private InteractionInterface mListener;
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = (MyActivityFragmentInteractionInterface) getActivity();
-        mListener.onFragmentDetached(this);
+        mListener = (InteractionInterface) getActivity();
     }
 
 

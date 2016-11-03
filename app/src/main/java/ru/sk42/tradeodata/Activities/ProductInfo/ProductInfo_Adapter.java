@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
@@ -18,10 +18,10 @@ import ru.sk42.tradeodata.R;
 public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapter.ViewHolder> {
 
     private final List<Stock> mValues;
-    private final MyActivityFragmentInteractionInterface mListener;
+    private final InteractionInterface mListener;
     private Integer selectedItem;
 
-    public ProductInfo_Adapter(List<Stock> items, MyActivityFragmentInteractionInterface listener) {
+    public ProductInfo_Adapter(List<Stock> items, InteractionInterface listener) {
         selectedItem = -1;
 
         mValues = items;
@@ -95,7 +95,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
                     notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
-                    //mListener.onItemSelection(mValues.get(selectedItem));
+                    //mListener.onItemSelected(mValues.get(selectedItem));
                 }
             });
         }

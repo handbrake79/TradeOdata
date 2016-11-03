@@ -9,10 +9,9 @@ import android.widget.TextView;
 
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
-import java.security.SecureRandom;
 import java.util.List;
 
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.R;
@@ -21,11 +20,11 @@ import ru.sk42.tradeodata.R;
 public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsListBrowser_Adapter.ViewHolder> implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
 
     private final List<Product> items;
-    private final MyActivityFragmentInteractionInterface mListener;
+    private final InteractionInterface mListener;
     private Product parentProduct;
     private ProductsList_Fragment owner_fragment;
 
-    public ProductsListBrowser_Adapter(List<Product> items, MyActivityFragmentInteractionInterface listener, final ProductsList_Fragment ownerfragment) {
+    public ProductsListBrowser_Adapter(List<Product> items, InteractionInterface listener, final ProductsList_Fragment ownerfragment) {
         this.items = items;
         mListener = listener;
         owner_fragment = ownerfragment;

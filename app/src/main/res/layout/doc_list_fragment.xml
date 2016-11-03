@@ -7,11 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Activities.Documents_List.DocList_ActivityFragment"
-    tools:showIn="@layout/documents__list_activity"
-    >
-
-
-
+    tools:showIn="@layout/documents__list_activity">
 
 
 </RelativeLayout>

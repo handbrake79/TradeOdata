@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.SaleRowProductRecyclerViewAdapter;
-import ru.sk42.tradeodata.Activities.MyActivityFragmentInteractionInterface;
+import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
@@ -28,13 +28,12 @@ public class ProductsFragment extends Fragment {
     @Bind(R.id.rvDocPageProducts)
     android.support.v7.widget.RecyclerView mProductsRecyclerView;
     private DocSale docSale;
-    private MyActivityFragmentInteractionInterface mListener;
+    private InteractionInterface mListener;
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = (MyActivityFragmentInteractionInterface) getActivity();
-        mListener.onFragmentDetached(this);
+        mListener = (InteractionInterface) getActivity();
     }
 
 
@@ -50,7 +49,7 @@ public class ProductsFragment extends Fragment {
         mProductsRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
         mProductsRecyclerView.setSelected(true);
         mProductsRecyclerView.setLayoutManager(new LinearLayoutManager(mProductsRecyclerView.getContext()));
-        adapter = new SaleRowProductRecyclerViewAdapter(docSale.getProductsList(), (MyActivityFragmentInteractionInterface) getActivity());
+        adapter = new SaleRowProductRecyclerViewAdapter(docSale.getProductsList(), (InteractionInterface) getActivity());
         mProductsRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
