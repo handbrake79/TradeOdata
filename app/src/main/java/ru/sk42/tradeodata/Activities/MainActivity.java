@@ -14,11 +14,11 @@ import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.LoadDataFromServer;
-import ru.sk42.tradeodata.Services.MyResultReceiver;
+import ru.sk42.tradeodata.Services.ServiceResultReciever;
 
-public class MainActivity extends AppCompatActivity implements MyResultReceiver.Receiver {
+public class MainActivity extends AppCompatActivity implements ServiceResultReciever.Receiver {
 
-    MyResultReceiver mReceiver;
+    ServiceResultReciever mReceiver;
     long prevtime, curtime;
     ProgressDialog progressDialog;
 
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MyResultReceiver.
 
         SettingsOld.setApplication(getApplication());
         SettingsOld.readSettings();
-        mReceiver = new MyResultReceiver(new Handler());
+        mReceiver = new ServiceResultReciever(new Handler());
         mReceiver.setReceiver(this);
         Intent i = new Intent(this, LoadDataFromServer.class);
         i.putExtra("from", "MainAct");

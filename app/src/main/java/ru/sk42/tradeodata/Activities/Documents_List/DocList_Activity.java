@@ -31,13 +31,13 @@ import ru.sk42.tradeodata.Model.Document.DocSaleList;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.LoadDataFromServer;
-import ru.sk42.tradeodata.Services.MyResultReceiver;
+import ru.sk42.tradeodata.Services.ServiceResultReciever;
 
-public class DocList_Activity extends AppCompatActivity implements InteractionInterface, MyResultReceiver.Receiver, OnDocumentSaved {
+public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReciever.Receiver {
 
     private static final String TAG = "***Doclist activity";
 
-    public MyResultReceiver mReceiver;
+    public ServiceResultReciever mReceiver;
 
     Calendar startDate = GregorianCalendar.getInstance();
 
@@ -62,7 +62,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         progress = new ProgressDialog(this);
         progress.setIndeterminate(true);
 
-        mReceiver = new MyResultReceiver(new Handler());
+        mReceiver = new ServiceResultReciever(new Handler());
         mReceiver.setReceiver(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -212,11 +212,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         progress.setTitle(Uttils.DATE_FORMATTER.format(startDate.getTime()).toString());
         progress.setMessage(message);
         progress.show();
-    }
-
-    @Override
-    public void onDocumentSaved() {
-        mAdapter.notifyDataSetChanged();
     }
 
 }

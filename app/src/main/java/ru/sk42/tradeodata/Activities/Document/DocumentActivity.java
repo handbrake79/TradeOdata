@@ -44,10 +44,10 @@ import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.LoadDataFromServer;
-import ru.sk42.tradeodata.Services.MyResultReceiver;
+import ru.sk42.tradeodata.Services.ServiceResultReciever;
 
 public class DocumentActivity extends AppCompatActivity implements InteractionInterface,
-        MyResultReceiver.Receiver,
+        ServiceResultReciever.Receiver,
         QtyPickerFragment.OnQtyFragmentInteractionListener,
         ShippingInterface {
 
@@ -70,7 +70,7 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
     boolean exit = false;
 
-    public MyResultReceiver mReceiver;
+    public ServiceResultReciever mReceiver;
 
     //Fragments
     QtyPickerFragment qtyPickerFragment;
@@ -145,7 +145,7 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
         // Attach the view pager to the tab strip
         pagerSlidingTabStrip.setViewPager(viewPager);
 
-        mReceiver = new MyResultReceiver(new Handler());
+        mReceiver = new ServiceResultReciever(new Handler());
         mReceiver.setReceiver(this);
 
         Intent intent = getIntent();
