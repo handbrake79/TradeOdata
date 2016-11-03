@@ -37,7 +37,7 @@ public class Constants {
 
 
     public enum DATALOADER_MODE {
-        PRELOAD, DOCLIST, DOC
+        PRELOAD, LOAD_MISSING_FOR_LIST_OF_DOCUMENTS, REQUEST_DOCUMENTS, LOAD_MISSING_FOR_DOCUMENT
     }
 
     public class COLORS {

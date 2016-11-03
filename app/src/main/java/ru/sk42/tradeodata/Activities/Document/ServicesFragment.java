@@ -23,7 +23,7 @@ import ru.sk42.tradeodata.R;
 
 // In this case, the fragment displays simple text based on the page
 public class ServicesFragment extends Fragment {
-    static String TAG = "DocumentFragment";
+    static String TAG = "***ServiceFragment";
     SaleRowServiceRecyclerViewAdapter adapter;
     @Bind(R.id.rvDocPageServices)
     RecyclerView mServicesRecyclerView;

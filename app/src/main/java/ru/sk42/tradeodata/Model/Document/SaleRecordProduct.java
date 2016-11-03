@@ -21,39 +21,12 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SaleRecordProduct extends SaleRecord {
 
-    @DatabaseField(generatedId = true)
-    @JsonIgnore
-    long id;
-
-    @DatabaseField(foreign = true)
-    DocSale docSale;
-
-    @DatabaseField
-    @JsonProperty("Номенклатура_Key")
-    private String product_Key;
-
     @DatabaseField
     @JsonProperty("ПроцентСкидкиНаценки")
     private Integer discountPercentManual;
     @DatabaseField
     @JsonProperty("ПроцентАвтоматическихСкидок")
     private Integer discountPercentAuto;
-
-    @DatabaseField
-    @JsonProperty("Сумма")
-    private double total;
-
-    @DatabaseField
-    @JsonProperty("Ref_Key")
-    private String ref_Key;
-
-    @DatabaseField
-    @JsonProperty("LineNumber")
-    private int lineNumber;
-
-    @DatabaseField
-    @JsonProperty("Количество")
-    private double qty;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("ЕдиницаИзмерения_Key")
@@ -67,13 +40,6 @@ public class SaleRecordProduct extends SaleRecord {
     @JsonProperty("Склад_Key")
     private Store store;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private Product product;
-
-    @DatabaseField
-    @JsonProperty("Цена")
-    private double price;
-
     public SaleRecordProduct() {
     }
 
@@ -86,13 +52,6 @@ public class SaleRecordProduct extends SaleRecord {
         this.id = id;
     }
 
-    public Integer getLineNumber() {
-        return lineNumber;
-    }
-
-    public void setLineNumber(Integer lineNumber) {
-        this.lineNumber = lineNumber;
-    }
 
     public Store getStore() {
         return store;
@@ -100,14 +59,6 @@ public class SaleRecordProduct extends SaleRecord {
 
     public void setStore(Store store) {
         this.store = store;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
     }
 
     public Integer getDiscountPercentAuto() {
@@ -125,52 +76,6 @@ public class SaleRecordProduct extends SaleRecord {
     public void setDocSale(DocSale docSale) {
         this.docSale = docSale;
     }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public double getQty() {
-        return qty;
-    }
-
-    public void setQty(double qty) {
-        this.qty = qty;
-    }
-
-    public String getRef_Key() {
-        return ref_Key;
-    }
-
-    public void setRef_Key(String ref_Key) {
-        this.ref_Key = ref_Key;
-    }
-
-
-
-
-    public double getTotal() {
-        return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
-    }
-
-
-    public String getProduct_Key() {
-        return product_Key;
-    }
-
-    public void setProduct_Key(String product_Key) {
-        this.product_Key = product_Key;
-    }
-
-
 
     public Charact getCharact() {
         return charact;

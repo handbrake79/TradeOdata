@@ -12,10 +12,14 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import ru.sk42.tradeodata.Helpers.MyHelper;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Catalogs.Contract;
@@ -54,11 +58,12 @@ import ru.sk42.tradeodata.RetroRequests.ContractsRequest;
 import ru.sk42.tradeodata.RetroRequests.CurrencyRequest;
 import ru.sk42.tradeodata.RetroRequests.CustomersRequest;
 import ru.sk42.tradeodata.RetroRequests.DiscountCardsRequest;
+import ru.sk42.tradeodata.RetroRequests.DocsRequest;
+import ru.sk42.tradeodata.RetroRequests.MissingDataLoader;
 import ru.sk42.tradeodata.RetroRequests.OrganisationsRequest;
 import ru.sk42.tradeodata.RetroRequests.ProductsRequest;
 import ru.sk42.tradeodata.RetroRequests.RecordsCountRequest;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
-import ru.sk42.tradeodata.RetroRequests.RetroDataLoader;
 import ru.sk42.tradeodata.RetroRequests.RoutesRequest;
 import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
 import ru.sk42.tradeodata.RetroRequests.ShippingRatesRequest;
@@ -104,14 +109,20 @@ public class LoadDataFromServer extends IntentService {
                 Preload();
                 return;
             }
-            if (mode.equals(Constants.DATALOADER_MODE.DOCLIST.name())) {
-                loadData();
+            if (mode.equals(Constants.DATALOADER_MODE.LOAD_MISSING_FOR_LIST_OF_DOCUMENTS.name())) {
+                loadMissingDataForDocumentsList();
                 return;
             }
-            if (mode.equals(Constants.DATALOADER_MODE.DOC.name())) {
-                loadData();
+            if (mode.equals(Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name())) {
+                loadMissingDataForSingleDocument();
                 return;
             }
+            if (mode.equals(Constants.DATALOADER_MODE.REQUEST_DOCUMENTS.name())) {
+                loadDocuments();
+                return;
+            }
+
+
         }
 
 
@@ -149,7 +160,7 @@ public class LoadDataFromServer extends IntentService {
 
         loadProducts();
 
-        sendServiceFinished();
+        sendServiceFinished("Загрузка справочников завершена");
     }
 
     private void loadShippingRates() {
@@ -162,7 +173,7 @@ public class LoadDataFromServer extends IntentService {
             e.printStackTrace();
         }
 
-        if(count > 0){
+        if (count > 0) {
             return;
         }
 
@@ -454,46 +465,92 @@ public class LoadDataFromServer extends IntentService {
     }
 
 
-    private void loadData() {
-        Integer id = intent.getIntExtra("id", -1);
-        String ref_Key = intent.getStringExtra("ref_Key");
-
-        Class clazz = null;
-        if (id != -1) {
-            clazz = DocSaleList.class;
-            RetroDataLoader.LoadMissingDataForObject(null, clazz);
-            for (DocSale docSale :
-                    DocSaleList.getList().getValues()) {
-                docSale.setForeignObjects();
-            }
-        } else {
-            DocSale doc = DocSale.getDocument(ref_Key);
-            clazz = DocSale.class;
-            RetroDataLoader.LoadMissingDataForObject(doc, clazz);
-            doc.setForeignObjects();
-
+    private void loadMissingDataForDocumentsList() {
+        MissingDataLoader.LoadMissingDataForObject(null, DocSaleList.class);
+        for (DocSale docSale :
+                DocSaleList.getList().getValues()) {
+            docSale.setForeignObjects();
         }
 
-        sendServiceFinished();
+        sendServiceFinished("Загрузка объектов по ссылкам для списка завершена");
+
+    }
+
+    private void loadMissingDataForSingleDocument() {
+        String ref_Key = intent.getStringExtra("ref_Key");
+        DocSale doc = DocSale.getDocument(ref_Key);
+        MissingDataLoader.LoadMissingDataForObject(doc, DocSale.class);
+        doc.setForeignObjects();
+
+        sendServiceFinished("Загрузка объектов по ссылкам для документа завершена");
+
+    }
+
+    private void loadDocuments() {
+
+        Calendar d1 = GregorianCalendar.getInstance();
+        d1.setTimeInMillis(intent.getLongExtra("StartDate", 0));
+        Calendar d2 = GregorianCalendar.getInstance();
+        d2.setTimeInMillis(d1.getTimeInMillis());
+        d2.add(Calendar.DATE, 1);
+
+        String df1 = Uttils.DATE_FORMAT_1C.format(d1.getTime());
+        String df2 = Uttils.DATE_FORMAT_1C.format(d2.getTime());
+
+        String filter = "Date gt datetime'" + df1 + "' and Date lt datetime'" + df2 + "'" + " and Контрагент_Key eq guid'" + Constants.CUSTOMER_GUID + "'" + " and Ответственный_Key eq guid'" + SettingsOld.getCurrentUser().getRef_Key() + "'";
+
+
+        sendFeedback("Загрузка документов за период " + df1 + " - " + df2);
+
+        DocsRequest request = ServiceGenerator.createService(DocsRequest.class);
+        Call<DocSaleList> callDocuments = request.call(RetroConstants.getMap(filter));
+        callDocuments.enqueue(new Callback<DocSaleList>() {
+            @Override
+            public void onResponse(Call<DocSaleList> call, Response<DocSaleList> response) {
+                DocSaleList list = response.body();
+                if (list == null) {
+                    Log.wtf(TAG, "onResponse: DocSaleList is null", new Exception());
+                    return;
+                }
+
+                MyHelper.getInstance().deleteDocSaleList();
+
+                try {
+                    list.save();
+                } catch (Exception e) {
+                    Log.w(TAG, "onResponse: " + e.toString());
+                }
+
+                loadMissingDataForDocumentsList();
+
+                sendServiceFinished("Загрузка списка документов завершена");
+
+            }
+
+            @Override
+            public void onFailure(Call<DocSaleList> call, Throwable t) {
+                Log.d(TAG, "onResponse: " + t.toString());
+
+            }
+        });
+
 
     }
 
 
     void sendFeedback(String message) {
-        sendNotification(message);
-
         Bundle b = new Bundle();
         b.putString("Message", message);
         resultReceiver.send(0, b);
-
     }
 
     public void onDestroy() {
         super.onDestroy();
     }
 
-    private void sendServiceFinished() {
-        sendFeedback("Предварительная загрузка завершена");
+    private void sendServiceFinished(String msg) {
+        sendNotification(msg);
+        sendFeedback(msg);
         resultReceiver.send(1, null);
     }
 

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Catalogs.Contract;
 import ru.sk42.tradeodata.Model.Catalogs.Currency;
@@ -264,14 +265,6 @@ public class DocSale extends CDO {
 
     public String getCurrency_Key() {
         return Constants.CURRENCY_GUID;
-    }
-
-
-    public String getFormattedDate() {
-        SimpleDateFormat fmt = new SimpleDateFormat("dd-MM-yy hh:mm:ss");
-        Calendar calendar = new GregorianCalendar(1900 + date.getYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
-        fmt.setCalendar(calendar);
-        return fmt.format(calendar.getTime());
     }
 
     public Date getDate() {
@@ -604,10 +597,10 @@ public class DocSale extends CDO {
         //this.reload();
     }
 
-    @Override
-    public String toString() {
-        return "Реализация № " + getNumber() + " от " + getFormattedDate();
-    }
+//    @Override
+//    public String toString() {
+//        return "Реализация № " + getNumber() + " от " + getFormattedDate();
+//    }
 
     public void setForeignObjectsInHeader() {
         //this.setAuthor(User.getList(User.class, getAuthorRefKey()));

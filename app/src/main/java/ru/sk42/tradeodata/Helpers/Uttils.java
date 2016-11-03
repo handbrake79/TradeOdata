@@ -15,6 +15,8 @@ import java.util.Locale;
 public class Uttils {
     public final static DateFormat DATE_FORMATTER = new SimpleDateFormat("dd.MM.yyyy");
     public final static DateFormat TIME_FORMATTER = new SimpleDateFormat("HH:mm");
+    public final static DateFormat DATE_FORMAT_1C = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
 
     public static boolean isShippingDateValid(Calendar shippingDate) {
         Calendar yesterday = getYesterday();

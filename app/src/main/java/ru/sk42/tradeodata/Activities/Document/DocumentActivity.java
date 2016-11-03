@@ -132,8 +132,6 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
         setContentView(R.layout.document__activity);
         ButterKnife.bind(this, this);
 
-        setActionBarTitle();
-
         progressDialog = new ProgressDialog(this);
 
         fragmentPagerAdapter = new DocumentFragmentPageAdapter(getSupportFragmentManager());
@@ -521,7 +519,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
 
     private void callDataLoaderService() {
         Intent i = new Intent(this, LoadDataFromServer.class);
-        i.putExtra("mode", Constants.DATALOADER_MODE.DOC.name());
+        i.putExtra("mode", Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name());
         i.putExtra("from", "Document");
         i.putExtra("ref_Key", getDocRef_Key());
         i.putExtra("receiverTag", mReceiver);
@@ -548,7 +546,7 @@ public class DocumentActivity extends AppCompatActivity implements MyActivityFra
         if (record instanceof SaleRecordProduct) {
             for (SaleRecordProduct row : docSale.getProducts()
                     ) {
-                if (row.getLineNumber().intValue() == lineNumber) {
+                if (row.getLineNumber() == lineNumber) {
                     row.setQty(qty);
                 }
             }

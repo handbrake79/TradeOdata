@@ -21,9 +21,9 @@ import ru.sk42.tradeodata.Model.Document.DocSaleList;
 /**
  * Created by я on 19.08.2016.
  */
-public class RetroDataLoader {
+public class MissingDataLoader {
 
-    static String TAG = "RetroDataLoader***";
+    static String TAG = "MissingDataLoader***";
 
     static private CDO objectToCheck;
     static private HashMap<Class<?>, ArrayList<String>> unresolvedLinks;
@@ -47,7 +47,7 @@ public class RetroDataLoader {
 
        // callBackInterface = mCallBackInterface;
 
-        if (clazz.getCanonicalName().equals("ru.sk42.tradeodata.Model.Documents.DocSaleList")) {
+        if (clazz.getCanonicalName().equals("ru.sk42.tradeodata.Model.Document.DocSaleList")) {
             unresolvedLinks = CheckRelatedDataToLoad.checkObject(DocSaleList.getList());
         } else {
             CDO cdo = (CDO) mcdo;

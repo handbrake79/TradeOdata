@@ -17,41 +17,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
  */
 @DatabaseTable(tableName = "SaleRecordService")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SaleRecordService {
-
-    @DatabaseField(foreign = true)
-    DocSale docSale;
-
-    @DatabaseField(generatedId = true)
-    @JsonIgnore
-    long id;
-
-    @DatabaseField
-    @JsonProperty("Сумма")
-    private double total;
-
-    @DatabaseField
-    @JsonProperty("Ref_Key")
-    private String ref_Key;
-
-    @DatabaseField
-    @JsonProperty("LineNumber")
-    private int lineNumber;
-
-    @DatabaseField
-    @JsonProperty("Количество")
-    private double qty;
-
-    @JsonProperty("Номенклатура_Key")
-    @DatabaseField
-    private String product_Key;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private Product product;
-
-    @DatabaseField
-    @JsonProperty("Цена")
-    private double price;
+public class SaleRecordService extends SaleRecord {
 
     @DatabaseField
     @JsonProperty("Содержание")
@@ -59,86 +25,12 @@ public class SaleRecordService {
 
     public SaleRecordService() {
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    public void setLineNumber(int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-
     public String getProductDescription() {
         return productDescription;
     }
 
     public void setProductDescription(String productDescription) {
         this.productDescription = productDescription;
-    }
-
-    public double getQty() {
-        return qty;
-    }
-
-    public void setQty(double qty) {
-        this.qty = qty;
-    }
-
-    public String getRef_Key() {
-        return ref_Key;
-    }
-
-    public void setRef_Key(String ref_Key) {
-        this.ref_Key = ref_Key;
-    }
-
-    public double getTotal() {
-        return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
-    }
-
-    public DocSale getDocSale() {
-        return docSale;
-    }
-
-    public void setDocSale(DocSale docSale) {
-        this.docSale = docSale;
-    }
-
-    public String getProduct_Key() {
-        return product_Key;
-    }
-
-    public void setProduct_Key(String product_Key) {
-        this.product_Key = product_Key;
     }
 
     public void save() {

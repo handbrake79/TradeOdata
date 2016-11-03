@@ -7,8 +7,7 @@
     android:backgroundTintMode="src_over"
     app:cardBackgroundColor="@color/cardview_light_background"
     app:cardCornerRadius="5dp"
-    app:cardElevation="2dp"
-    >
+    app:cardElevation="2dp">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -23,26 +22,16 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:text="Номер"
-            android:textSize="10sp"
-             />
+            android:textColor="@color/accent"
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/docList_Date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5sp"
+            android:layout_marginLeft="5dp"
             android:layout_toEndOf="@+id/docList_Number"
             android:text="Дата"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/docList_Author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="5sp"
-            android:text="Автор"
             android:textSize="10sp" />
 
 
@@ -51,12 +40,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="5sp"
-            android:layout_toEndOf="@id/docList_Author"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:text="Договор"
+            android:textColor="@color/accent"
 
-            android:textSize="10sp"
-            />
+            android:textSize="10sp" />
+
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:id="@+id/docList_Author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+
+            android:layout_toRightOf="@id/docList_Contract"
+
+            android:text="Автор"
+            android:textSize="10sp" />
+
 
         <TextView
             android:id="@+id/docList_ProductCount"
@@ -64,32 +66,54 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="5sp"
-            android:layout_toEndOf="@id/docList_Contract"
+            android:layout_toEndOf="@id/docList_Author"
             android:text="ProdCount"
 
-            android:textSize="10sp"
-            />
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/docList_Total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="3dp"
+            android:layout_marginLeft="5dp"
+            android:layout_toLeftOf="@+id/docList_Total_caption"
             android:gravity="right"
             android:text="12345.67"
+            android:textColor="@color/accent"
             android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/docList_Total_caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:gravity="right"
+            android:text="руб"
+            android:textColor="@color/accent"
+            android:textSize="10sp" />
+
+        <ImageView
+            android:visibility="visible"
+            app:srcCompat="@drawable/truck1"
+            android:layout_toLeftOf="@+id/docList_Total"
+            android:layout_width="25dp"
+            android:layout_height="15dp"
+            android:id="@+id/icon_shipping" />
 
         <TextView
             android:id="@+id/docList_Posted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginLeft="3dp"
+            android:layout_marginLeft="5dp"
             android:text="posted"
-            android:textSize="10sp" />
+            android:textColor="@color/accent"
+            android:textSize="10sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>
+
+

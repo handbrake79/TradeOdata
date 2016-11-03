@@ -43,7 +43,7 @@ public class ProductsList_Fragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    static String TAG = "ProductsList_Fragment";
+    static String TAG = "***ProdList_Fragment";
     Product testProduct;
     // TODO: Customize parameters
     private int mColumnCount = 1;

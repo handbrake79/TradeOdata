@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         holder.mItem = mValues.get(position);
-        holder.mDate.setText(holder.mItem.getFormattedDate());
+        holder.mDate.setText(Uttils.DATE_FORMATTER.format(holder.mItem.getDate()));
         holder.mNumber.setText(holder.mItem.getNumber());
         holder.mAuthor.setText(holder.mItem.getAuthor().getDescription());
         holder.mTotal.setText(Uttils.fd(holder.mItem.getTotal()));
@@ -60,6 +61,13 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         productsCount = holder.mItem.getProducts().size();
         servicesCount = holder.mItem.getServices().size();
         holder.mProductCount.setText("Товаров " + productsCount.toString() + ", услуг " + servicesCount.toString());
+        if(holder.mItem.getNeedShipping()) {
+            holder.mShipping.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.mShipping.setVisibility(View.GONE);
+
+        }
 
 
         // Handle item click and set the selection
@@ -86,6 +94,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         public final TextView mPosted;
         public final TextView mContract;
         public final TextView mProductCount;
+        public final ImageView mShipping;
         public DocSale mItem;
 
         public ViewHolder(View view) {
@@ -100,6 +109,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
             mPosted = (TextView) view.findViewById(R.id.docList_Posted);
             mContract = (TextView) view.findViewById(R.id.docList_Contract);
             mProductCount = (TextView) view.findViewById(R.id.docList_ProductCount);
+            mShipping = (ImageView) view.findViewById(R.id.icon_shipping);
 
         }
 
