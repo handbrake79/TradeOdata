@@ -54,6 +54,8 @@ public class ProductsFragment extends Fragment {
     }
 
     void setAdapter() {
+        DocumentActivity activity = (DocumentActivity) getActivity();
+        docSale = activity.getDocSale();
         adapter = new SaleRowProductRecyclerViewAdapter(docSale.getProductsList(), (InteractionInterface) getActivity());
         mProductsRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();

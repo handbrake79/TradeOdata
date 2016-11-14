@@ -25,7 +25,7 @@ public interface ShippingInterface {
 
     void onUnloadCostChanged(int unloadCost, TextInputLayout til);
 
-    void onWorkersChanged(int workers);
+    void onWorkersChanged(int workers, TextInputLayout til);
 
     void onAddressChanged(String address);
 

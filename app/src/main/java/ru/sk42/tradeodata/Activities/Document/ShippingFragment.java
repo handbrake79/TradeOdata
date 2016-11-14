@@ -118,6 +118,9 @@ public class ShippingFragment extends Fragment {
     @Bind(R.id.til_unload_cost)
     TextInputLayout tilUnloadCost;
 
+    @Bind(R.id.til_Workers)
+    TextInputLayout tilWorkers;
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -288,6 +291,24 @@ public class ShippingFragment extends Fragment {
                 return false;
             }
         });
+
+        mWorkersCountEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+                if (mWorkersCountEditText.getText() != null) {
+                    int count = 0;
+                    try {
+                        count = Integer.valueOf(mWorkersCountEditText.getText().toString());
+                    } catch (NumberFormatException e) {
+                        count = 0;
+                    }
+                    mListenerShipping.onWorkersChanged(count, tilWorkers);
+                }
+                return false;
+            }
+        });
+
 
         mNeedShippingSwitch.setChecked(docSale.getNeedShipping());
         toggleShippingElements(mNeedShippingSwitch.isChecked());
@@ -471,28 +492,7 @@ public class ShippingFragment extends Fragment {
         }
     }
 
-    private void submit() {
-        mListenerShipping.onNeedShippingChanged(mNeedShippingSwitch.isChecked());
 
-        mListenerShipping.onDateChanged(mDate, mShippingDateText);
-        mListenerShipping.onTimeFromChanged(mTimeFrom, mTimeFromText);
-        mListenerShipping.onTimeToChanged(mTimeTo, mTimeToText);
-
-        mListenerShipping.onAddressChanged(mShippingAddressEditText.getText().toString());
-
-        mListenerShipping.onVehicleTypeChanged(mVehicleTypeSpinner.getSelectedItem().toString(), (TextView) mVehicleTypeSpinner.getSelectedView());
-        mListenerShipping.onStartingPointChanged(mStartingPointSpinner.getSelectedItem().toString(), (TextView) mStartingPointSpinner.getSelectedView());
-        mListenerShipping.onRouteChanged(mRouteText.getText().toString(), mRouteText);
-
-        mListenerShipping.onShippingCostChanged(Integer.valueOf(mShippingCostEditText.getText().toString()), tilShippingCost);
-
-        mListenerShipping.onNeedUnloadChanged(mNeedUnloadSwitch.isChecked());
-        mListenerShipping.onWorkersChanged(Integer.valueOf(mWorkersCountEditText.getText().toString()));
-
-        mListenerShipping.onUnloadCostChanged(Integer.valueOf(mUnloadCostEditText.getText().toString()), tilUnloadCost);
-
-        initView();
-    }
 
     private void onNeedUnloadChanged() {
         boolean needUnload = mNeedUnloadSwitch.isChecked();

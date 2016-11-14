@@ -17,8 +17,8 @@ import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.R;
 
 
-public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsListBrowser_Adapter.ViewHolder> implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
-
+public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsListBrowser_Adapter.ViewHolder>{
+// implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder>
     private final List<Product> items;
     private final InteractionInterface mListener;
     private Product parentProduct;
@@ -35,61 +35,6 @@ public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsLi
         this.parentProduct = parentProduct;
     }
 
-    @Override
-    public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.product_browser_header, parent, false);
-        return new RecyclerView.ViewHolder(view) {
-        };
-    }
-
-    @Override
-    public long getHeaderId(int position) {
-//        Product product = getItem(position);
-//        if (product.isFirstLevelCategory() || product.isTopCategory())
-//            return -1;
-//        else
-        return 0;
-        //   return getItem(position).getDescription().charAt(0);
-    }
-
-    @Override
-    public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position) {
-        TextView textView = (TextView) holder.itemView;
-        Product product = getItem(position);
-        holder.itemView.setBackgroundColor(Constants.COLORS.ENABLED);
-
-        if (product.isFirstLevelCategory()) {
-            textView.setText("Номенклатура");
-            return;
-        }
-
-        if (product.isTopCategory()) {
-            textView.setText("Top category!");
-            return;
-        }
-
-        if (product.isLowerThanFirstLevel()) {
-            if (parentProduct != null) {
-                textView.setText(parentProduct.getDescription());
-                return;
-            } else {
-                textView.setText("Вышестоящая группа");
-                return;
-            }
-        }
-
-        textView.setText("Заголовок по умолчанию");
-
-        //textView.setText(String.valueOf(product.getDescription().charAt(0)));
-    }
-
-//    private int getRandomColor() {
-//        SecureRandom rgen = new SecureRandom();
-//        return Color.HSVToColor(150, new float[]{
-//                rgen.nextInt(359), 1, 1
-//        });
-//    }
 
     public Product getItem(int position) {
         return items.get(position);

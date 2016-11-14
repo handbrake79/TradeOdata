@@ -27,7 +27,7 @@ import ru.sk42.tradeodata.R;
  * Activities containing this fragment MUST implement the {@link InteractionInterface}
  * interface.
  */
-public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
+public class ProductInfoFragment extends android.support.v4.app.Fragment {
 
     // TODO: Customize parameter argument names
     private static final String TAG = "ProductInfo***";
@@ -45,12 +45,12 @@ public class ProductInfo_Fragment extends android.support.v4.app.Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
 
-    public ProductInfo_Fragment() {
+    public ProductInfoFragment() {
     }
 
 
-    public static ProductInfo_Fragment newInstance(String refkey) {
-        ProductInfo_Fragment fragment = new ProductInfo_Fragment();
+    public static ProductInfoFragment newInstance(String refkey) {
+        ProductInfoFragment fragment = new ProductInfoFragment();
         Bundle args = new Bundle();
         args.putString("ref_Key", refkey);
         fragment.setArguments(args);

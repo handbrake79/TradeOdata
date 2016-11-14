@@ -92,7 +92,6 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
                 @Override
                 public void onClick(View v) {
                     // Redraw the old selection and the new
-                    notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
                     //mListener.onItemSelected(mValues.get(selectedItem));

@@ -28,9 +28,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
 import ru.sk42.tradeodata.Activities.InteractionInterface;
-import ru.sk42.tradeodata.Activities.ProductInfo.ProductInfo_Fragment;
-import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsListFragment;
-import ru.sk42.tradeodata.Activities.ProductsListBrowser.ViewProductsList;
+import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsListActivity;
 import ru.sk42.tradeodata.Activities.QtyInputActivity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
@@ -55,7 +53,6 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
     private static final String TAG = "Document ACTIVITY***";
 
-    ProductsListFragment productsList_fragment;
 
     DocumentFragmentPageAdapter fragmentPagerAdapter;
     ViewPager viewPager;
@@ -66,9 +63,6 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
     public ServiceResultReciever mReceiver;
 
-    //Fragments
-    QtyPickerFragment qtyPickerFragment;
-    ProductInfo_Fragment productInfo_Fragment;
 
     Menu menu;
     ProgressDialog progressDialog;
@@ -183,16 +177,16 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
     @Override
     public void onItemSelected(Object object) {
-        //это внутри фрагмента СтокИнфо при выборе строки склада
-        if (object instanceof Stock) {
-            getSupportFragmentManager().popBackStack();
-            if (docSale != null) {
-                addNewProductRow((Stock) object);
-            } else {
-                Toast.makeText(this, "не выбран документ", Toast.LENGTH_SHORT).show();
-            }
-
-        }
+//        //это внутри фрагмента СтокИнфо при выборе строки склада
+//        if (object instanceof Stock) {
+//            getSupportFragmentManager().popBackStack();
+//            if (docSale != null) {
+//                addNewProductRow((Stock) object);
+//            } else {
+//                Toast.makeText(this, "не выбран документ", Toast.LENGTH_SHORT).show();
+//            }
+//
+//        }
         if (object instanceof SaleRecord) {
             showQtyPickerActivity((SaleRecord) object);
         }
@@ -218,29 +212,8 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
     }
 
-
-    private void showProductsPage() {
-        viewPager.post(new Runnable() {
-            @Override
-            public void run() {
-                viewPager.setCurrentItem(1);
-            }
-        });
-    }
-
-    private void showServicesPage() {
-        viewPager.post(new Runnable() {
-            @Override
-            public void run() {
-                viewPager.setCurrentItem(2);
-            }
-        });
-    }
-
     @Override
     public void onRequestSuccess(Object object) {
-        if (object instanceof ProductInfo)
-            showProductInfoActivity((ProductInfo) object);
     }
 
     @Override
@@ -323,8 +296,13 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
     }
 
     @Override
-    public void onWorkersChanged(int workers) {
+    public void onWorkersChanged(int workers, TextInputLayout til) {
         docSale.setWorkersCount(workers);
+        if (workers == 0 && docSale.getNeedUnload() || workers > 5) {
+            til.setError("проверьте грузчиков!");
+        } else {
+            til.setError(null);
+        }
         recalc();
     }
 
@@ -442,31 +420,16 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
 
     private void showProductsListFragment() {
-        Intent intent = new Intent(this, ViewProductsList.class);
+        Intent intent = new Intent(this, ProductsListActivity.class);
         startActivityForResult(intent, 100);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null)
-        {
+        if (data == null) {
             return;
         }
         if (requestCode == 100 && resultCode == 0) {
-            ProductInfo productInfo = null;
-            String ref_Key = data.getStringExtra("ref_Key");
-            if (ref_Key != null) {
-                try {
-                    productInfo = ProductInfo.getObject(ProductInfo.class, ref_Key);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (productInfo != null) {
-                    showProductInfoActivity(productInfo);
-                }
-            }
-        }
-        if (requestCode == 200 && resultCode == 0) {
 
             Stock stock = null;
             int id = data.getIntExtra("id", -1);
@@ -498,20 +461,23 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
                             docSale.getProducts()) {
                         if (rec.getId() == id) {
                             rec.setQty(qty);
-                            recalc();
                         }
                     }
                 }
             }
         }
-    }
+
+        recalc();
 
 
-    private void showProductInfoActivity(ProductInfo productInfo) {
+        viewPager.post(new Runnable() {
+            @Override
+            public void run() {
+                viewPager.setCurrentItem(1);
+            }
+        });
 
-        Intent intent = new Intent(this, ViewProductsList.class);
-        startActivityForResult(intent, 200);
-
+        fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
     }
 
 

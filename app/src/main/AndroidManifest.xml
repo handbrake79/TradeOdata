@@ -30,13 +30,13 @@
         <activity
             android:name=".Activities.Documents_List.DocList_Activity"
             android:label="@string/title_activity_documents__list_"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
 
         <service
             android:name=".Services.LoadDataFromServer"
             android:exported="false" />
 
-        <activity android:name=".Activities.ProductsListBrowser.ViewProductsList" />
+        <activity android:name=".Activities.ProductsListBrowser.ProductsListActivity" />
         <activity android:name=".Activities.ProductInfo.ProductInfoActivity" />
         <activity android:name=".Activities.QtyInputActivity"></activity>
     </application>

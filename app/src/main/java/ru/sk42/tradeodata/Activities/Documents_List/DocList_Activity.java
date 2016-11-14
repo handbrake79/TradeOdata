@@ -6,14 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
@@ -65,23 +64,21 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         mReceiver = new ServiceResultReciever(new Handler());
         mReceiver.setReceiver(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         startDate = SettingsOld.getStartDate();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "", Snackbar.LENGTH_LONG)
-                        .setAction("Изменить дату", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view1) {
-                                selectDate();
-                            }
-                        }).show();
-
+                Toast.makeText(DocList_Activity.this, "Создать новый документ!", Toast.LENGTH_SHORT).show();
+//                Snackbar.make(view, "", Snackbar.LENGTH_LONG)
+//                        .setAction("", new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view1) {
+//                                selectDate();
+//                            }
+//                        }).show();
+//
             }
         });
 
@@ -98,18 +95,28 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
             setActionBarTitle();
 
         }
-//        selectDate();
     }
 
     private void setActionBarTitle() {
-        ActionBar actionBar = getSupportActionBar();
         String title = Uttils.DATE_FORMATTER.format(startDate.getTime());
         if (doc_list != null)
             title += " документов " + doc_list.size().toString() + "";
         else
             title += " документов еще нет";
-        actionBar.setTitle(title);
 
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View viewActionBar = inflater.inflate(R.layout.custom_actionbar, null);
+
+        TextView tv = (TextView) viewActionBar.findViewById(R.id.customt_actionbar_caption);
+        tv.setText(title);
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectDate();
+            }
+        });
+        getSupportActionBar().setCustomView(viewActionBar);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
     }
 
     private void setAdapter() {
@@ -118,6 +125,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setmValues(doc_list.getArrayList());
         mAdapter.notifyDataSetChanged();
+        setActionBarTitle();
     }
 
 
@@ -137,8 +145,8 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
         CalendarDatePickerDialogFragment datePickerDialog = new CalendarDatePickerDialogFragment()
                 .setPreselectedDate(y, m, d)
-                .setFirstDayOfWeek(Calendar.MONDAY)
                 .setOnDateSetListener(new OnDateSetListener())
+                .setFirstDayOfWeek(Calendar.MONDAY)
                 .setDoneText("Выбрать")
                 .setCancelText("Отмена")
                 .setThemeLight();
@@ -161,7 +169,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 0){
+        if (requestCode == 0) {
             //закрылся документ
             setAdapter();
         }

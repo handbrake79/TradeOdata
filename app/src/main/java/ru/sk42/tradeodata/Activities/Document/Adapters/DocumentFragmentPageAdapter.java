@@ -68,15 +68,18 @@ public class DocumentFragmentPageAdapter extends FragmentPagerAdapter {
     }
 
     public void notifyFragmentDataSetChanged(int position) {
-        switch (position)
-        {
+        switch (position) {
             case 0:
                 break;
             case 1:
-                productsFragment.notifyDataChanged();
+                if (productsFragment != null) {
+                    productsFragment.notifyDataChanged();
+                }
                 break;
             case 2:
-                servicesFragment.notifyDataChanged();
+                if (servicesFragment != null) {
+                    servicesFragment.notifyDataChanged();
+                }
                 break;
             case 3:
                 break;

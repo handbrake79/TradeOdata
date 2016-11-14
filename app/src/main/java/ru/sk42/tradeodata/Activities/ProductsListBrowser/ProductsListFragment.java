@@ -52,6 +52,7 @@ public class ProductsListFragment extends Fragment {
     private List<Product> productArrayList = new ArrayList<>();
     private ProductsListBrowser_Adapter mAdapter;
 
+    private ProductsListActivity parentACtivity;
     String lastViewedGroupKey;
 
     //ProgressDialog progressDialog;
@@ -92,30 +93,8 @@ public class ProductsListFragment extends Fragment {
             }
             mAdapter = new ProductsListBrowser_Adapter(productArrayList, mListener, this);
             mRecyclerView.setAdapter(mAdapter);
-
-
-            final StickyRecyclerHeadersDecoration headersDecor = new StickyRecyclerHeadersDecoration(mAdapter);
-            mRecyclerView.addItemDecoration(headersDecor);
             mRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
 
-            mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                @Override
-                public void onChanged() {
-                    headersDecor.invalidateHeaders();
-                }
-            });
-
-
-            StickyRecyclerHeadersTouchListener touchListener =
-                    new StickyRecyclerHeadersTouchListener(mRecyclerView, headersDecor);
-            touchListener.setOnHeaderClickListener(
-                    new StickyRecyclerHeadersTouchListener.OnHeaderClickListener() {
-                        @Override
-                        public void onHeaderClick(View header, int position, long headerId) {
-                            showParentProducts();
-                        }
-                    });
-            mRecyclerView.addOnItemTouchListener(touchListener);
 
             lastViewedGroupKey = Settings.getLastViewedProductGroupStatic();
             if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.NULL_GUID)) {
@@ -182,6 +161,7 @@ public class ProductsListFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement InteractionInterface");
         }
+        parentACtivity = (ProductsListActivity) context;
     }
 
     public void showParentProducts() {
@@ -221,13 +201,17 @@ public class ProductsListFragment extends Fragment {
         return list;
     }
 
+    private void setTitle(String title){
+        parentACtivity.setActionBarTitle(title);
+    }
+
     public void showChildrenProducts(Product product) {
 
         if (!product.isFolder()) {
             return; //это не группа, оставляем всё как есть
         }
 
-        getActivity().setTitle(product.getDescription());
+        setTitle(product.getDescription());
 
         String guid = product.getRef_Key();
         currentCategory = product;
@@ -248,7 +232,7 @@ public class ProductsListFragment extends Fragment {
 
     public void showTopLevelProducts() {
         currentCategory = Product.getStub();
-        getActivity().setTitle("Номенклатура");
+        setTitle("Номенклатура");
         String guid = Constants.NULL_GUID;
         List<Product> list = getProductsByParent(guid);
         if (list == null || list.size() == 0) {

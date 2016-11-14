@@ -1,35 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/DocList_Activity"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".Activities.Documents_List.DocList_Activity">
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/doclist_drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-             />
-
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v7.widget.RecyclerView android:layout_width="match_parent"
-        android:layout_marginTop="40dp"
+    <ListView
+        android:id="@+id/doclist_left_drawer"
+        android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:id="@+id/rvDocList"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:layout_gravity="start"
+        android:background="#111"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp" />
 
-    </android.support.v7.widget.RecyclerView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
 
+        <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/rvDocList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -39,4 +39,5 @@
         android:onClick="fab_onclick"
         android:src="@android:drawable/ic_menu_today" />
 
-</android.support.design.widget.CoordinatorLayout>
+
+</android.support.v4.widget.DrawerLayout>
