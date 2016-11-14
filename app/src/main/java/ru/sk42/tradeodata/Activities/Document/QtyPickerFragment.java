@@ -14,6 +14,8 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import ru.sk42.tradeodata.Helpers.Uttils;
+import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.R;
 
 /**
@@ -46,7 +48,7 @@ public class QtyPickerFragment extends DialogFragment {
     @Bind(R.id.qty_fragment_total)
     TextView mTotal;
 
-    Object record;
+    SaleRecord record;
     private double mQty;
     private double mPrice;
     private int mLineNumber;
@@ -64,24 +66,17 @@ public class QtyPickerFragment extends DialogFragment {
      * @return A new instance of fragment QtyPickerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static QtyPickerFragment newInstance(Object record, double mQty, double mPrice, int lineNumber) {
+    public static QtyPickerFragment newInstance(SaleRecord record) {
         QtyPickerFragment fragment = new QtyPickerFragment();
-        Bundle args = new Bundle();
-        args.putDouble(tagQty, mQty);
-        args.putDouble(tagPrice, mPrice);
-        args.putInt(tagLineNumber, lineNumber);
-        fragment.setArguments(args);
+        fragment.record = record;
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mQty = getArguments().getDouble(tagQty);
-            mPrice = getArguments().getDouble(tagPrice);
-            mLineNumber = getArguments().getInt(tagLineNumber);
-        }
+        mQty = record.getQty();
+        mPrice = record.getPrice();
     }
 
     @Override
@@ -99,9 +94,8 @@ public class QtyPickerFragment extends DialogFragment {
 
     private void initViewData() {
 
-        inputQtyNumberEdittext.setText(String.valueOf(mQty));
-        double total = mQty * mPrice;
-        mTotal.setText("На сумму " + String.valueOf(total));
+        inputQtyNumberEdittext.setText(String.valueOf(record.getQty()));
+        mTotal.setText("Цена " + Uttils.fd(record.getPrice()) + " руб., сумма " + Uttils.fd(record.getTotal()) + " руб.");
     }
 
 
@@ -152,26 +146,17 @@ public class QtyPickerFragment extends DialogFragment {
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
-                mListener.onQtyFragmentInteraction(record, mQty, mLineNumber);
-                //getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+                record.setQty(mQty);
+                mListener.onQtyFragmentInteraction(record);
                 break;
         }
+        record.setQty(mQty);
         initViewData();
     }
 
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnQtyFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onQtyFragmentInteraction(Object record, double qty, int lineNumber);
+        void onQtyFragmentInteraction(SaleRecord record);
     }
 }

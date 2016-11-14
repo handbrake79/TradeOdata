@@ -12,32 +12,33 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="ru.sk42.tradeodata.Activities.MainActivity">
+        <activity android:name=".Activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="ru.sk42.tradeodata.Activities.SettingsActivity">
+        <activity android:name=".Activities.SettingsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filter>
         </activity>
-
-
-        <activity android:name="ru.sk42.tradeodata.Activities.Document.DocumentActivity" />
+        <activity android:name=".Activities.Document.DocumentActivity" />
         <activity
-            android:name="ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity"
+            android:name=".Activities.Documents_List.DocList_Activity"
             android:label="@string/title_activity_documents__list_"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <service
-            android:name="ru.sk42.tradeodata.Services.LoadDataFromServer"
-            android:exported="false"></service>
+            android:name=".Services.LoadDataFromServer"
+            android:exported="false" />
 
+        <activity android:name=".Activities.ProductsListBrowser.ViewProductsList" />
+        <activity android:name=".Activities.ProductInfo.ProductInfoActivity" />
+        <activity android:name=".Activities.QtyInputActivity"></activity>
     </application>
 
 </manifest>

@@ -50,7 +50,7 @@ import static ru.sk42.tradeodata.Helpers.Uttils.TIME_FORMATTER;
 
 
 // In this case, the fragment displays simple text based on the page
-public class ShippingFragment extends Fragment implements ErrorInterface {
+public class ShippingFragment extends Fragment {
 
     private ShippingInterface mListenerShipping;
 
@@ -142,6 +142,8 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
 
 
     private void initView() {
+
+        mNeedShippingSwitch.requestFocus();
 
         DocumentActivity activity = (DocumentActivity) getActivity();
         docSale = activity.getDocSale();
@@ -253,6 +255,39 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
             }
         });
 
+        mShippingCostEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+                if (mShippingAddressEditText.getText() != null) {
+                    int cost = 0;
+                    try {
+                        cost = Integer.valueOf(mShippingCostEditText.getText().toString());
+                    } catch (NumberFormatException e) {
+                        cost = 0;
+                    }
+                    mListenerShipping.onShippingCostChanged(cost, tilShippingCost);
+                }
+                return false;
+            }
+        });
+
+        mUnloadCostEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+                if (mUnloadCostEditText.getText() != null) {
+                    int cost = 0;
+                    try {
+                        cost = Integer.valueOf(mUnloadCostEditText.getText().toString());
+                    } catch (NumberFormatException e) {
+                        cost = 0;
+                    }
+                    mListenerShipping.onUnloadCostChanged(cost, tilUnloadCost);
+                }
+                return false;
+            }
+        });
 
         mNeedShippingSwitch.setChecked(docSale.getNeedShipping());
         toggleShippingElements(mNeedShippingSwitch.isChecked());
@@ -264,8 +299,6 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         mUnloadCostEditText.setText(docSale.getUnloadCost().toString());
 
         mWorkersCountEditText.setText(docSale.getWorkersCount().toString());
-
-        mNeedShippingSwitch.requestFocus();
 
         toggleShippingElements(docSale.getNeedShipping());
 
@@ -504,16 +537,9 @@ public class ShippingFragment extends Fragment implements ErrorInterface {
         mShippingCostEditText.setEnabled(state);
 
         mNeedUnloadSwitch.setEnabled(state);
-//        mWorkersCountEditText.setEnabled(state);
-//        mUnloadCostEditText.setEnabled(state);
-        //submitButton.setEnabled(state);
 
     }
 
-    @Override
-    public void onError(int resourceID, String error) {
-
-    }
 
     class TimeFromListener implements RadialTimePickerDialogFragment.OnTimeSetListener {
         @Override

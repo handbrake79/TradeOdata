@@ -99,6 +99,7 @@ public class SaleRecord {
 
     public void setQty(double qty) {
         this.qty = qty;
+        this.total = this.qty * this.price;
     }
 
     public String getProduct_Key() {

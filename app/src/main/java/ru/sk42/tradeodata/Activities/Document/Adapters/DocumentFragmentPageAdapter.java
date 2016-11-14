@@ -17,6 +17,11 @@ public class DocumentFragmentPageAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 4;
     private String tabTitles[] = new String[]{"Реквизиты", "Товары", "Услуги", "Доставка"};
 
+    public RequisitesFragment requisitesFragment;
+    public ProductsFragment productsFragment;
+    public ServicesFragment servicesFragment;
+    public ShippingFragment shippingFragment;
+
     public DocumentFragmentPageAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -30,22 +35,52 @@ public class DocumentFragmentPageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new RequisitesFragment();
+                if (requisitesFragment == null) {
+                    requisitesFragment = new RequisitesFragment();
+                }
+                return requisitesFragment;
             case 1:
-                return new ProductsFragment();
+                if (productsFragment == null) {
+                    productsFragment = new ProductsFragment();
+                }
+                return productsFragment;
             case 2:
-                return new ServicesFragment();
+                if (servicesFragment == null) {
+                    servicesFragment = new ServicesFragment();
+                }
+                return servicesFragment;
             case 3:
-                return new ShippingFragment();
-
-
+                if (shippingFragment == null) {
+                    shippingFragment = new ShippingFragment();
+                }
+                return shippingFragment;
         }
-        return new RequisitesFragment();
+        if (requisitesFragment == null) {
+            requisitesFragment = new RequisitesFragment();
+        }
+        return requisitesFragment;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position
         return tabTitles[position];
+    }
+
+    public void notifyFragmentDataSetChanged(int position) {
+        switch (position)
+        {
+            case 0:
+                break;
+            case 1:
+                productsFragment.notifyDataChanged();
+                break;
+            case 2:
+                servicesFragment.notifyDataChanged();
+                break;
+            case 3:
+                break;
+
+        }
     }
 }

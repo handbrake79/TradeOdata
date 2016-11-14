@@ -129,16 +129,20 @@ public class Stock extends CDO {
 
     @Override
     public String getRef_Key() {
-        return null;
+
+        throw new RuntimeException("Stub!");
+
     }
 
     @Override
     public void setRef_Key(String s) {
+        throw new RuntimeException("Stub!");
 
     }
 
     @Override
     public void setDescription(String s) {
+        throw new RuntimeException("Stub!");
 
     }
 

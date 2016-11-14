@@ -15,6 +15,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
+import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
 
@@ -53,6 +54,9 @@ public class RequisitesFragment extends Fragment {
 
     @Bind(R.id.input_comment)
     EditText mComment;
+
+    @Bind(R.id.doc_page_req_disc_text)
+    TextView mDiscountCard;
 
     private DocSale docSale;
     private InteractionInterface mListener;
@@ -140,6 +144,11 @@ public class RequisitesFragment extends Fragment {
                 docSale.setComment(editable.toString());
             }
         });
+
+        DiscountCard card = docSale.getDiscountCard();
+        if(card != null){
+            mDiscountCard.setText(docSale.getDiscountCard().toString());
+        }
     }
 
     @Override

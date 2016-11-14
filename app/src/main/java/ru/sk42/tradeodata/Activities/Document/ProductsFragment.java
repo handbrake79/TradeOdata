@@ -49,16 +49,19 @@ public class ProductsFragment extends Fragment {
         mProductsRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
         mProductsRecyclerView.setSelected(true);
         mProductsRecyclerView.setLayoutManager(new LinearLayoutManager(mProductsRecyclerView.getContext()));
+        setAdapter();
+        return mProductsRecyclerView;
+    }
+
+    void setAdapter() {
         adapter = new SaleRowProductRecyclerViewAdapter(docSale.getProductsList(), (InteractionInterface) getActivity());
         mProductsRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
-        return mProductsRecyclerView;
     }
 
     public void notifyDataChanged() {
-        adapter.notifyDataSetChanged();
+        setAdapter();
     }
-
 
 }

@@ -27,10 +27,12 @@ import java.util.Calendar;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
-import ru.sk42.tradeodata.Activities.Documents_List.OnDocumentSaved;
 import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductInfo.ProductInfo_Fragment;
-import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsList_Fragment;
+import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsListFragment;
+import ru.sk42.tradeodata.Activities.ProductsListBrowser.ViewProductsList;
+import ru.sk42.tradeodata.Activities.QtyInputActivity;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
@@ -38,8 +40,8 @@ import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
+import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
-import ru.sk42.tradeodata.Model.Document.SaleRecordService;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
@@ -53,15 +55,7 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
     private static final String TAG = "Document ACTIVITY***";
 
-    ProductsList_Fragment productsList_fragment;
-
-    public static DocumentActivity newInstance(OnDocumentSaved mListener){
-        DocumentActivity activity = new DocumentActivity();
-        activity.mListener = mListener;
-        return activity;
-    }
-
-    OnDocumentSaved mListener;
+    ProductsListFragment productsList_fragment;
 
     DocumentFragmentPageAdapter fragmentPagerAdapter;
     ViewPager viewPager;
@@ -75,8 +69,6 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
     //Fragments
     QtyPickerFragment qtyPickerFragment;
     ProductInfo_Fragment productInfo_Fragment;
-    //fragments
-
 
     Menu menu;
     ProgressDialog progressDialog;
@@ -161,6 +153,23 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
         if (docSale == null)
             reloadDocSale();
 
+        pagerSlidingTabStrip.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                fragmentPagerAdapter.notifyFragmentDataSetChanged(position);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         callDataLoaderService();
 
     }
@@ -184,11 +193,8 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
             }
 
         }
-        if (object instanceof SaleRecordProduct) {
-            showQtyPickerFragment((SaleRecordProduct) object);
-        }
-        if (object instanceof SaleRecordService) {
-            showQtyPickerFragment((SaleRecordService) object);
+        if (object instanceof SaleRecord) {
+            showQtyPickerActivity((SaleRecord) object);
         }
     }
 
@@ -234,7 +240,7 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
     @Override
     public void onRequestSuccess(Object object) {
         if (object instanceof ProductInfo)
-            showStockInfoFragment((ProductInfo) object);
+            showProductInfoActivity((ProductInfo) object);
     }
 
     @Override
@@ -281,6 +287,8 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
     private void recalc() {
         docSale.reCalculateTotal();
         refreshTotal();
+        fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
+        fragmentPagerAdapter.notifyFragmentDataSetChanged(2);
     }
 
     @Override
@@ -434,58 +442,90 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
 
     private void showProductsListFragment() {
+        Intent intent = new Intent(this, ViewProductsList.class);
+        startActivityForResult(intent, 100);
+    }
 
-        if (productsList_fragment != null && productsList_fragment.isVisible()) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null)
+        {
             return;
         }
+        if (requestCode == 100 && resultCode == 0) {
+            ProductInfo productInfo = null;
+            String ref_Key = data.getStringExtra("ref_Key");
+            if (ref_Key != null) {
+                try {
+                    productInfo = ProductInfo.getObject(ProductInfo.class, ref_Key);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (productInfo != null) {
+                    showProductInfoActivity(productInfo);
+                }
+            }
+        }
+        if (requestCode == 200 && resultCode == 0) {
 
-        productsList_fragment = new ProductsList_Fragment();
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, productsList_fragment, String.valueOf(R.id.rvProductsListFragment))
-                .addToBackStack(productsList_fragment.getClass().getName())
-                .commit();
-
-    }
-
-    private void showStockInfoFragment(ProductInfo productInfo) {
-
-        if (productInfo == null) {
-            Log.e(TAG, "showStockInfoFragment: productInfo is NULL", new Exception());
-            finish();
+            Stock stock = null;
+            int id = data.getIntExtra("id", -1);
+            if (id != -1) {
+                try {
+                    stock = MyHelper.getStockDao().queryForId(id);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (stock != null) {
+                    addNewProductRow(stock);
+                }
+            }
         }
 
-        productInfo_Fragment = ProductInfo_Fragment.newInstance(productInfo.getRef_Key());
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content_frame, productInfo_Fragment, String.valueOf(R.id.linearlayoutProductInfo))
-                .addToBackStack(productInfo_Fragment.getClass().getCanonicalName())
-                .commit();
+        if (requestCode == 300 && resultCode == 0) {
+
+            SaleRecord record = null;
+            int id = data.getIntExtra("id", -1);
+            double qty = data.getDoubleExtra("qty", -1);
+            if (id != -1) {
+                try {
+                    record = MyHelper.getSaleRecordDao().queryForId(id);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (record != null) {
+                    for (SaleRecordProduct rec :
+                            docSale.getProducts()) {
+                        if (rec.getId() == id) {
+                            rec.setQty(qty);
+                            recalc();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void showProductInfoActivity(ProductInfo productInfo) {
+
+        Intent intent = new Intent(this, ViewProductsList.class);
+        startActivityForResult(intent, 200);
 
     }
 
 
-    private void showQtyPickerFragment(SaleRecordProduct recordProduct) {
-        qtyPickerFragment = QtyPickerFragment.newInstance(recordProduct, recordProduct.getQty(), recordProduct.getActualPrice(), recordProduct.getLineNumber());
+    private void showQtyPickerActivity(SaleRecord record) {
+        if (record.getProduct_Key().equals(Constants.SHIPPING_GUID) ||
+                record.getProduct_Key().equals(Constants.UNLOAD_GUID)) {
+            return; //для услуг по доставке и разгрузке не редактируем кол-во
+        }
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content_frame, qtyPickerFragment, qtyPickerFragment.getClass().getName())
-                .addToBackStack(qtyPickerFragment.getClass().getName())
-                .commit();
-
+        Intent intent = new Intent(this, QtyInputActivity.class);
+        intent.putExtra("id", record.getId());
+        startActivityForResult(intent, 300);
     }
 
-    private void showQtyPickerFragment(SaleRecordService recordService) {
-        qtyPickerFragment = QtyPickerFragment.newInstance(recordService, recordService.getQty(), recordService.getPrice(), recordService.getLineNumber());
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content_frame, qtyPickerFragment, qtyPickerFragment.getClass().getName())
-                .addToBackStack(qtyPickerFragment.getClass().getName())
-                .commit();
-
-    }
 
     private void setActionBarTitle() {
         ActionBar actionBar = getSupportActionBar();
@@ -523,32 +563,10 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
     }
 
     @Override
-    public void onQtyFragmentInteraction(Object record, double qty, int lineNumber) {
-
+    public void onQtyFragmentInteraction(SaleRecord record) {
         getSupportFragmentManager().popBackStack();
 
-        if (record instanceof SaleRecordProduct) {
-            for (SaleRecordProduct row : docSale.getProducts()
-                    ) {
-                if (row.getLineNumber() == lineNumber) {
-                    row.setQty(qty);
-                }
-            }
-            showProductsPage();
-        }
-        if (record instanceof SaleRecordService) {
-            for (SaleRecordService row : docSale.getServices()
-                    ) {
-                if (row.getLineNumber() == lineNumber) {
-                    row.setQty(qty);
-                }
-            }
-            showServicesPage();
-        }
-
-        docSale.reCalculateTotal();
-
-
+        recalc();
     }
 
     public void saveLocal() {

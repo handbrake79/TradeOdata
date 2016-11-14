@@ -1,5 +1,7 @@
 package ru.sk42.tradeodata.Model.Document;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,12 +23,15 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SaleRecordProduct extends SaleRecord {
 
+    static final String TAG = "SaleRecordProduct***";
+
     @DatabaseField
     @JsonProperty("ПроцентСкидкиНаценки")
-    private Integer discountPercentManual;
+    private int discountPercentManual;
+
     @DatabaseField
     @JsonProperty("ПроцентАвтоматическихСкидок")
-    private Integer discountPercentAuto;
+    private int discountPercentAuto;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("ЕдиницаИзмерения_Key")
@@ -52,7 +57,6 @@ public class SaleRecordProduct extends SaleRecord {
         this.id = id;
     }
 
-
     public Store getStore() {
         return store;
     }
@@ -62,10 +66,10 @@ public class SaleRecordProduct extends SaleRecord {
     }
 
     public Integer getDiscountPercentAuto() {
-        return discountPercentAuto.intValue();
+        return discountPercentAuto;
     }
 
-    public void setDiscountPercentAuto(Integer discountPercentAuto) {
+    public void setDiscountPercentAuto(int discountPercentAuto) {
         this.discountPercentAuto = discountPercentAuto;
     }
 
@@ -86,10 +90,10 @@ public class SaleRecordProduct extends SaleRecord {
     }
 
     public Integer getDiscountPercentManual() {
-        return discountPercentManual.intValue();
+        return discountPercentManual;
     }
 
-    public void setDiscountPercentManual(Integer discountPercentManual) {
+    public void setDiscountPercentManual(int discountPercentManual) {
         this.discountPercentManual = discountPercentManual;
     }
 
@@ -120,5 +124,20 @@ public class SaleRecordProduct extends SaleRecord {
 
     public double getActualPrice() {
         return Math.round(this.total / this.qty * 100) / 100;
+    }
+
+    @Override
+    public void setQty(double qty){
+        this.qty = qty;
+        this.total = this.qty * this.price;
+
+        try {
+            int discount = this.discountPercentManual + this.discountPercentAuto;
+            if(discount > 0){
+                this.total = this.total / 100 * (100 - discount);
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "setQty: " + e.toString());
+        }
     }
 }

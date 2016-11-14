@@ -47,18 +47,24 @@ public class ServicesFragment extends Fragment {
         view = inflater.inflate(R.layout.doc_page_services, container, false);
         ButterKnife.bind(this, view);
 
+        setAdapter();
+
+        return view;
+
+    }
+
+    private void setAdapter() {
         mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
         mServicesRecyclerView.setSelected(true);
         mServicesRecyclerView.setLayoutManager(new LinearLayoutManager(mServicesRecyclerView.getContext()));
         adapter = new SaleRowServiceRecyclerViewAdapter(docSale.getServicesList(), (InteractionInterface) getActivity());
         mServicesRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-
-        return view;
-
     }
 
     public void notifyDataChanged(){
-        adapter.notifyDataSetChanged();
+        if(adapter != null) {
+            setAdapter();
+        }
     }
 }

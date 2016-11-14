@@ -22,9 +22,9 @@ public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsLi
     private final List<Product> items;
     private final InteractionInterface mListener;
     private Product parentProduct;
-    private ProductsList_Fragment owner_fragment;
+    private ProductsListFragment owner_fragment;
 
-    public ProductsListBrowser_Adapter(List<Product> items, InteractionInterface listener, final ProductsList_Fragment ownerfragment) {
+    public ProductsListBrowser_Adapter(List<Product> items, InteractionInterface listener, final ProductsListFragment ownerfragment) {
         this.items = items;
         mListener = listener;
         owner_fragment = ownerfragment;
@@ -118,7 +118,7 @@ public class ProductsListBrowser_Adapter extends RecyclerView.Adapter<ProductsLi
             @Override
             public void onClick(View v) {
                 if (null != owner_fragment) {
-                    owner_fragment.onItemSelection(holder.mItem);
+                    owner_fragment.onItemSelected(holder.mItem);
                 }
             }
         });

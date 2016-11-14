@@ -58,7 +58,7 @@ public class Uttils {
     }
 
     public static String fd(double d) {
-        DecimalFormat df = new DecimalFormat("#.00");
+        DecimalFormat df = new DecimalFormat("#0.00");
         return String.valueOf(df.format(d));
     }
 }

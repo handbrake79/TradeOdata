@@ -14,23 +14,19 @@
         android:dividerHeight="0dp" />
 
 
-    <FrameLayout
-        android:id="@+id/content_frame"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/llDocMainFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/llDocMainFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="10"
-            android:background="@color/cardview_light_background"
-            android:orientation="vertical"
-            android:padding="5dp">
+        android:layout_height="match_parent"
+        android:layout_weight="10"
+        android:background="@color/cardview_light_background"
+        android:orientation="vertical"
+        android:padding="5dp">
 
 
             <LinearLayout
+                android:id="@+id/ll_test"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -53,12 +49,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="7"
                     android:background="@android:color/white" />
+
             </LinearLayout>
 
-            <include layout="@layout/bottom_sheet_total" />
+        <include layout="@layout/bottom_sheet_total" />
 
-        </android.support.design.widget.CoordinatorLayout>
-    </FrameLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
 
 </android.support.v4.widget.DrawerLayout>

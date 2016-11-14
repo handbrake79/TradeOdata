@@ -29,6 +29,7 @@ import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.DocSaleList;
+import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
 import ru.sk42.tradeodata.Model.Document.SaleRecordService;
 import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
@@ -341,6 +342,17 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
             return null;
         }
 
+
+    }
+
+    public static Dao<SaleRecord, Object> getSaleRecordDao() {
+
+        try {
+            return getInstance().getDao(SaleRecord.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
 
     }
 }

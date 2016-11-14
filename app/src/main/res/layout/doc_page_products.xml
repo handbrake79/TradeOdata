@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This is the fragment  to be displayed for a section associated with a tab -->
 <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingBottom="30dp"
     android:id="@+id/rvDocPageProducts"
     android:layout_width="match_parent"
     android:layout_height="match_parent">

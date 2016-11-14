@@ -131,8 +131,14 @@ public class LoadDataFromServer extends IntentService {
     private void Preload() {
 
         sendFeedback("Начата предварительная загрузка");
-        //loadProducts();
+
+        loadProducts();
+
         loadCustomers();
+
+        loadVehicleTypes();
+
+        loadStores();
 
         loadDiscountCards();
 
@@ -141,10 +147,6 @@ public class LoadDataFromServer extends IntentService {
         loadUnits();
 
         loadContracts();
-
-        loadVehicleTypes();
-
-        loadStores();
 
         loadUsers();
 
@@ -158,7 +160,6 @@ public class LoadDataFromServer extends IntentService {
 
         loadShippingRates();
 
-        loadProducts();
 
         sendServiceFinished("Загрузка справочников завершена");
     }
@@ -500,7 +501,7 @@ public class LoadDataFromServer extends IntentService {
         String filter = "Date gt datetime'" + df1 + "' and Date lt datetime'" + df2 + "'" + " and Контрагент_Key eq guid'" + Constants.CUSTOMER_GUID + "'" + " and Ответственный_Key eq guid'" + SettingsOld.getCurrentUser().getRef_Key() + "'";
 
 
-        sendFeedback("Загрузка документов за период " + df1 + " - " + df2);
+        sendFeedback("Загрузка документов на " + Uttils.DATE_FORMATTER.format(d1.getTime()));
 
         DocsRequest request = ServiceGenerator.createService(DocsRequest.class);
         Call<DocSaleList> callDocuments = request.call(RetroConstants.getMap(filter));
@@ -518,7 +519,7 @@ public class LoadDataFromServer extends IntentService {
                 try {
                     list.save();
                 } catch (Exception e) {
-                    Log.w(TAG, "onResponse: " + e.toString());
+                    Log.w(TAG, "list.save(): " + e.toString());
                 }
 
                 loadMissingDataForDocumentsList();
@@ -529,7 +530,7 @@ public class LoadDataFromServer extends IntentService {
 
             @Override
             public void onFailure(Call<DocSaleList> call, Throwable t) {
-                Log.d(TAG, "onResponse: " + t.toString());
+                Log.d(TAG, "onFailure: " + t.toString());
 
             }
         });

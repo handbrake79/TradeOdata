@@ -39,7 +39,7 @@ import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
 
 
-public class ProductsList_Fragment extends Fragment {
+public class ProductsListFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -60,7 +60,7 @@ public class ProductsList_Fragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ProductsList_Fragment() {
+    public ProductsListFragment() {
     }
 
 
@@ -134,7 +134,7 @@ public class ProductsList_Fragment extends Fragment {
     }
 
 
-    public void onItemSelection(final Product product) {
+    public void onItemSelected(final Product product) {
         if (product.isFolder()) {
             Settings.setLastViewedProductGroupStatic(product.getRef_Key());
             showChildrenProducts(product);
@@ -185,8 +185,9 @@ public class ProductsList_Fragment extends Fragment {
     }
 
     public void showParentProducts() {
-        if (currentCategory.isEmpty())
+        if (currentCategory.isEmpty()) {
             return;
+        }
         if (currentCategory.isFirstLevelCategory()) {
             showTopLevelProducts();
             return;
@@ -222,7 +223,12 @@ public class ProductsList_Fragment extends Fragment {
 
     public void showChildrenProducts(Product product) {
 
-        if (!product.isFolder()) return; //это не группа, оставляем всё как есть
+        if (!product.isFolder()) {
+            return; //это не группа, оставляем всё как есть
+        }
+
+        getActivity().setTitle(product.getDescription());
+
         String guid = product.getRef_Key();
         currentCategory = product;
         mAdapter.setParentProduct(currentCategory);
@@ -242,6 +248,7 @@ public class ProductsList_Fragment extends Fragment {
 
     public void showTopLevelProducts() {
         currentCategory = Product.getStub();
+        getActivity().setTitle("Номенклатура");
         String guid = Constants.NULL_GUID;
         List<Product> list = getProductsByParent(guid);
         if (list == null || list.size() == 0) {
@@ -257,8 +264,6 @@ public class ProductsList_Fragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener.onFragmentDetached(this);
-//        mListener = null;
         currentCategory = null;
     }
 

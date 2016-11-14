@@ -114,6 +114,34 @@
         android:layout_alignParentTop="true"
         android:src="@drawable/dotted_underline" />
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/doc_page_req_discount_card_capt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="Скидочная карта" />
+
+        <TextView
+            android:id="@+id/doc_page_req_disc_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="отсутствует" />
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/dotted_underline" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -160,6 +188,7 @@
             android:layout_alignParentRight="true"
             android:text="Доставка" />
     </RelativeLayout>
+
 
     <ImageView
         android:layout_width="match_parent"
@@ -241,10 +270,10 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:layout_below="@id/til_passperson"
             android:id="@+id/til_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/til_passperson"
             android:hint="Комментарий">
 
 
