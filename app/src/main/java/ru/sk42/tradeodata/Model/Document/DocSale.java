@@ -1,5 +1,6 @@
 package ru.sk42.tradeodata.Model.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
@@ -7,13 +8,18 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementArray;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Namespace;
+import org.simpleframework.xml.Path;
+import org.simpleframework.xml.convert.Convert;
+
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,60 +38,96 @@ import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
+import ru.sk42.tradeodata.XML.DateConverter;
 
 /**
- * Created by test on 31.03.2016.
+ * Created by PostRaw on 31.03.2016.
  */
-@DatabaseTable
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class DocSale extends CDO {
 
+@DatabaseTable
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+public class DocSale extends CDO {
     private static final String TAG = "DocSale class";
 
-    @JsonProperty("Товары")
-    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
+    @JsonProperty("Ref_Key")
+    @DatabaseField(id = true)
+    @Element(name = "Ref_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    private String ref_Key;
 
-    private Collection<SaleRecordProduct> products;
-    @JsonProperty("Услуги")
-    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
 
-    private Collection<SaleRecordService> services;
+
+    @Element(name = "ВидОперации")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    private static final String xmlvidoperacii = "ПродажаКомиссия";
+
+    @Element(name = "ВидПередачи")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    private static final String xmlvidperedachi = "СоСклада";
+
+
+    @Element(name = "КурсВзаиморасчетов")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    private static final int xmlkurs = 1;
+
+    @Element(name = "КратностьВзаиморасчетов")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    private static final int xmlkratnost = 1;
+
+    @Element(name = "ОтражатьВУправленческомУчете")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    private static final boolean xmlupr = true;
 
     @JsonProperty("Number")
     @DatabaseField
+    @Element(name = "Number")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String number;
 
+    @Element(name = "Date")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    @Convert(DateConverter.class)
     @JsonProperty("Date")
     @DatabaseField
     private Date date;
 
     @JsonProperty("Posted")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     @DatabaseField
+    @Element
     private Boolean posted;
 
     @JsonProperty("ФИОДляПропуска")
     @DatabaseField
+    @Element(name = "ФИОДляПропуска")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String passPerson;
 
-    @JsonProperty("СуммаДоставки")
     @DatabaseField
+    @JsonProperty("СуммаДоставки")
+    @Element(name = "СуммаДоставки")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private Integer shippingTotal;
 
     @JsonProperty("СтоимостьДоставки")
     @DatabaseField
+    @Element(name = "СтоимостьДоставки")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private Integer shippingCost;
 
     @JsonProperty("НужнаДоставка")
     @DatabaseField
+    @Element(name = "НужнаДоставка")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private Boolean needShipping;
 
     @JsonProperty("НужнаРазгрузка")
     @DatabaseField
+    @Element(name = "НужнаРазгрузка")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private Boolean needUnload;
-
-    @JsonProperty("Ref_Key")
-    @DatabaseField(id = true)
-    private String ref_Key;
 
     @JsonProperty("ТипТС_Key")
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
@@ -97,15 +139,19 @@ public class DocSale extends CDO {
 
     @JsonProperty("АвтомобильДляПропуска")
     @DatabaseField
+    @Element(name = "АвтомобильДляПропуска")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String passVehicle;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("Ответственный_Key")
     private User author;
 
+
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("ДоговорКонтрагента_Key")
     private Contract contract;
+
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("Контрагент_Key")
@@ -113,10 +159,14 @@ public class DocSale extends CDO {
 
     @JsonProperty("Комментарий")
     @DatabaseField
+    @Element(name = "Комментарий")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String comment;
 
     @JsonProperty("СуммаДокумента")
     @DatabaseField
+    @Element(name = "СуммаДокумента")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private Double total;
 
     @JsonProperty("ДисконтнаяКарта_Key")
@@ -129,11 +179,16 @@ public class DocSale extends CDO {
 
     @JsonProperty("Вес")
     @DatabaseField
+    @Element(name = "Вес")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+
     private Integer weight;
 
 
     @JsonProperty("Объем")
     @DatabaseField
+    @Element(name = "Объем")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private Integer volume;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
@@ -146,34 +201,205 @@ public class DocSale extends CDO {
 
     @JsonProperty("СтоимостьРазгрузки")
     @DatabaseField
+    @Element(name = "СтоимостьРазгрузки")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private Integer unloadCost;
 
     @JsonProperty("АдресДоставки")
     @DatabaseField
+    @Element(name = "АдресДоставки")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String shippingAddress;
 
     @JsonProperty("КоличествоГрузчиков")
     @DatabaseField
+    @Element(name = "КоличествоГрузчиков")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private Integer workersCount;
 
     @JsonProperty("ДатаДоставки")
     @DatabaseField
+    @Element(name = "ДатаДоставки")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    @Convert(DateConverter.class)
     private Date shippingDate;
 
     @JsonProperty("ВремяДоставкиС")
     @DatabaseField
+    @Element(name = "ВремяДоставкиС")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    @Convert(DateConverter.class)
     private Date shippingTimeFrom;
 
     @JsonProperty("ВремяДоставкиПо")
     @DatabaseField
+    @Element(name = "ВремяДоставкиПо")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    @Convert(DateConverter.class)
     private Date shippingTimeTo;
 
+    @Attribute(name = "type")
+    @Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
+    @Path("d:Товары")
+    private String docsaleType = "Collection(StandardODATA.Document_РеализацияТоваровУслуг_Товары_RowType)";
+
+    @JsonProperty("Товары")
+    @Path("d:Товары")
+    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
+    @ElementList(inline = true, entry = "d:element")
+    private Collection<SaleRecordProduct> products;
+
+
+
+
+
+    @JsonProperty("Услуги")
+    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
+//    @ElementList(name = "Услуги", entry = "element", inline = true)
+//    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    private Collection<SaleRecordService> services;
+
+
+    private String contract_Key;
+    private String customer_Key;
+    private String organisation_Key;
+    private String discountCard_Key;
+    private String route_Key;
+    private String startingPoint_Key;
+    private String vehicleType_Key;
+    private String currency_Key;
+    private String user_key;
+
+    @Element(name = "Ответственный_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getUser_key() {
+        return getAuthor().getRef_Key();
+    }
+
+    @Element(name = "Ответственный_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setUser_key(String user_key) {
+        this.user_key = user_key;
+    }
+
+    @Element(name = "ДоговорКонтрагента_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getContract_Key() {
+        return getContract().getRef_Key();
+    }
+
+    @Element(name = "ДоговорКонтрагента_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setContract_Key(String contract_Key) {
+        this.contract_Key = contract_Key;
+    }
+
+    @Element(name = "Контрагент_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getCustomer_Key() {
+        return getCustomer().getRef_Key();
+    }
+
+    @Element(name = "Контрагент_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setCustomer_Key(String customer_Key) {
+        this.customer_Key = customer_Key;
+    }
+
+    @Element(name = "Организация_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getOrganisation_Key() {
+        return getOrganisation().getRef_Key();
+    }
+
+    @Element(name = "Организация_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setOrganisation_Key(String organisation_Key) {
+        this.organisation_Key = organisation_Key;
+    }
+
+    @Element(name = "ДисконтнаяКарта_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getDiscountCard_Key() {
+        if (discountCard == null) {
+            return Constants.NULL_GUID;
+        } else {
+            return getDiscountCard().getRef_Key();
+        }
+    }
+
+    @Element(name = "ДисконтнаяКарта_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setDiscountCard_Key(String discountCard_Key) {
+        this.discountCard_Key = discountCard_Key;
+    }
+
+    @Element(name = "Маршрут_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getRoute_Key() {
+        return getRoute().getRef_Key();
+    }
+
+    @Element(name = "Маршрут_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setRoute_Key(String route_Key) {
+        this.route_Key = route_Key;
+    }
+
+    @Element(name = "НачальнаяТочкаМаршрута_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getStartingPoint_Key() {
+        return getStartingPoint().getRef_Key();
+    }
+
+    @Element(name = "НачальнаяТочкаМаршрута_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setStartingPoint_Key(String startingPoint_Key) {
+        this.startingPoint_Key = startingPoint_Key;
+    }
+
+    @Element(name = "ТипТС_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getVehicleType_Key() {
+        return getVehicleType().getRef_Key();
+    }
+
+    @Element(name = "ТипТС_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setVehicleType_Key(String vehicleType_Key) {
+        this.vehicleType_Key = vehicleType_Key;
+    }
+
+    @Element(name = "ВалютаДокумента_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setCurrency_Key(String currency_Key) {
+        this.currency_Key = currency_Key;
+    }
+
+    @Element(name = "ВалютаДокумента_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public String getCurrency_Key() {
+        return Constants.CURRENCY_GUID;
+    }
+
+    public void setShippingTotal(Integer shippingTotal) {
+        this.shippingTotal = shippingTotal;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
+
+    public void setReferenceShipingCost(int referenceShipingCost) {
+        this.referenceShipingCost = referenceShipingCost;
+    }
+
+    @JsonIgnore
+    private int referenceShipingCost;
 
     public int getReferenceShipingCost() {
         return referenceShipingCost;
     }
-
-    private int referenceShipingCost;
 
     public DocSale() {
     }
@@ -262,11 +488,6 @@ public class DocSale extends CDO {
         this.posted = posted;
     }
 
-
-    public String getCurrency_Key() {
-        return Constants.CURRENCY_GUID;
-    }
-
     public Date getDate() {
         return date;
     }
@@ -324,6 +545,15 @@ public class DocSale extends CDO {
     }
 
     public String getRef_Key() {
+        if(ref_Key == null)
+        {
+            ref_Key = Constants.NULL_GUID;
+        }
+        if(ref_Key.equals(""))
+        {
+            ref_Key = Constants.NULL_GUID;
+        }
+
         return ref_Key;
     }
 
@@ -388,9 +618,9 @@ public class DocSale extends CDO {
 
     private void deleteProductRecords() {
         try {
-            List<SaleRecordProduct> list = MyHelper.getSaleRowProductDao().queryForEq("ref_Key", getRef_Key());
+            List<SaleRecordProduct> list = MyHelper.getSaleRecordProductDao().queryForEq("ref_Key", getRef_Key());
 
-            MyHelper.getSaleRowProductDao().delete(list);
+            MyHelper.getSaleRecordProductDao().delete(list);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -462,6 +692,7 @@ public class DocSale extends CDO {
         this.passVehicle = passVehicle;
     }
 
+
     public Collection<SaleRecordProduct> getProducts() {
         return products;
     }
@@ -502,27 +733,9 @@ public class DocSale extends CDO {
                 row.setProduct(product);
             }
 
-//            Unit unit = Unit.getObject(Unit.class, row.getProductUnit_Key());
-//
-//            if (unit != null) {
-//                save = true;
-//                row.setUnit(unit);
-//            }
-//
-//            Store store = Store.getObject(Store.class, row.getStore_Key());
-//            if (store != null) {
-//                save = true;
-//                row.setStore(store);
-//            }
-//
-//            Charact charact = Charact.getObject(Charact.class, row.getCharact_Key());
-//            if (charact != null) {
-//                save = true;
-//                row.setCharact(charact);
-//            }
-
-            if (save)
+            if (save) {
                 row.update();
+            }
         }
 
         for (SaleRecordService saleRecordService : this.getServices()
@@ -593,24 +806,13 @@ public class DocSale extends CDO {
     public void setForeignObjects() {
         this.setForeignObjectsInProductsAndServices();
         update();
-
-        //this.reload();
     }
 
-//    @Override
-//    public String toString() {
-//        return "Реализация № " + getNumber() + " от " + getFormattedDate();
-//    }
-
-    public void setForeignObjectsInHeader() {
-        //this.setAuthor(User.getList(User.class, getAuthorRefKey()));
-        //this.setCustomer(Customer.getList(Customer.class, getCustomerRefKey()));
-        //this.setContract(Contract.getList(Contract.class, getContractRefKey()));
-        //this.setRoute(Route.getList(Route.class, getRoute_Key()));
-        //this.setStartingPoint(StartingPoint.getList(StartingPoint.class, getStartingPoint_Key()));
-
-        update();
+    @Override
+    public String toString() {
+        return "Реализация № " + getNumber() + " от " + Uttils.DATE_FORMATTER.format(getDate());
     }
+
 
     void update() {
         try {
@@ -737,15 +939,16 @@ public class DocSale extends CDO {
         double t = 0;
         for (SaleRecordProduct rec :
                 getProducts()) {
-            t+= rec.getTotal();
+            t += rec.getTotal();
         }
         return t;
     }
+
     public double getServicesTotal() {
         double t = 0;
         for (SaleRecordService rec :
                 getServices()) {
-            t+= rec.getTotal();
+            t += rec.getTotal();
         }
         return t;
     }

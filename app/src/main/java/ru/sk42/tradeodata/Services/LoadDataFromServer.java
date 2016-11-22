@@ -130,36 +130,49 @@ public class LoadDataFromServer extends IntentService {
 
     private void Preload() {
 
-        sendFeedback("Начата предварительная загрузка");
+        sendFeedback("Начали загрузку с сервера 1С");
 
+        sendFeedback("loadProducts");
         loadProducts();
 
+        sendFeedback("loadCustomers");
         loadCustomers();
 
+        sendFeedback("loadVehicleTypes");
         loadVehicleTypes();
 
+        sendFeedback("loadStores");
         loadStores();
 
+        sendFeedback("loadDiscountCards");
         loadDiscountCards();
 
+        sendFeedback("loadCharacts");
         loadCharacts();
 
+        sendFeedback("loadUnits");
         loadUnits();
 
+        sendFeedback("loadContracts");
         loadContracts();
 
+        sendFeedback("loadUsers");
         loadUsers();
 
+        sendFeedback("loadRoutes");
         loadRoutes();
 
+        sendFeedback("loadStartingPoints");
         loadStartingPoints();
 
+        sendFeedback("loadCurrency");
         loadCurrency();
 
+        sendFeedback("loadOrganisations");
         loadOrganisations();
 
+        sendFeedback("loadShippingRates");
         loadShippingRates();
-
 
         sendServiceFinished("Загрузка справочников завершена");
     }
@@ -186,7 +199,7 @@ public class LoadDataFromServer extends IntentService {
 
             Response<ShippingRatesList> response = call.execute();
             ShippingRatesList list = response.body();
-            sendFeedback("Сохраняем " + String.valueOf(list.getValues().size()) + " записей");
+            sendFeedback("Сохраняем " + String.valueOf(list.getValues().size()) + " тарифов доставки");
             TableUtils.dropTable(MyHelper.getShippingRouteDao(), false);
             TableUtils.createTable(MyHelper.getShippingRouteDao());
 

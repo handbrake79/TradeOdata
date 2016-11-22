@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import ru.sk42.tradeodata.Activities.Document.SaleRecordInterface;
 import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
@@ -17,16 +19,16 @@ import ru.sk42.tradeodata.Model.Document.SaleRecordService;
 import ru.sk42.tradeodata.R;
 
 /**
- * Created by test on 21.04.2016.
+ * Created by PostRaw on 21.04.2016.
  */
-public class SaleRowServiceRecyclerViewAdapter extends RecyclerView.Adapter<SaleRowServiceRecyclerViewAdapter.ViewHolder> {
+public class ServicesRecordsAdapter extends RecyclerView.Adapter<ServicesRecordsAdapter.ViewHolder> {
 
     private int selectedItem;
     private ArrayList<SaleRecordService> mValues;
 
-    private InteractionInterface mListener;
+    private SaleRecordInterface mListener;
 
-    public SaleRowServiceRecyclerViewAdapter(ArrayList<SaleRecordService> mValues, InteractionInterface mListener) {
+    public ServicesRecordsAdapter(ArrayList<SaleRecordService> mValues, SaleRecordInterface mListener) {
         this.mListener = mListener;
         this.mValues = mValues;
     }
@@ -55,9 +57,9 @@ public class SaleRowServiceRecyclerViewAdapter extends RecyclerView.Adapter<Sale
         holder.mItem = mValues.get(position);
 
         holder.tvProduct.setText(holder.mItem.getProduct().getDescription());
-        holder.tvQty.setText(Uttils.fd(holder.mItem.getQty()));
-        holder.tvPrice.setText(Uttils.fd(holder.mItem.getPrice()));
-        holder.tvTotal.setText(Uttils.fd(holder.mItem.getTotal()));
+        holder.tvQty.setText(Uttils.formatDoubleToQty(holder.mItem.getQty()));
+        holder.tvPrice.setText(Uttils.formatDoubleToMoney(holder.mItem.getPrice()));
+        holder.tvTotal.setText(Uttils.formatDoubleToMoney(holder.mItem.getTotal()));
 
     }
 
@@ -90,11 +92,14 @@ public class SaleRowServiceRecyclerViewAdapter extends RecyclerView.Adapter<Sale
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(Uttils.isPredefined(getSelectedObject().getProduct())){
+                        return;
+                    }
                     // Redraw the old selection and the new
                     notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
-                    mListener.onItemSelected(getSelectedObject());
+                    mListener.onRecordSelected(getSelectedObject());
                 }
             });
         }

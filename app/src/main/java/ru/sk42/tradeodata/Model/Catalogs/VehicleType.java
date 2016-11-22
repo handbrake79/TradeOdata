@@ -133,7 +133,7 @@ public class VehicleType extends CDO {
 
     public static VehicleType getObjectByName(String mVehicleType) {
         try {
-            List<VehicleType> list = MyHelper.getVehicleTypesDao().queryForEq("description", mVehicleType);
+            List<VehicleType> list = MyHelper.getVehicleTypesDao().queryForEq("Description", mVehicleType);
             if (list.size() > 0) {
                 return list.get(0);
             }

@@ -11,4 +11,5 @@ public interface InteractionInterface {
         void onItemSelected(Object selectedObject); //stock?
 
         void onRequestSuccess(Object obj); //productInfo?
+
 }

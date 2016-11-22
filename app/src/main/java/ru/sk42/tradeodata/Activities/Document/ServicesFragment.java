@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import ru.sk42.tradeodata.Activities.Document.Adapters.SaleRowServiceRecyclerViewAdapter;
+import ru.sk42.tradeodata.Activities.Document.Adapters.ServicesRecordsAdapter;
 import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
 
@@ -24,17 +24,15 @@ import ru.sk42.tradeodata.R;
 // In this case, the fragment displays simple text based on the page
 public class ServicesFragment extends Fragment {
     static String TAG = "***ServiceFragment";
-    SaleRowServiceRecyclerViewAdapter adapter;
+    ServicesRecordsAdapter adapter;
     @Bind(R.id.rvDocPageServices)
     RecyclerView mServicesRecyclerView;
     private DocSale docSale;
-    private InteractionInterface mListener;
     View view;
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = (InteractionInterface) getActivity();
     }
 
     @Override
@@ -57,7 +55,7 @@ public class ServicesFragment extends Fragment {
         mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
         mServicesRecyclerView.setSelected(true);
         mServicesRecyclerView.setLayoutManager(new LinearLayoutManager(mServicesRecyclerView.getContext()));
-        adapter = new SaleRowServiceRecyclerViewAdapter(docSale.getServicesList(), (InteractionInterface) getActivity());
+        adapter = new ServicesRecordsAdapter(docSale.getServicesList(), (SaleRecordInterface) getActivity());
         mServicesRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

@@ -16,7 +16,7 @@ import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
 
 /**
- * Created by test on 16.03.2016.
+ * Created by PostRaw on 16.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Chars")
@@ -41,7 +41,7 @@ public class Charact extends CDO{
 
     public static <T> T getObject(Class<T> clazz, String key) {
         try {
-            List<Charact> list = MyHelper.getInstance().getDao(Charact.class).queryForEq("ref_Key", key);
+            List<Charact> list = MyHelper.getInstance().getDao(Charact.class).queryForEq("Ref_Key", key);
             if (list.size() > 0)
                 return (T) list.get(0);
             else return null;

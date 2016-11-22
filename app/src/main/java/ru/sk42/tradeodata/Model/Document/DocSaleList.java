@@ -10,7 +10,7 @@ import java.util.Collection;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 
 /**
- * Created by test on 14.04.2016.
+ * Created by PostRaw on 14.04.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DocSaleList {
@@ -58,11 +58,6 @@ public class DocSaleList {
 
     }
 
-    public void setForeignObjects() {
-        for (DocSale docSale : values) {
-            docSale.setForeignObjectsInHeader();
-        }
-    }
 
     public Integer size() {
         return values.size();

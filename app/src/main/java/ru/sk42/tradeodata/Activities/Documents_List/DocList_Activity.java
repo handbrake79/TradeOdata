@@ -51,7 +51,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ***OnCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.documents__list_activity);
+        setContentView(R.layout.doclist_activity);
 
         if (SettingsOld.getCurrentUser() == null) {
             showToast("Dыберите пользователя в настройках");
@@ -179,6 +179,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     public void onRequestSuccess(Object obj) {
         Toast.makeText(this, "STRANGE THINGS GOING ON! " + obj.getClass().getName().toString(), Toast.LENGTH_LONG).show();
     }
+
 
 
     @Override

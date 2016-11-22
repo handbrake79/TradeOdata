@@ -16,7 +16,7 @@ import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 
 /**
- * Created by test on 14.03.2016.
+ * Created by PostRaw on 14.03.2016.
  */
 public class SettingsOld {
     private static String InfoBaseName;

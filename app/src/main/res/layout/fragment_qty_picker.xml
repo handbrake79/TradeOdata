@@ -1,66 +1,85 @@
-<RelativeLayout android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/accent"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
     android:layout_centerInParent="true"
     android:layout_marginTop="180dp"
-    android:paddingTop="15dp"
-    android:layout_height="200dp">
-        <Button
-            android:text="-"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
-            android:layout_alignParentLeft="true"
-            android:id="@+id/qty_fragment_minus" />
+    android:background="@color/primary"
+    android:paddingTop="15dp">
+
+    <Button
+        android:id="@+id/qty_fragment_minus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:text="-"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/qty_fragment_product_caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Номенклатура"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/qty_fragment_product_caption"
+        android:id="@+id/til_qty_input_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:hint="Количество">
 
         <android.support.design.widget.TextInputEditText
-            android:layout_alignParentTop="true"
-            android:layout_height="wrap_content"
             android:id="@+id/qty_fragment_input_qty"
-            android:layout_centerInParent="true"
-            android:text="12345678.56"
             android:layout_width="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title.Inverse"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:hint="Количество"
-            android:singleLine="true"
+            android:inputType="numberDecimal"
             android:selectAllOnFocus="true"
-            android:inputType="numberDecimal" />
+            android:text="12345678.56"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Title.Inverse" />
+    </android.support.design.widget.TextInputLayout>
 
-        <TextView
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/qty_fragment_input_qty"
-            android:layout_centerInParent="true"
-            android:textSize="16sp"
-            android:id="@+id/qty_fragment_total"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Сумма"/>
+    <TextView
+        android:id="@+id/qty_fragment_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/til_qty_input_text"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:text="Сумма"
+        android:textSize="16sp" />
 
-        <Button
-            android:text="+"
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:id="@+id/qty_fragment_plus"
-            android:layout_alignParentRight="true"
+    <Button
+        android:id="@+id/qty_fragment_plus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="12dp"
+        android:text="+"
 
-            />
+        android:visibility="invisible" />
 
-        <Button
-            android:layout_marginTop="20dp"
-            android:layout_below="@id/qty_fragment_total"
-            android:text="OK"
-            android:id="@+id/qty_fragment_ok"
-            android:layout_centerInParent="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-            <!--android:layout_alignParentBottom="true"-->
-            android:layout_height="70dp"
-            android:layout_width="140dp" />
+    <Button
+        android:id="@+id/qty_fragment_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/qty_fragment_total"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:text="OK" />
+    <!--android:layout_alignParentBottom="true"-->
+    android:layout_height="70dp"
+    android:layout_width="140dp" />
 
-    </RelativeLayout>
+</RelativeLayout>
 

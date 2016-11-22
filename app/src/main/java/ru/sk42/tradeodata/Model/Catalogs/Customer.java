@@ -15,7 +15,7 @@ import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 
 
 /**
- * Created by test on 14.03.2016.
+ * Created by PostRaw on 14.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Customers")

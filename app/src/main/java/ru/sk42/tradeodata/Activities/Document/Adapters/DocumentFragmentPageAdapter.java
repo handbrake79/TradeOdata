@@ -10,7 +10,7 @@ import ru.sk42.tradeodata.Activities.Document.ServicesFragment;
 import ru.sk42.tradeodata.Activities.Document.ShippingFragment;
 
 /**
- * Created by test on 18.04.2016.
+ * Created by PostRaw on 18.04.2016.
  */
 public class DocumentFragmentPageAdapter extends FragmentPagerAdapter {
 

@@ -6,6 +6,9 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Namespace;
+
 import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
@@ -15,7 +18,7 @@ import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 
 
 /**
- * Created by test on 14.03.2016.
+ * Created by PostRaw on 14.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Users")
@@ -24,6 +27,7 @@ public class User extends CDO {
     @JsonProperty("Description")
     @DatabaseField
     private String description;
+
     @DatabaseField(id = true)
     @com.fasterxml.jackson.annotation.JsonProperty("Ref_Key")
     private String ref_Key;

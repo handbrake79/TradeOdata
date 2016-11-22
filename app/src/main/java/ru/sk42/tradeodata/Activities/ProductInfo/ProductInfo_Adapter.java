@@ -18,14 +18,12 @@ import ru.sk42.tradeodata.R;
 public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapter.ViewHolder> {
 
     private final List<Stock> mValues;
-    private final InteractionInterface mListener;
     private Integer selectedItem;
 
     public ProductInfo_Adapter(List<Stock> items, InteractionInterface listener) {
         selectedItem = -1;
 
         mValues = items;
-        mListener = listener;
     }
 
     public int getSelectedItem() {
@@ -44,7 +42,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
 
         holder.itemView.setSelected(selectedItem == position);
         if (selectedItem == position)
-            holder.itemView.setBackgroundColor(Constants.COLORS.SELECTED_COLOR);
+            holder.itemView.setBackgroundColor(Color.CYAN);
         else
             holder.itemView.setBackgroundColor(Color.WHITE);
 
@@ -92,6 +90,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
                 @Override
                 public void onClick(View v) {
                     // Redraw the old selection and the new
+                    notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
                     //mListener.onItemSelected(mValues.get(selectedItem));

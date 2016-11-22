@@ -7,7 +7,7 @@ import java.util.Date;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 
 /**
- * Created by test on 18.03.2016.
+ * Created by PostRaw on 18.03.2016.
  */
 public class Constants {
 
@@ -40,7 +40,8 @@ public class Constants {
     }
 
     public class COLORS {
-        public static final int SELECTED_COLOR = 45311;
+
+        public static final int SELECTED_COLOR = 4370350;
         public static final int REGULAR_COLOR = 13882323;
 
         public static final int DISABLED = 0x939393;

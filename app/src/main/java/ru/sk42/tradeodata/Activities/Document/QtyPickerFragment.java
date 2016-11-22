@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +50,10 @@ public class QtyPickerFragment extends DialogFragment {
     @Bind(R.id.qty_fragment_total)
     TextView mTotal;
 
+
     SaleRecord record;
+    @Bind(R.id.qty_fragment_product_caption)
+    TextView qtyFragmentProductCaption;
     private double mQty;
     private double mPrice;
     private int mLineNumber;
@@ -86,16 +91,38 @@ public class QtyPickerFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_qty_picker, container, false);
         ButterKnife.bind(this, view);
 
-        initViewData();
+        inputQtyNumberEdittext.setText(String.valueOf(record.getQty()));
+        qtyFragmentProductCaption.setText(record.getProduct().getDescription());
+        recalc();
+
+        inputQtyNumberEdittext.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mQty = 0;
+                try {
+                    mQty = Float.valueOf(editable.toString());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+                record.setQty(mQty);
+                recalc();
+            }
+        });
 
         return view;
 
     }
 
-    private void initViewData() {
-
-        inputQtyNumberEdittext.setText(String.valueOf(record.getQty()));
-        mTotal.setText("Цена " + Uttils.fd(record.getPrice()) + " руб., сумма " + Uttils.fd(record.getTotal()) + " руб.");
+    private void recalc() {
+        mTotal.setText("Цена " + Uttils.formatDoubleToMoney(record.getPrice()) + " руб., сумма " + Uttils.formatDoubleToMoney(record.getTotal()) + " руб.");
     }
 
 
@@ -151,7 +178,7 @@ public class QtyPickerFragment extends DialogFragment {
                 break;
         }
         record.setQty(mQty);
-        initViewData();
+        recalc();
     }
 
 

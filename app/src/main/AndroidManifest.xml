@@ -38,7 +38,7 @@
 
         <activity android:name=".Activities.ProductsListBrowser.ProductsListActivity" />
         <activity android:name=".Activities.ProductInfo.ProductInfoActivity" />
-        <activity android:name=".Activities.QtyInputActivity"></activity>
+        <activity android:name=".Activities.Document.QtyInputActivity"></activity>
     </application>
 
 </manifest>

@@ -59,7 +59,6 @@ public class ShippingFragment extends Fragment {
     private Calendar mTimeTo = GregorianCalendar.getInstance();
 
     private DocSale docSale;
-    private InteractionInterface mListener;
 
     static String TAG = "shipping";
     private static final int REQ_CODE_SPEECH_INPUT = 100;
@@ -124,7 +123,6 @@ public class ShippingFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = (InteractionInterface) getActivity();
     }
 
 

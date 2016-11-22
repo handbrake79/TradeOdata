@@ -6,18 +6,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.j256.ormlite.field.DatabaseField;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Namespace;
+
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 
 /**
  * Created by хрюн моржов on 02.11.2016.
  */
 
-//@DatabaseTable
+@Element
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SaleRecord {
 
     public SaleRecord() {
     }
+
+
+    @Attribute(name = "type")
+    @Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
+    public static final String saleRecordAttribute = "StandardODATA.Document_РеализацияТоваровУслуг_Товары_RowType";
 
     @DatabaseField(foreign = true)
     DocSale docSale;
@@ -28,22 +37,32 @@ public class SaleRecord {
 
     @DatabaseField
     @JsonProperty("Сумма")
+    @Element(name = "Сумма")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     protected double total;
 
     @DatabaseField
     @JsonProperty("Ref_Key")
+    @Element(name = "Ref_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     protected String ref_Key;
 
     @DatabaseField
     @JsonProperty("LineNumber")
+    @Element(name = "LineNumber")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     protected int lineNumber;
 
     @DatabaseField
     @JsonProperty("Количество")
+    @Element(name = "Количество")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     protected double qty;
 
     @JsonProperty("Номенклатура_Key")
     @DatabaseField
+    @Element(name = "Номенклатура_Key")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     protected String product_Key;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
@@ -51,6 +70,8 @@ public class SaleRecord {
 
     @DatabaseField
     @JsonProperty("Цена")
+    @Element(name = "Цена")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     protected double price;
 
     public DocSale getDocSale() {
@@ -74,6 +95,7 @@ public class SaleRecord {
     }
 
     public void setTotal(double total) {
+        total = Math.round(total * 100d) / 100d;
         this.total = total;
     }
 
@@ -98,6 +120,7 @@ public class SaleRecord {
     }
 
     public void setQty(double qty) {
+        qty = Math.round(qty * 1000d) / 1000d;
         this.qty = qty;
         this.total = this.qty * this.price;
     }

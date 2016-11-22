@@ -10,7 +10,7 @@ import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Currency;
 
 /**
- * Created by test on 04.03.2016.
+ * Created by PostRaw on 04.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CurrencyList {

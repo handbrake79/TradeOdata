@@ -94,7 +94,7 @@ public class Route extends CDO
 
     public static Route getObjectByName(String route) {
         try {
-            List<Route> list = MyHelper.getRouteDao().queryForEq("description", route);
+            List<Route> list = MyHelper.getRouteDao().queryForEq("Description", route);
             if(list.size() > 0){
                 return list.get(0);
             }

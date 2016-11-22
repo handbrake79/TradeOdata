@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.Activities;
+package ru.sk42.tradeodata.Activities.Document;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import java.sql.SQLException;
 
-import ru.sk42.tradeodata.Activities.Document.QtyPickerFragment;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.R;
@@ -19,16 +18,18 @@ public class QtyInputActivity extends AppCompatActivity implements QtyPickerFrag
         setContentView(R.layout.activity_qty_input);
 
         Intent intent = getIntent();
-        int id = intent.getIntExtra("id", -1);
+        long id = intent.getLongExtra("id", -1);
+        double qty = intent.getDoubleExtra("qty", -1);
         if (id != -1) {
 
             SaleRecord record = null;
             try {
-                record = MyHelper.getSaleRecordDao().queryForId(id);
+                record = MyHelper.getSaleRecordProductDao().queryForId(id);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             if (record != null) {
+                record.setQty(qty);
                 QtyPickerFragment qtyPickerFragment = QtyPickerFragment.newInstance(record);
 
                 getSupportFragmentManager()
@@ -40,6 +41,10 @@ public class QtyInputActivity extends AppCompatActivity implements QtyPickerFrag
             }
 
         }
+    }
+
+    public void onBackPressed(){
+        finish();
     }
 
     @Override

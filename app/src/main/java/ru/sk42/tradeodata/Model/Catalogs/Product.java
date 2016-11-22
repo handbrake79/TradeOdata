@@ -12,7 +12,7 @@ import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
 
 /**
- * Created by test on 16.03.2016.
+ * Created by PostRaw on 16.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Products")
@@ -99,7 +99,7 @@ public class Product extends CDO {
     private void updateFromDB() {
         if (ref_Key != null) {
             try {
-                Product source = MyHelper.getInstance().getDao(Product.class).queryForEq("ref_Key", ref_Key).get(0);
+                Product source = MyHelper.getInstance().getDao(Product.class).queryForEq("Ref_Key", ref_Key).get(0);
                 copyProperties(source);
             } catch (SQLException e) {
                 e.printStackTrace();

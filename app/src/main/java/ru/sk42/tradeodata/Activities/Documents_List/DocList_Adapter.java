@@ -12,12 +12,11 @@ import java.util.List;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
-import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
 
 /**
- * Created by test on 28.04.2016.
+ * Created by PostRaw on 28.04.2016.
  */
 public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHolder> {
     private List<DocSale> mValues;
@@ -38,7 +37,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.doc_list_card, parent, false);
+                .inflate(R.layout.doclist_card, parent, false);
         return new ViewHolder(view);
     }
 
@@ -50,7 +49,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         holder.mDate.setText(Uttils.DATE_FORMATTER.format(holder.mItem.getDate()));
         holder.mNumber.setText(holder.mItem.getNumber());
         holder.mAuthor.setText(holder.mItem.getAuthor().getDescription());
-        holder.mTotal.setText(Uttils.fd(holder.mItem.getTotal()));
+        holder.mTotal.setText(Uttils.formatDoubleToMoney(holder.mItem.getTotal()));
 
         if (holder.mItem.getPosted()) {
             holder.mPosted.setTextColor(android.graphics.Color.argb(255, 0, 176, 255));

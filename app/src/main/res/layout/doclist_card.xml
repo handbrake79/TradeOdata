@@ -3,11 +3,10 @@
     android:id="@+id/cvDocList"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    android:backgroundTintMode="src_over"
+    android:layout_margin="2dp"
     app:cardBackgroundColor="@color/cardview_light_background"
-    app:cardCornerRadius="5dp"
-    app:cardElevation="2dp">
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp">
 
     <RelativeLayout
         android:layout_width="fill_parent"

@@ -100,8 +100,9 @@
             android:text="Договор" />
 
         <TextView
+            android:gravity="right"
             android:id="@+id/doc_page_req_contract_text"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:text="Договор" />
@@ -116,23 +117,28 @@
 
 
     <RelativeLayout
+        android:gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp">
 
         <TextView
+
             android:id="@+id/doc_page_req_discount_card_capt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:text="Скидочная карта" />
 
-        <TextView
+        <android.support.design.widget.TextInputEditText
+            android:gravity="right"
+            android:layout_alignBaseline="@id/doc_page_req_discount_card_capt"
             android:id="@+id/doc_page_req_disc_text"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="отсутствует" />
+            android:hint="введите номер"
+            android:layout_alignParentEnd="true"
+            />
     </RelativeLayout>
 
     <ImageView

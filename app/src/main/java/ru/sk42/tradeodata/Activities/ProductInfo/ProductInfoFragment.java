@@ -29,11 +29,9 @@ import ru.sk42.tradeodata.R;
  */
 public class ProductInfoFragment extends android.support.v4.app.Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String TAG = "ProductInfo***";
     public ProductInfo productInfo;
     RecyclerView mRecyclerView;
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private InteractionInterface mListener;
     private ProductInfo_Adapter mAdapter;
@@ -131,23 +129,13 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
 
 
     public void onStockSelected() {
-        if(productInfo.getStocks().size() == 0)
+        if (productInfo.getStocks().size() == 0)
             return;
         int pos = mAdapter.getSelectedItem();
         Stock stock = (Stock) productInfo.getStocks().toArray()[pos];
 
         mListener.onItemSelected(stock);
 
-    }
-
-
-    public void showMessage(String title, String message) {
-        Log.d(TAG, "showMessage: " + message);
-////        tvLog.append(title + " : " + message + "\n");
-//        progress.setIndeterminate(true);
-//        progress.setTitle(title);
-//        progress.setMessage(message);
-//        progress.show();
     }
 
 

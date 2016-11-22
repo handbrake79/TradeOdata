@@ -73,7 +73,7 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
     public static MyHelper getInstance(Application application) {
 
         if (instance == null) {
-            instance = new MyHelper(application, "test.db", 1);
+            instance = new MyHelper(application, "PostRaw.db", 1);
         }
         return instance;
     }
@@ -119,7 +119,7 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public static void dropAndCreateTables() {
-        getInstance().context.deleteDatabase("test.db");
+        getInstance().context.deleteDatabase("PostRaw.db");
         createTables();
     }
 
@@ -141,7 +141,7 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public static Dao<SaleRecordProduct, Object> getSaleRowProductDao() {
+    public static Dao<SaleRecordProduct, Object> getSaleRecordProductDao() {
         try {
             return getInstance().getDao(SaleRecordProduct.class);
         } catch (SQLException e) {

@@ -13,7 +13,7 @@ import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
 
 /**
- * Created by test on 19.04.2016.
+ * Created by PostRaw on 19.04.2016.
  */
 
 @DatabaseTable

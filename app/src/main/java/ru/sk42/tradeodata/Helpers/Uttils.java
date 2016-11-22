@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import ru.sk42.tradeodata.Model.Catalogs.Product;
+import ru.sk42.tradeodata.Model.Constants;
+
 /**
  * Created by хрюн моржов on 26.10.2016.
  */
@@ -57,8 +60,21 @@ public class Uttils {
         }
     }
 
-    public static String fd(double d) {
+    public static String formatDoubleToMoney(double d) {
         DecimalFormat df = new DecimalFormat("#0.00");
         return String.valueOf(df.format(d));
+    }
+
+    public static String formatDoubleToQty(double d) {
+        DecimalFormat df = new DecimalFormat("#0.000");
+        return String.valueOf(df.format(d));
+    }
+
+    public static boolean isPredefined(Product product) {
+        if (product.getRef_Key().equals(Constants.SHIPPING_GUID)
+                || product.getRef_Key().equals(Constants.UNLOAD_GUID)) {
+            return true;
+        }
+        return false;
     }
 }

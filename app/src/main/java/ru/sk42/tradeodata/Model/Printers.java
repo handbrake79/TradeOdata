@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 
 /**
- * Created by test on 04.03.2016.
+ * Created by PostRaw on 04.03.2016.
  */
 
 public class Printers {

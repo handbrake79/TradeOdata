@@ -8,8 +8,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -59,12 +61,11 @@ public class RequisitesFragment extends Fragment {
     TextView mDiscountCard;
 
     private DocSale docSale;
-    private InteractionInterface mListener;
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = (InteractionInterface) getActivity();
+        mListenerShipping = null;
     }
 
 
@@ -87,6 +88,12 @@ public class RequisitesFragment extends Fragment {
     public void initView() {
         mAuthorText.setText(docSale.getAuthor().toString());
         docPageReqContractText.setText(docSale.getContract().toString());
+        docPageReqContractText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "Изменить или создать новый договор", Toast.LENGTH_SHORT).show();
+            }
+        });
         docPageReqCustomerText.setText(docSale.getCustomer().toString());
         docPageReqNumberText.setText(docSale.getNumber());
         docPageReqDateText.setText(Uttils.DATE_FORMATTER.format(docSale.getDate()));
@@ -149,6 +156,7 @@ public class RequisitesFragment extends Fragment {
         if(card != null){
             mDiscountCard.setText(docSale.getDiscountCard().toString());
         }
+        mAuthorText.requestFocus();
     }
 
     @Override

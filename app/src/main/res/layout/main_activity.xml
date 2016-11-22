@@ -10,25 +10,6 @@
     tools:context=".Activities.MainActivity">
 
 
-
-    <Button
-        android:id="@+id/btnDocs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/btnSettings"
-        android:onClick="btnDocListClick"
-        android:text="Документы" />
-
-    <Button
-        android:id="@+id/btnSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnDocs"
-        android:layout_centerHorizontal="true"
-        android:onClick="btnSettingsOnClick"
-        android:text="Настройки" />
-
     <EditText
         android:id="@+id/edtLog"
         android:layout_width="wrap_content"
@@ -39,5 +20,24 @@
         android:layout_below="@+id/btnSettings"
         android:ems="10"
         android:inputType="textMultiLine"
-        android:visibility="invisible" />
+        android:visibility="visible"
+        android:textSize="10sp" />
+
+    <Button
+        android:id="@+id/btnDocs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="btnDocListClick"
+        android:text="Документы"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/btnSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="btnSettingsOnClick"
+        android:text="Настройки"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>

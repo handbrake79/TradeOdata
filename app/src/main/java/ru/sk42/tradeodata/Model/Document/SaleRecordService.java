@@ -13,7 +13,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
 
 
 /**
- * Created by test on 31.03.2016.
+ * Created by PostRaw on 31.03.2016.
  */
 @DatabaseTable(tableName = "SaleRecordService")
 @JsonIgnoreProperties(ignoreUnknown = true)

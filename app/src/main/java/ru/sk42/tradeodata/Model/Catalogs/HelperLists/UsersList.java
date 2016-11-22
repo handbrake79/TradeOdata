@@ -13,7 +13,7 @@ import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Constants;
 
 /**
- * Created by test on 04.03.2016.
+ * Created by PostRaw on 04.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UsersList {

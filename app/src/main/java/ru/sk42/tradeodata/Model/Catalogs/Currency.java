@@ -14,17 +14,19 @@ import ru.sk42.tradeodata.Model.Constants;
 
 
 /**
- * Created by test on 14.03.2016.
+ * Created by PostRaw on 14.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Currency")
 public class Currency extends CDO {
+
     @JsonProperty
     @DatabaseField
-    private String Description;
-    @DatabaseField(id = true, columnName = "ref_Key")
+    public String Description;
+
+    @DatabaseField(id = true, columnName = "Ref_Key")
     @JsonProperty("Ref_Key")
-    private String ref_Key;
+    public String ref_Key;
 
     public Currency(String ref_Key) {
         this.setRef_Key(ref_Key);

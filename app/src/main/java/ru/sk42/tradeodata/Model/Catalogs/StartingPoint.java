@@ -106,7 +106,7 @@ public class StartingPoint extends CDO {
 
     public static StartingPoint getObjectByName(String mStartingPoint) {
         try {
-            List<StartingPoint> list = MyHelper.getStartingPointDao().queryForEq("description", mStartingPoint);
+            List<StartingPoint> list = MyHelper.getStartingPointDao().queryForEq("Description", mStartingPoint);
             if (list.size() > 0) {
                 return list.get(0);
             }

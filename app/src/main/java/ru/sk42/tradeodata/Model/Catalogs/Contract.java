@@ -15,7 +15,7 @@ import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 
 
 /**
- * Created by test on 14.03.2016.
+ * Created by PostRaw on 14.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Contracts")
@@ -25,7 +25,7 @@ public class Contract extends CDO {
     @DatabaseField
     private String Description;
 
-    @DatabaseField(id = true, columnName = "ref_Key")
+    @DatabaseField(id = true, columnName = "Ref_Key")
     @JsonProperty("Ref_Key")
     private String ref_Key;
 

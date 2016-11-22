@@ -27,9 +27,7 @@ import java.util.Calendar;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
-import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsListActivity;
-import ru.sk42.tradeodata.Activities.QtyInputActivity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
@@ -40,15 +38,13 @@ import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
-import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.LoadDataFromServer;
 import ru.sk42.tradeodata.Services.ServiceResultReciever;
 
-public class DocumentActivity extends AppCompatActivity implements InteractionInterface,
+public class DocumentActivity extends AppCompatActivity implements SaleRecordInterface,
         ServiceResultReciever.Receiver,
-        QtyPickerFragment.OnQtyFragmentInteractionListener,
         ShippingInterface {
 
     private static final String TAG = "Document ACTIVITY***";
@@ -175,22 +171,6 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onItemSelected(Object object) {
-//        //это внутри фрагмента СтокИнфо при выборе строки склада
-//        if (object instanceof Stock) {
-//            getSupportFragmentManager().popBackStack();
-//            if (docSale != null) {
-//                addNewProductRow((Stock) object);
-//            } else {
-//                Toast.makeText(this, "не выбран документ", Toast.LENGTH_SHORT).show();
-//            }
-//
-//        }
-        if (object instanceof SaleRecord) {
-            showQtyPickerActivity((SaleRecord) object);
-        }
-    }
 
     private void addNewProductRow(Stock stock) {
         SaleRecordProduct row = new SaleRecordProduct();
@@ -212,9 +192,6 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
     }
 
-    @Override
-    public void onRequestSuccess(Object object) {
-    }
 
     @Override
     public void onBackPressed() {
@@ -447,12 +424,12 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
         if (requestCode == 300 && resultCode == 0) {
 
-            SaleRecord record = null;
-            int id = data.getIntExtra("id", -1);
+            SaleRecordProduct record = null;
+            long id = data.getLongExtra("id", -1);
             double qty = data.getDoubleExtra("qty", -1);
             if (id != -1) {
                 try {
-                    record = MyHelper.getSaleRecordDao().queryForId(id);
+                    record = MyHelper.getSaleRecordProductDao().queryForId(id);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -481,7 +458,31 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
     }
 
 
-    private void showQtyPickerActivity(SaleRecord record) {
+    @Override
+    public void plus(SaleRecord record) {
+        double q = record.getQty() + 1;
+        record.setQty(q);
+        recalc();
+    }
+
+    @Override
+    public void minus(SaleRecord record) {
+        double q = record.getQty();
+        if(q > 1){
+            q--;
+            record.setQty(q);
+            recalc();
+        }
+    }
+
+    @Override
+    public void deleteRecord(SaleRecord record) {
+        docSale.getProducts().remove(record);
+        recalc();
+    }
+
+    @Override
+    public void onRecordSelected(SaleRecord record) {
         if (record.getProduct_Key().equals(Constants.SHIPPING_GUID) ||
                 record.getProduct_Key().equals(Constants.UNLOAD_GUID)) {
             return; //для услуг по доставке и разгрузке не редактируем кол-во
@@ -489,6 +490,7 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
         Intent intent = new Intent(this, QtyInputActivity.class);
         intent.putExtra("id", record.getId());
+        intent.putExtra("qty", record.getQty());
         startActivityForResult(intent, 300);
     }
 
@@ -528,19 +530,8 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
         }
     }
 
-    @Override
-    public void onQtyFragmentInteraction(SaleRecord record) {
-        getSupportFragmentManager().popBackStack();
-
-        recalc();
-    }
-
     public void saveLocal() {
-        //что у нас не сохраняется сразу?
-        //уберем setOnFocusListener
-        //будем сохранять адрес, стоимость, грузчиков и т.п.
-        //т.е. всё что не спиннеры и не дата время
-        //shipp
+
         try {
             docSale.save();
         } catch (SQLException e) {
@@ -551,16 +542,16 @@ public class DocumentActivity extends AppCompatActivity implements InteractionIn
 
     public void refreshTotal() {
 
-        String total = "Итого " + Uttils.fd(docSale.getTotal()) + " руб, вес "
-                + Uttils.fd(docSale.getWeight()) + " кг, объем "
-                + Uttils.fd(docSale.getVolume()) + " м3, "
+        String total = "Итого " + Uttils.formatDoubleToMoney(docSale.getTotal()) + " руб, вес "
+                + Uttils.formatDoubleToMoney(docSale.getWeight()) + " кг, объем "
+                + Uttils.formatDoubleToMoney(docSale.getVolume()) + " м3, "
                 + docSale.getProducts().size() + " товаров";
 
         mTotalText.setText(total);
 
-        mProductsTotalText.setText(Uttils.fd(docSale.getProductsTotal()));
+        mProductsTotalText.setText(Uttils.formatDoubleToMoney(docSale.getProductsTotal()));
 
-        mServicesTotalText.setText(Uttils.fd(docSale.getServicesTotal()));
+        mServicesTotalText.setText(Uttils.formatDoubleToMoney(docSale.getServicesTotal()));
 
         mNeedShippingText.setText(docSale.getNeedShipping() ? "Доставка" : "Самовывоз");
 

@@ -12,7 +12,7 @@ import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
 
 /**
- * Created by test on 18.03.2016.
+ * Created by PostRaw on 18.03.2016.
  */
 @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
 public class ShippingRatesList {
