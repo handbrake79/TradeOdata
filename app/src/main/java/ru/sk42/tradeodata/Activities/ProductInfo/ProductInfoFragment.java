@@ -132,9 +132,10 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
         if (productInfo.getStocks().size() == 0)
             return;
         int pos = mAdapter.getSelectedItem();
-        Stock stock = (Stock) productInfo.getStocks().toArray()[pos];
-
-        mListener.onItemSelected(stock);
+        if (pos >= 0) {
+            Stock stock = (Stock) productInfo.getStocks().toArray()[pos];
+            mListener.onItemSelected(stock);
+        }
 
     }
 

@@ -55,7 +55,7 @@ public class UsersList {
 
             usersArrayList = new ArrayList<User>();
             User user = new User();
-            user.setRef_Key(Constants.NULL_GUID);
+            user.setRef_Key(Constants.ZERO_GUID);
             user.setDescription("Нет данных сотрудника");
             usersArrayList.add(0, user);
             return usersArrayList;

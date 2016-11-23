@@ -313,11 +313,11 @@ public class ShippingFragment extends Fragment {
 
         mNeedUnloadSwitch.setChecked(docSale.getNeedUnload());
 
-        mShippingCostEditText.setText(docSale.getShippingCost().toString());
+        mShippingCostEditText.setText(Uttils.formatInt(docSale.getShippingCost()));
 
-        mUnloadCostEditText.setText(docSale.getUnloadCost().toString());
+        mUnloadCostEditText.setText(Uttils.formatInt(docSale.getUnloadCost()));
 
-        mWorkersCountEditText.setText(docSale.getWorkersCount().toString());
+        mWorkersCountEditText.setText(Uttils.formatInt(docSale.getWorkersCount()));
 
         toggleShippingElements(docSale.getNeedShipping());
 
@@ -325,7 +325,7 @@ public class ShippingFragment extends Fragment {
     }
 
     private void setShippingCostText() {
-        mShippingCostEditText.setText(docSale.getShippingCost().toString());
+        mShippingCostEditText.setText(Uttils.formatInt(docSale.getShippingCost()));
         String hint = "Стоимость доставки";
         if (docSale.getReferenceShipingCost() > 0) {
             hint += " (мин.цена по выбранному маршруту " + String.valueOf(docSale.getReferenceShipingCost() + " руб)");

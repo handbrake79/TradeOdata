@@ -135,7 +135,7 @@ public class CheckRelatedDataToLoad {
             }
 
 //            guid = row.getCharact_Key();
-//            if (!guid.equals(Constants.NULL_GUID)) {
+//            if (!guid.equals(Constants.ZERO_GUID)) {
 //                if (!listCharact.contains(guid) && charact == null) {
 //                    listCharact.add(guid);
 //                }

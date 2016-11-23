@@ -39,7 +39,7 @@ public class Route extends CDO
     }
 
     public static void createStub() {
-        Route r = new Route(Constants.NULL_GUID);
+        Route r = new Route(Constants.ZERO_GUID);
         r.setDescription("");
         try {
             r.save();

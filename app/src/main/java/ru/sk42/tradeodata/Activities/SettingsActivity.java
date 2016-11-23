@@ -24,7 +24,7 @@ import ru.sk42.tradeodata.Model.Printers;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
-import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
+import ru.sk42.tradeodata.Services.ServiceGenerator;
 import ru.sk42.tradeodata.RetroRequests.UsersRequest;
 
 

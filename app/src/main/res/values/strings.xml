@@ -10,5 +10,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="speech_prompt">Произнесите вслух адрес доставки</string>
     <string name="speech_not_supported">Распознавание речи не поддерживается!</string>
+    <string name="drawer_open">ящик открыт</string>
+    <string name="drawer_close">ящик закрыт</string>
 
 </resources>

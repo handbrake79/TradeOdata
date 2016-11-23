@@ -6,9 +6,6 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Namespace;
-
 import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
@@ -49,7 +46,7 @@ public class User extends CDO {
 
     @Override
     public boolean isEmpty() {
-        return ref_Key.equals(Constants.NULL_GUID);
+        return ref_Key.equals(Constants.ZERO_GUID);
     }
 
     @Override

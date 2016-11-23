@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.Model.Catalogs;
+package ru.sk42.tradeodata.XML;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Default;
@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import ru.sk42.tradeodata.Model.Document.DocSale;
-import ru.sk42.tradeodata.XML.DateConverter;
 
 
 /**
@@ -21,15 +20,15 @@ import ru.sk42.tradeodata.XML.DateConverter;
  */
 @Root(name = "entry",strict=false)
 @Default(DefaultType.FIELD)
-public class Testcur  {
+public class WrapperXML_DocSale {
 
     Content content;
 
-    public Testcur(DocSale docSale) {
+    public WrapperXML_DocSale(DocSale docSale) {
         this.content = new Content(docSale);
     }
 
-    public Testcur() {
+    public WrapperXML_DocSale() {
         this.content = new Content();
     }
 }

@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersTouchListener;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.ProductInfoRequest;
 import ru.sk42.tradeodata.RetroRequests.ProductsRequest;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
-import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
+import ru.sk42.tradeodata.Services.ServiceGenerator;
 
 
 public class ProductsListFragment extends Fragment {
@@ -97,7 +95,7 @@ public class ProductsListFragment extends Fragment {
 
 
             lastViewedGroupKey = Settings.getLastViewedProductGroupStatic();
-            if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.NULL_GUID)) {
+            if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.ZERO_GUID)) {
                 Product lastViewedGroup = Product.getObject(Product.class, lastViewedGroupKey);
                 if (lastViewedGroup != null) {
                     showChildrenProducts(lastViewedGroup);
@@ -233,7 +231,7 @@ public class ProductsListFragment extends Fragment {
     public void showTopLevelProducts() {
         currentCategory = Product.getStub();
         setTitle("Номенклатура");
-        String guid = Constants.NULL_GUID;
+        String guid = Constants.ZERO_GUID;
         List<Product> list = getProductsByParent(guid);
         if (list == null || list.size() == 0) {
             Toast.makeText(this.getContext(), "DB Request", Toast.LENGTH_SHORT).show();

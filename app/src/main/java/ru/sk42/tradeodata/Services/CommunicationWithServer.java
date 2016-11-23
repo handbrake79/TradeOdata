@@ -5,16 +5,28 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
 import com.j256.ormlite.table.TableUtils;
 
+import org.simpleframework.xml.convert.Registry;
+import org.simpleframework.xml.convert.RegistryStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
+
 import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,6 +57,8 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
+import ru.sk42.tradeodata.RetroRequests.SingleDocRequest;
+import ru.sk42.tradeodata.XML.WrapperXML_DocSale;
 import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
@@ -59,19 +73,20 @@ import ru.sk42.tradeodata.RetroRequests.CurrencyRequest;
 import ru.sk42.tradeodata.RetroRequests.CustomersRequest;
 import ru.sk42.tradeodata.RetroRequests.DiscountCardsRequest;
 import ru.sk42.tradeodata.RetroRequests.DocsRequest;
-import ru.sk42.tradeodata.RetroRequests.MissingDataLoader;
 import ru.sk42.tradeodata.RetroRequests.OrganisationsRequest;
+import ru.sk42.tradeodata.RetroRequests.PatchDocument;
+import ru.sk42.tradeodata.RetroRequests.PostDocument;
 import ru.sk42.tradeodata.RetroRequests.ProductsRequest;
 import ru.sk42.tradeodata.RetroRequests.RecordsCountRequest;
 import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 import ru.sk42.tradeodata.RetroRequests.RoutesRequest;
-import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
 import ru.sk42.tradeodata.RetroRequests.ShippingRatesRequest;
 import ru.sk42.tradeodata.RetroRequests.StartingPointsRequest;
 import ru.sk42.tradeodata.RetroRequests.StoresRequest;
 import ru.sk42.tradeodata.RetroRequests.UnitsRequest;
 import ru.sk42.tradeodata.RetroRequests.UsersRequest;
 import ru.sk42.tradeodata.RetroRequests.VehicleTypesRequest;
+import ru.sk42.tradeodata.XML.DateConverter;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -80,15 +95,15 @@ import ru.sk42.tradeodata.RetroRequests.VehicleTypesRequest;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
-public class LoadDataFromServer extends IntentService {
+public class CommunicationWithServer extends IntentService {
 
     NotificationManager manager;
     final String TAG = "Service ***";
     ResultReceiver resultReceiver;
     Intent intent;
 
-    public LoadDataFromServer() {
-        super("LoadDataFromServer");
+    public CommunicationWithServer() {
+        super("CommunicationWithServer");
     }
 
     public void onCreate() {
@@ -114,11 +129,21 @@ public class LoadDataFromServer extends IntentService {
                 return;
             }
             if (mode.equals(Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name())) {
-                loadMissingDataForSingleDocument();
+                loadMissingDataForSingleDocument(null);
                 return;
             }
             if (mode.equals(Constants.DATALOADER_MODE.REQUEST_DOCUMENTS.name())) {
                 loadDocuments();
+                return;
+            }
+
+            if (mode.equals(Constants.DATALOADER_MODE.REQUEST_SINGLE_DOCUMENT.name())) {
+                loadSingleDocument();
+                return;
+            }
+
+            if (mode.equals(Constants.DATALOADER_MODE.SAVE_TO_1C.name())) {
+                saveTo1C();
                 return;
             }
 
@@ -127,6 +152,94 @@ public class LoadDataFromServer extends IntentService {
 
 
     }
+
+    private class SaveResult {
+        public SaveResult() {
+            ok = false;
+            guid = "";
+            error = "";
+        }
+
+        boolean ok;
+        String guid;
+        String error;
+        int code;
+    }
+
+    //вернет guid, если
+    private void saveTo1C() {
+        final SaveResult result = new SaveResult();
+        DocSale docSale = DocSale.getDocument(Constants.ZERO_GUID); // пока сохраняем новый док в базу с нулевым гидом
+
+
+        String xml = writeDocSaleToXMLString(docSale);
+
+        RequestBody body = RequestBody.create(MediaType.parse("text/plain"), xml);
+        if (docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
+            //это новый документ, гуида еще нет
+            //вызываем метод Пост
+            PostDocument mPostRequest = ServiceGenerator.createXMLService(PostDocument.class);
+            Call<ResponseBody> call = mPostRequest.call(body);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    result.code = response.raw().code();
+                    String location = response.headers().get("Location");
+                    if (location == null) {
+                        result.guid = Constants.ZERO_GUID;
+                        result.error = "location not found!";
+                    }
+                    int i = location.indexOf("guid'");
+                    if (i > 0) {
+                        result.guid = location.substring(i + 5, location.length() - 3);
+                        result.ok = true;
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    result.error = t.toString();
+                }
+            });
+        }
+
+        if (!docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
+            //вызываем метод patch такой документ уже есть в базе 1с
+            PatchDocument mPatchRequest = ServiceGenerator.createXMLService(PatchDocument.class);
+            Call<ResponseBody> call = mPatchRequest.call(docSale.getRef_Key(), body);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    result.code = response.raw().code();
+                    //разбираемся
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    result.error = t.toString();
+                }
+            });
+        }
+
+        String msg;
+        if(result.ok){
+            msg = "Документ успешно сохранен";
+        }
+        else
+        {
+            msg = "Ошибка сохранения: " + result.error;
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putString("guid", result.guid);
+        bundle.putString("error", msg);
+        bundle.putInt("code", result.code);
+        bundle.putString("guid", result.guid);
+
+        resultReceiver.send(Constants.SAVE_DOCUMENT_RESULT, bundle);
+
+    }
+
 
     private void Preload() {
 
@@ -490,8 +603,10 @@ public class LoadDataFromServer extends IntentService {
 
     }
 
-    private void loadMissingDataForSingleDocument() {
-        String ref_Key = intent.getStringExtra("ref_Key");
+    private void loadMissingDataForSingleDocument(String ref_Key) {
+        if(ref_Key == null) {
+            ref_Key = intent.getStringExtra("ref_Key");
+        }
         DocSale doc = DocSale.getDocument(ref_Key);
         MissingDataLoader.LoadMissingDataForObject(doc, DocSale.class);
         doc.setForeignObjects();
@@ -551,11 +666,52 @@ public class LoadDataFromServer extends IntentService {
 
     }
 
+    private void loadSingleDocument() {
+        final String ref_Key = intent.getStringExtra("ref_Key");
+        String filter = "Ref_Key eq guid'" + ref_Key + "'";
+
+        sendFeedback("Загрузка документа с сервера");
+
+        SingleDocRequest request = ServiceGenerator.createService(SingleDocRequest.class);
+        Call<DocSaleList> callDocuments = request.call(RetroConstants.getMap(filter));
+        callDocuments.enqueue(new Callback<DocSaleList>() {
+            @Override
+            public void onResponse(Call<DocSaleList> call, Response<DocSaleList> response) {
+                DocSaleList list = response.body();
+                if (list == null) {
+                    Log.wtf(TAG, "onResponse: DocSaleList is null", new Exception());
+                    return;
+                }
+
+                if(list.size() == 1)
+                {
+                    DocSale docSale = list.getValues().iterator().next();
+                    try {
+                        docSale.save();
+                    } catch (Exception e) {
+                        Log.w(TAG, "docSale.save(): " + e.toString());
+                    }
+
+                }
+
+                loadMissingDataForSingleDocument(ref_Key);
+
+            }
+
+            @Override
+            public void onFailure(Call<DocSaleList> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t.toString());
+
+            }
+        });
+
+
+    }
 
     void sendFeedback(String message) {
         Bundle b = new Bundle();
         b.putString("Message", message);
-        resultReceiver.send(0, b);
+        resultReceiver.send(Constants.FEEDBACK, b);
     }
 
     public void onDestroy() {
@@ -565,7 +721,7 @@ public class LoadDataFromServer extends IntentService {
     private void sendServiceFinished(String msg) {
         sendNotification(msg);
         sendFeedback(msg);
-        resultReceiver.send(1, null);
+        resultReceiver.send(Constants.LOAD_FINISHED, null);
     }
 
 
@@ -608,5 +764,34 @@ public class LoadDataFromServer extends IntentService {
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.notify(0, noti);
     }
+
+
+    private String writeDocSaleToXMLString(DocSale docSale) {
+        String xmlString;
+
+        Registry registry = new Registry();
+        Strategy strategy = new RegistryStrategy(registry);
+        DateConverter dateConverter = new DateConverter();
+        try {
+            registry.bind(Date.class, dateConverter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Persister persister = new Persister(strategy);
+        StringWriter writer = new StringWriter();
+
+        WrapperXML_DocSale XMLDocSaleWrapper = new WrapperXML_DocSale(docSale);
+
+
+        try {
+            persister.write(XMLDocSaleWrapper, writer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        xmlString = writer.toString();
+        return xmlString;
+    }
+
 
 }

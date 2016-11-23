@@ -41,8 +41,8 @@ public class ProductsList {
 
             productArrayList = new ArrayList<Product>();
             Product product = new Product();
-            product.setRef_Key(Constants.NULL_GUID);
-            product.setParent_key(Constants.NULL_GUID);
+            product.setRef_Key(Constants.ZERO_GUID);
+            product.setParent_key(Constants.ZERO_GUID);
             product.setDescription("Номенклатура");
             product.setCode("");
             product.setFolder(false);

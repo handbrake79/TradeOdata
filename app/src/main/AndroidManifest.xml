@@ -26,18 +26,18 @@
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.Document.DocumentActivity" />
+        <activity android:name=".Activities.Document.DocumentActivity">
+        </activity>
         <activity
             android:name=".Activities.Documents_List.DocList_Activity"
             android:label="@string/title_activity_documents__list_"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
 
         <service
-            android:name=".Services.LoadDataFromServer"
+            android:name=".Services.CommunicationWithServer"
             android:exported="false" />
 
         <activity android:name=".Activities.ProductsListBrowser.ProductsListActivity" />
-        <activity android:name=".Activities.ProductInfo.ProductInfoActivity" />
         <activity android:name=".Activities.Document.QtyInputActivity"></activity>
     </application>
 

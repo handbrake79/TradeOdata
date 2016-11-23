@@ -29,7 +29,7 @@ import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.DocSaleList;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
-import ru.sk42.tradeodata.Services.LoadDataFromServer;
+import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReciever;
 
 public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReciever.Receiver {
@@ -70,7 +70,12 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(DocList_Activity.this, "Создать новый документ!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(DocList_Activity.this, DocumentActivity.class);
+                intent.putExtra("mode", Constants.ModeNewOrder);
+                startActivityForResult(intent, 0);
+                mAdapter.notifyDataSetChanged();
+
+//                Toast.makeText(DocList_Activity.this, "Создать новый документ!", Toast.LENGTH_SHORT).show();
 //                Snackbar.make(view, "", Snackbar.LENGTH_LONG)
 //                        .setAction("", new View.OnClickListener() {
 //                            @Override
@@ -158,7 +163,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     public void onItemSelected(Object selectedObject) {
         //это может быть выбор документа из списка
         if (selectedObject instanceof DocSale) {
-
             Intent intent = new Intent(this, DocumentActivity.class);
             intent.putExtra("mode", Constants.ModeExistingOrder);
             intent.putExtra("ref_Key", ((DocSale) selectedObject).getRef_Key());
@@ -197,7 +201,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
     public void requestDocList() {
 
-        Intent i = new Intent(this, LoadDataFromServer.class);
+        Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("StartDate", startDate.getTimeInMillis());
         i.putExtra("mode", Constants.DATALOADER_MODE.REQUEST_DOCUMENTS.name());
         i.putExtra("receiverTag", mReceiver);

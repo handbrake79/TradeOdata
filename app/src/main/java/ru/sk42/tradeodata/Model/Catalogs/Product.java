@@ -48,7 +48,7 @@ public class Product extends CDO {
 
     public static Product getStub() {
         Product p = new Product();
-        p.setRef_Key(Constants.NULL_GUID);
+        p.setRef_Key(Constants.ZERO_GUID);
         p.setDescription("Заглушка, товар не определен!");
         return p;
     }
@@ -117,7 +117,7 @@ public class Product extends CDO {
     }
 
     public String getRef_Key() {
-        if (ref_Key == null) return Constants.NULL_GUID;
+        if (ref_Key == null) return Constants.ZERO_GUID;
         return ref_Key;
     }
 
@@ -142,19 +142,19 @@ public class Product extends CDO {
     }
 
     public boolean isFirstLevelCategory() {
-        return parent_key.equals(Constants.NULL_GUID);
+        return parent_key.equals(Constants.ZERO_GUID);
     }
 
     public boolean isTopCategory() {
-        return ref_Key.equals(Constants.NULL_GUID);
+        return ref_Key.equals(Constants.ZERO_GUID);
     }
 
     public boolean isLowerThanFirstLevel() {
-        return !parent_key.equals(Constants.NULL_GUID);
+        return !parent_key.equals(Constants.ZERO_GUID);
     }
 
     public boolean isEmpty() {
-        return ref_Key.equals(Constants.NULL_GUID);
+        return ref_Key.equals(Constants.ZERO_GUID);
     }
 
     @Override

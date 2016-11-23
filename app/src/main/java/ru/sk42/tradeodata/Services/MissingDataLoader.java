@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.RetroRequests;
+package ru.sk42.tradeodata.Services;
 
 import android.util.Log;
 
@@ -17,6 +17,14 @@ import ru.sk42.tradeodata.Model.Catalogs.HelperLists.StoreList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UnitsList;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
 import ru.sk42.tradeodata.Model.Document.DocSaleList;
+import ru.sk42.tradeodata.RetroRequests.CharRequest;
+import ru.sk42.tradeodata.RetroRequests.ContractsRequest;
+import ru.sk42.tradeodata.RetroRequests.CustomersRequest;
+import ru.sk42.tradeodata.RetroRequests.ProductsRequest;
+import ru.sk42.tradeodata.RetroRequests.RetroConstants;
+import ru.sk42.tradeodata.RetroRequests.StoresRequest;
+import ru.sk42.tradeodata.RetroRequests.UnitsRequest;
+import ru.sk42.tradeodata.RetroRequests.UsersRequest;
 
 /**
  * Created by я on 19.08.2016.

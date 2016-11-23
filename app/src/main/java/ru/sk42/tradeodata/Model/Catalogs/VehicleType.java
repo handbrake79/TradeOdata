@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.types.StringType;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
@@ -119,7 +118,7 @@ public class VehicleType extends CDO {
     }
 
     public static void createStub() {
-        VehicleType v = new VehicleType(Constants.NULL_GUID);
+        VehicleType v = new VehicleType(Constants.ZERO_GUID);
         v.setDescription("");
         v.setCode("");
         v.setMaxTonnage(0);

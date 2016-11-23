@@ -77,4 +77,9 @@ public class Uttils {
         }
         return false;
     }
+
+    public static String formatInt(int i) {
+        DecimalFormat df = new DecimalFormat("#0");
+        return String.valueOf(df.format(i));
+    }
 }

@@ -27,15 +27,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
-import ru.sk42.tradeodata.Model.Catalogs.Testcur;
+import ru.sk42.tradeodata.XML.WrapperXML_DocSale;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.RetroRequests.PatchDocument;
-import ru.sk42.tradeodata.RetroRequests.PostDocument;
-import ru.sk42.tradeodata.RetroRequests.ServiceGenerator;
-import ru.sk42.tradeodata.Services.LoadDataFromServer;
+import ru.sk42.tradeodata.Services.ServiceGenerator;
+import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReciever;
 import ru.sk42.tradeodata.XML.DateConverter;
 
@@ -63,13 +62,13 @@ public class MainActivity extends AppCompatActivity implements ServiceResultReci
         SettingsOld.readSettings();
         mReceiver = new ServiceResultReciever(new Handler());
         mReceiver.setReceiver(this);
-        Intent i = new Intent(this, LoadDataFromServer.class);
+        Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("from", "MainAct");
         i.putExtra("mode", Constants.DATALOADER_MODE.PRELOAD.name());
         i.putExtra("receiverTag", mReceiver);
-        //startService(i);
+        startService(i);
 
-        test();
+        //test();
 
     }
 
@@ -149,15 +148,15 @@ public class MainActivity extends AppCompatActivity implements ServiceResultReci
             e.printStackTrace();
         }
         docSale.setDate(GregorianCalendar.getInstance().getTime());
-        //docSale.setRef_Key(Constants.NULL_GUID);
+        //docSale.setRef_Key(Constants.ZERO_GUID);
         docSale.setNumber(String.valueOf(docSale.getDate().getTime()));
         docSale.setComment("Ебать ты высокий!");
-        Testcur testcur = new Testcur(docSale);
+        WrapperXML_DocSale XMLDocSaleWrapper = new WrapperXML_DocSale(docSale);
 
 
 
         try {
-            persister.write(testcur, writer);
+            persister.write(XMLDocSaleWrapper, writer);
         } catch (Exception e) {
             e.printStackTrace();
             finish();

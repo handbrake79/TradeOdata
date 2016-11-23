@@ -94,7 +94,7 @@ public class StartingPoint extends CDO {
     }
 
     public static void createStub() {
-        StartingPoint s = new StartingPoint(Constants.NULL_GUID);
+        StartingPoint s = new StartingPoint(Constants.ZERO_GUID);
         s.setDescription("");
         try {
             s.save();

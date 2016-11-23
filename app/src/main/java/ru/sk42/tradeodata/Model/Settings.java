@@ -54,7 +54,7 @@ public class Settings {
 
 
     public static String getLastViewedProductGroupStatic(){
-        String mLastViewedProductGroup = Constants.NULL_GUID;
+        String mLastViewedProductGroup = Constants.ZERO_GUID;
         try {
             List<Settings> list = MyHelper.getSettingsDao().queryForAll();
             mLastViewedProductGroup = list.get(0).getLastViewedProductGroup();

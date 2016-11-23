@@ -88,7 +88,7 @@ public class Unit extends CDO {
     }
 
     public boolean isEmpty() {
-        if (ref_Key.equals(Constants.NULL_GUID))
+        if (ref_Key.equals(Constants.ZERO_GUID))
             return true;
         else
             return false;

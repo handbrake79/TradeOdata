@@ -9,19 +9,26 @@ import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import butterknife.Bind;
@@ -40,7 +47,7 @@ import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
-import ru.sk42.tradeodata.Services.LoadDataFromServer;
+import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReciever;
 
 public class DocumentActivity extends AppCompatActivity implements SaleRecordInterface,
@@ -49,6 +56,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     private static final String TAG = "Document ACTIVITY***";
 
+    ActionBarDrawerToggle mDrawerToggle;
+
+    ArrayList<String> mActionNames = new ArrayList();
 
     DocumentFragmentPageAdapter fragmentPagerAdapter;
     ViewPager viewPager;
@@ -59,6 +69,13 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     public ServiceResultReciever mReceiver;
 
+
+    enum mActions {
+        SAVE_LOCAL,
+        SAVE_1C,
+        POST,
+        CLOSE
+    }
 
     Menu menu;
     ProgressDialog progressDialog;
@@ -92,6 +109,12 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Bind(R.id.footer_total_services_value)
     TextView mServicesTotalText;
+
+    @Bind(R.id.doc_drawer_layout)
+    DrawerLayout mDrawerLayout;
+
+    @Bind(R.id.doc_listview)
+    ListView mDrawerList;
 
     public String getDocRef_Key() {
         return docRef_Key;
@@ -138,8 +161,10 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
 
         if (mode == Constants.ModeNewOrder) {
-            docSale = new DocSale();
+            docSale = DocSale.newInstance();
+            docRef_Key = docSale.getRef_Key();
         }
+
         if (docSale == null)
             reloadDocSale();
 
@@ -160,7 +185,52 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             }
         });
 
-        callDataLoaderService();
+        mActionNames.add("Сохранить");
+        mActionNames.add("Передать в 1С");
+        mActionNames.add("Провести в 1С");
+        mActionNames.add("Закрыть");
+
+
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.list_item, mActionNames));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(DocumentActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                Toast.makeText(DocumentActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                null,  /* nav drawer image to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+        ) {
+            public void onDrawerClosed(View view) {
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                mDrawerList.bringToFront();
+                mDrawerLayout.requestLayout();
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        if (mode == Constants.ModeExistingOrder) {
+            callDataLoaderService();
+        }
 
     }
 
@@ -468,7 +538,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     @Override
     public void minus(SaleRecord record) {
         double q = record.getQty();
-        if(q > 1){
+        if (q > 1) {
             q--;
             record.setQty(q);
             recalc();
@@ -500,7 +570,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         String title = docSale.getNumber() + " от " + Uttils.DATE_FORMATTER.format(docSale.getDate());
         actionBar.setTitle(title);
         actionBar.setWindowTitle("WindowTitle");
-        actionBar.setSubtitle((!docSale.getRef_Key().equals(Constants.NULL_GUID) ? "записан, " : "не записан, ") + (docSale.getPosted() ? " проведен" : "не проведен"));
+        actionBar.setSubtitle((!docSale.getRef_Key().equals(Constants.ZERO_GUID) ? "записан, " : "не записан, ") + (docSale.getPosted() ? " проведен" : "не проведен"));
 
     }
 
@@ -510,7 +580,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
 
     private void callDataLoaderService() {
-        Intent i = new Intent(this, LoadDataFromServer.class);
+        Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("mode", Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name());
         i.putExtra("from", "Document");
         i.putExtra("ref_Key", getDocRef_Key());
@@ -520,14 +590,43 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
 
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        if (resultCode == 1) {
+    public void onReceiveResult(int code, Bundle data) {
+        if (code == Constants.LOAD_FINISHED) {
             Log.d(TAG, "onReceiveResult: SFO COMPLETED");
             //Видимо здесь нужно показывать фрагмент
             reloadDocSale();
             setActionBarTitle();
             refreshTotal();
         }
+
+        if (code == Constants.SAVE_DOCUMENT_RESULT) {
+            boolean ok = data.getBoolean("ok");
+            if (!ok) {
+                showMessage(data.getString("error"));
+            }
+            if (ok) {
+                //документ на сервере мог измениться, например могли быть применены скидки
+                //нужно перезагрузить документ с сервера
+                if (docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
+                    docSale.setRef_Key(data.getString("guid"));
+                    saveLocal();
+                }
+                callReloadFromServer();
+            }
+        }
+    }
+
+    private void callReloadFromServer() {
+        Intent i = new Intent(this, CommunicationWithServer.class);
+        i.putExtra("mode", Constants.DATALOADER_MODE.REQUEST_SINGLE_DOCUMENT.name());
+        i.putExtra("ref_Key", docSale.getRef_Key());
+        i.putExtra("receiverTag", mReceiver);
+        i.putExtra("from", "DocList");
+        startService(i);
+    }
+
+    private void showMessage(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
     public void saveLocal() {
@@ -555,15 +654,51 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
         mNeedShippingText.setText(docSale.getNeedShipping() ? "Доставка" : "Самовывоз");
 
-        mShippingCostText.setText(docSale.getShippingCost().toString());
+        mShippingCostText.setText(Uttils.formatInt(docSale.getShippingCost()));
 
         mNeedUnloadText.setText(docSale.getNeedUnload() ? "Грузчики" : "Без разгрузки");
 
-        mUnloadCostText.setText(docSale.getUnloadCost().toString());
+        mUnloadCostText.setText(Uttils.formatInt(docSale.getUnloadCost()));
 
-        mWorkersCountText.setText(docSale.getWorkersCount().toString());
+        mWorkersCountText.setText(Uttils.formatInt(docSale.getWorkersCount()));
 
-        mShippingTotalText.setText(docSale.getShippingTotal().toString());
+        mShippingTotalText.setText(Uttils.formatInt(docSale.getShippingTotal()));
     }
 
+    private class DrawerItemClickListener implements android.widget.AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            Log.d(TAG, "onItemClick: DrawerItemClickListener");
+            selectItem(position);
+        }
+
+    }
+
+    private void selectItem(int position) {
+        mDrawerList.setItemChecked(position, true);
+        mDrawerLayout.closeDrawer(mDrawerList);
+        mActions selectedAction = mActions.values()[position];
+        switch (selectedAction) {
+            case CLOSE:
+                onBackPressed();
+                break;
+            case POST:
+                //callPost();
+                break;
+            case SAVE_LOCAL:
+                saveLocal();
+                break;
+            case SAVE_1C:
+                saveLocal();
+                callServiceSaveTo1C();
+        }
+    }
+
+    private void callServiceSaveTo1C() {
+        Intent i = new Intent(this, CommunicationWithServer.class);
+        i.putExtra("mode", Constants.DATALOADER_MODE.SAVE_TO_1C.name());
+        i.putExtra("receiverTag", mReceiver);
+        i.putExtra("from", "DocList");
+        startService(i);
+    }
 }

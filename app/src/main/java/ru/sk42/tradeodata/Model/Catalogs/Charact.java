@@ -53,8 +53,8 @@ public class Charact extends CDO{
 
 
     public static void createStub(){
-        Charact charact = new Charact(Constants.NULL_GUID);
-        charact.setOwner_Key(Constants.NULL_GUID);
+        Charact charact = new Charact(Constants.ZERO_GUID);
+        charact.setOwner_Key(Constants.ZERO_GUID);
         charact.setDescription("-");
         try {
             charact.save();
@@ -92,7 +92,7 @@ public class Charact extends CDO{
     }
 
     public boolean isEmpty() {
-        if (this.ref_Key.equals(Constants.NULL_GUID))
+        if (this.ref_Key.equals(Constants.ZERO_GUID))
             return true;
         else
             return false;

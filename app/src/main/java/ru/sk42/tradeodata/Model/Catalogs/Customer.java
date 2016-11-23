@@ -69,7 +69,7 @@ public class Customer extends CDO {
     }
 
     public boolean isEmpty() {
-        return ref_Key.equals(Constants.NULL_GUID);
+        return ref_Key.equals(Constants.ZERO_GUID);
     }
 
     @Override

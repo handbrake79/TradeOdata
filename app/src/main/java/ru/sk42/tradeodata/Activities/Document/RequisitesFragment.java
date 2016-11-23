@@ -97,8 +97,8 @@ public class RequisitesFragment extends Fragment {
         docPageReqCustomerText.setText(docSale.getCustomer().toString());
         docPageReqNumberText.setText(docSale.getNumber());
         docPageReqDateText.setText(Uttils.DATE_FORMATTER.format(docSale.getDate()));
-        docPageReqShippingCostText.setText(docSale.getShippingCost().toString());
-        docPageReqUnloadCostText.setText(docSale.getUnloadCost().toString());
+        docPageReqShippingCostText.setText(Uttils.formatInt(docSale.getShippingCost()));
+        docPageReqUnloadCostText.setText(Uttils.formatInt(docSale.getUnloadCost()));
         mPassPersonEditText.setText(docSale.getPassPerson());
         mPassPersonEditText.addTextChangedListener(new TextWatcher() {
             @Override
