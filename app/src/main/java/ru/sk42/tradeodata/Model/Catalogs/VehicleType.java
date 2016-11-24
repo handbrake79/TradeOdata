@@ -35,6 +35,13 @@ public class VehicleType extends CDO {
     @JsonProperty("МаксимальнаяГрузоподъемность")
     private Integer maxTonnage;
 
+    public static VehicleType newInstance() {
+        VehicleType obj = new VehicleType();
+        obj.setRef_Key(Constants.ZERO_GUID);
+        obj.setDescription("");
+        return obj;
+    }
+
 
     public VehicleType() {
     }

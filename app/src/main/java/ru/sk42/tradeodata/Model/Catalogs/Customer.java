@@ -20,6 +20,7 @@ import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable(tableName = "Customers")
 public class Customer extends CDO {
+
     @DatabaseField(id = true)
     @JsonProperty("Ref_Key")
     private String ref_Key;
@@ -34,6 +35,11 @@ public class Customer extends CDO {
 
     public Customer() {
     }
+
+    public static Customer newInstance() {
+        return Customer.getObject(Customer.class, Constants.CUSTOMER_GUID);
+    }
+
 
     public String getDescription() {
         return Description;

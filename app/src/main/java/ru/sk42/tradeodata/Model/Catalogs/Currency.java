@@ -87,4 +87,7 @@ public class Currency extends CDO {
         return this.getDescription().toString();
     }
 
+    public static Currency newInstance() {
+        return Currency.getObject(Currency.class, Constants.CURRENCY_GUID);
+    }
 }

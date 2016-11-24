@@ -35,7 +35,6 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
     private int mColumnCount = 1;
     private InteractionInterface mListener;
     private ProductInfo_Adapter mAdapter;
-    private ProgressDialog progress;
 
 
     /**
@@ -75,13 +74,17 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
         }
 
         View view = inflater.inflate(R.layout.product_info_fragment, container, false);
-        progress = new ProgressDialog(this.getContext());
 
         TextView tvProductDescription = (TextView) view.findViewById(R.id.tvProductInfo_ProductDescription);
+        TextView tvOutOfStock = (TextView) view.findViewById(R.id.tvProductInfo_outofstock);
+        Button btnSelect = (Button) view.findViewById(R.id.btnSelectStock);
+        if(productInfo.getArrayList().size() == 0){
+            tvOutOfStock.setVisibility(View.VISIBLE);
+            btnSelect.setVisibility(View.GONE);
+        }
         tvProductDescription.setText(productInfo.getDescription());
 
         View rvView = view.findViewById(R.id.rvStock);
-        Button btnSelect = (Button) view.findViewById(R.id.btnSelectStock);
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

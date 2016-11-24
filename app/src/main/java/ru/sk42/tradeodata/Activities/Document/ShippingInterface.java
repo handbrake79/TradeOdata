@@ -12,6 +12,7 @@ import java.util.Calendar;
  */
 public interface ShippingInterface {
 
+    void onCommentChanged(String mPassPerson);
 
     void onPassPersonChanged(String mPassPerson);
 

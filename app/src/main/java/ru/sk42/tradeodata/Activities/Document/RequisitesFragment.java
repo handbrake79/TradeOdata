@@ -97,8 +97,10 @@ public class RequisitesFragment extends Fragment {
         docPageReqCustomerText.setText(docSale.getCustomer().toString());
         docPageReqNumberText.setText(docSale.getNumber());
         docPageReqDateText.setText(Uttils.DATE_FORMATTER.format(docSale.getDate()));
+
         docPageReqShippingCostText.setText(Uttils.formatInt(docSale.getShippingCost()));
         docPageReqUnloadCostText.setText(Uttils.formatInt(docSale.getUnloadCost()));
+
         mPassPersonEditText.setText(docSale.getPassPerson());
         mPassPersonEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -116,6 +118,7 @@ public class RequisitesFragment extends Fragment {
                 mListenerShipping.onPassPersonChanged(editable.toString());
             }
         });
+
         mPassVehicleEditText.setText(docSale.getPassVehicle());
         mPassVehicleEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -148,7 +151,7 @@ public class RequisitesFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                docSale.setComment(editable.toString());
+                mListenerShipping.onCommentChanged(editable.toString());
             }
         });
 

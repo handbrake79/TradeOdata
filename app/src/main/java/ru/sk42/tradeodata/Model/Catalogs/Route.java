@@ -31,6 +31,13 @@ public class Route extends CDO
     @JsonProperty
     private String Description;
 
+    public static Route newInstance() {
+        Route obj = new Route();
+        obj.setRef_Key(Constants.ZERO_GUID);
+        obj.setDescription("");
+        return obj;
+    }
+
     public Route() {
     }
 

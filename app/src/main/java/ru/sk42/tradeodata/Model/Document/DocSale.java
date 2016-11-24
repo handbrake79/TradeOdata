@@ -1,7 +1,5 @@
 package ru.sk42.tradeodata.Model.Document;
 
-import android.os.Bundle;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,7 +38,6 @@ import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
-import ru.sk42.tradeodata.Model.Settings;
 import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.XML.DateConverter;
 
@@ -58,23 +55,35 @@ public class DocSale extends CDO {
     public static DocSale newInstance() {
         DocSale docSale = new DocSale();
         docSale.setRef_Key(Constants.ZERO_GUID);
-        docSale.setAuthor(SettingsOld.getCurrentUser());
-        docSale.setDate(new GregorianCalendar().getTime());
-        docSale.setCustomer(Customer.getObject(Customer.class,Constants.CUSTOMER_GUID));
-        docSale.setContract(Contract.getObject(Contract.class, Constants.CONTRACT_GUID));
+        docSale.setNumber("");
         docSale.setComment("Создано в андроиде");
-        docSale.setShippingAddress("");
+
+        docSale.products = new ArrayList<>();
+        docSale.services = new ArrayList<>();
+
+        docSale.setDate(new GregorianCalendar().getTime());
         docSale.setShippingDate(new Date());
         docSale.setShippingTimeFrom(new Date());
         docSale.setShippingTimeTo(new Date());
-        docSale.products = new ArrayList<>();
-        docSale.services = new ArrayList<>();
-        docSale.setRoute(new Route());
-        docSale.setVehicleType(new VehicleType());
-        docSale.setStartingPoint(new StartingPoint());
-        docSale.setNumber("");
+
+        docSale.setAuthor(SettingsOld.getCurrentUser());
+        docSale.setCustomer(Customer.newInstance());
+        docSale.setContract(Contract.newInstance());
+        docSale.setCurrency(Currency.newInstance());
+        docSale.setOrganisation(Organisation.newInstance());
+
+        docSale.setDiscountCard(DiscountCard.newInstance());
+        docSale.setRoute(Route.newInstance());
+        docSale.setVehicleType(VehicleType.newInstance());
+        docSale.setStartingPoint(StartingPoint.newInstance());
+
+        docSale.setShippingAddress("");
+        docSale.setPassVehicle("");
+        docSale.setPassPerson("");
+
         return docSale;
     }
+
 
 
     @JsonProperty("Ref_Key")
@@ -82,7 +91,6 @@ public class DocSale extends CDO {
     @Element(name = "Ref_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String ref_Key;
-
 
 
     @Element(name = "ВидОперации")
@@ -264,7 +272,7 @@ public class DocSale extends CDO {
     private Date shippingTimeTo;
 
     @Attribute(name = "type")
-    @Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
     @Path("d:Товары")
     private String docsaleType = "Collection(StandardODATA.Document_РеализацияТоваровУслуг_Товары_RowType)";
 
@@ -275,9 +283,6 @@ public class DocSale extends CDO {
     private Collection<SaleRecordProduct> products;
 
 
-
-
-
     @JsonProperty("Услуги")
     @ForeignCollectionField(eager = true, maxEagerLevel = 3)
 //    @ElementList(name = "Услуги", entry = "element", inline = true)
@@ -285,26 +290,35 @@ public class DocSale extends CDO {
     private Collection<SaleRecordService> services;
 
 
+    @DatabaseField
     private String contract_Key;
+    @DatabaseField
     private String customer_Key;
+    @DatabaseField
     private String organisation_Key;
+    @DatabaseField
     private String discountCard_Key;
+    @DatabaseField
     private String route_Key;
+    @DatabaseField
     private String startingPoint_Key;
+    @DatabaseField
     private String vehicleType_Key;
+    @DatabaseField
     private String currency_Key;
-    private String user_key;
+    @DatabaseField
+    private String author_key;
 
     @Element(name = "Ответственный_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    public String getUser_key() {
+    public String getAuthor_key() {
         return getAuthor().getRef_Key();
     }
 
     @Element(name = "Ответственный_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    public void setUser_key(String user_key) {
-        this.user_key = user_key;
+    public void setAuthor_key(String author_key) {
+        this.author_key = author_key;
     }
 
     @Element(name = "ДоговорКонтрагента_Key")
@@ -445,45 +459,43 @@ public class DocSale extends CDO {
         return currency;
     }
 
-    public DocSale setCurrency(Currency currency) {
+    public void setCurrency(Currency currency) {
+        this.currency_Key = currency.getRef_Key();
         this.currency = currency;
-        return this;
     }
 
     public DiscountCard getDiscountCard() {
         return discountCard;
     }
 
-    public DocSale setDiscountCard(DiscountCard discountCard) {
+    public void setDiscountCard(DiscountCard discountCard) {
+        this.discountCard_Key = discountCard.getRef_Key();
         this.discountCard = discountCard;
-        return this;
     }
 
     public Organisation getOrganisation() {
         return organisation;
     }
 
-    public DocSale setOrganisation(Organisation organisation) {
+    public void setOrganisation(Organisation organisation) {
+        this.organisation_Key = organisation.getRef_Key();
         this.organisation = organisation;
-        return this;
     }
 
     public int getWorkersCount() {
         return workersCount;
     }
 
-    public DocSale setWorkersCount(int workersCount) {
+    public void setWorkersCount(int workersCount) {
         this.workersCount = workersCount;
-        return this;
     }
 
     public String getShippingAddress() {
         return shippingAddress;
     }
 
-    public DocSale setShippingAddress(String shippingAddress) {
+    public void setShippingAddress(String shippingAddress) {
         this.shippingAddress = shippingAddress;
-        return this;
     }
 
     public boolean getNeedShipping() {
@@ -567,12 +579,10 @@ public class DocSale extends CDO {
     }
 
     public String getRef_Key() {
-        if(ref_Key == null)
-        {
+        if (ref_Key == null) {
             ref_Key = Constants.ZERO_GUID;
         }
-        if(ref_Key.equals(""))
-        {
+        if (ref_Key.equals("")) {
             ref_Key = Constants.ZERO_GUID;
         }
 
@@ -587,27 +597,29 @@ public class DocSale extends CDO {
         return vehicleType;
     }
 
-    public DocSale setVehicleType(VehicleType vehicleType) {
+    public void setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
-        return this;
+        this.vehicleType_Key = vehicleType.getRef_Key();
     }
 
     public Route getRoute() {
         return route;
     }
 
-    public DocSale setRoute(Route route) {
+    public void setRoute(Route route) {
+        if(route != null){
+            this.route_Key = route.getRef_Key();
+        }
         this.route = route;
-        return this;
     }
 
     public StartingPoint getStartingPoint() {
         return startingPoint;
     }
 
-    public DocSale setStartingPoint(StartingPoint startingPoint) {
+    public void setStartingPoint(StartingPoint startingPoint) {
+        this.startingPoint_Key = startingPoint.getRef_Key();
         this.startingPoint = startingPoint;
-        return this;
     }
 
     @Override
@@ -775,6 +787,9 @@ public class DocSale extends CDO {
     }
 
     public void setAuthor(User author) {
+        if (author != null) {
+            this.author_key = author.getRef_Key();
+        }
         this.author = author;
     }
 
@@ -783,6 +798,9 @@ public class DocSale extends CDO {
     }
 
     public void setContract(Contract contract) {
+        if (contract != null) {
+            this.contract_Key = contract.getRef_Key();
+        }
         this.contract = contract;
     }
 
@@ -791,6 +809,9 @@ public class DocSale extends CDO {
     }
 
     public void setCustomer(Customer customer) {
+        if (customer != null) {
+            this.customer_Key = customer.getRef_Key();
+        }
         this.customer = customer;
     }
 
@@ -802,27 +823,24 @@ public class DocSale extends CDO {
         return shippingDate;
     }
 
-    public DocSale setShippingDate(Date shippingDate) {
+    public void setShippingDate(Date shippingDate) {
         this.shippingDate = shippingDate;
-        return this;
     }
 
     public Date getShippingTimeFrom() {
         return shippingTimeFrom;
     }
 
-    public DocSale setShippingTimeFrom(Date shippingTimeFrom) {
+    public void setShippingTimeFrom(Date shippingTimeFrom) {
         this.shippingTimeFrom = shippingTimeFrom;
-        return this;
     }
 
     public Date getShippingTimeTo() {
         return shippingTimeTo;
     }
 
-    public DocSale setShippingTimeTo(Date shippingTimeTo) {
+    public void setShippingTimeTo(Date shippingTimeTo) {
         this.shippingTimeTo = shippingTimeTo;
-        return this;
     }
 
     public void setForeignObjects() {
@@ -853,6 +871,7 @@ public class DocSale extends CDO {
             }
             if (ref_key.equals(Constants.SHIPPING_GUID)) {
                 this.getServices().remove(rec);
+                break;
             }
         }
     }
@@ -866,6 +885,7 @@ public class DocSale extends CDO {
             }
             if (ref_key.equals(Constants.UNLOAD_GUID)) {
                 this.getServices().remove(rec);
+                break;
             }
         }
 

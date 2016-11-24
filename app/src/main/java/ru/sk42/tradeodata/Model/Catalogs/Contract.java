@@ -88,4 +88,8 @@ public class Contract extends CDO {
         return this.getDescription().toString();
     }
 
+
+    public static Contract newInstance() {
+        return Contract.getObject(Contract.class, Constants.CONTRACT_GUID);
+    }
 }

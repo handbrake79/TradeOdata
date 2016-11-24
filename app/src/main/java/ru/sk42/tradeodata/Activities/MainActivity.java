@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -130,68 +131,16 @@ public class MainActivity extends AppCompatActivity implements ServiceResultReci
     }
 
     void test(){
-
-        Registry registry = new Registry();
-        Strategy strategy = new RegistryStrategy(registry);
-        DateConverter dateConverter = new DateConverter();
+        DocSale doc1 = DocSale.newInstance();
         try {
-            registry.bind(Date.class, dateConverter);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Persister persister = new Persister(strategy);
-        StringWriter writer = new StringWriter();
-        DocSale docSale = null;
-        try {
-            docSale = MyHelper.getDocSaleDao().queryForAll().get(0);
+            doc1.save();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        docSale.setDate(GregorianCalendar.getInstance().getTime());
-        //docSale.setRef_Key(Constants.ZERO_GUID);
-        docSale.setNumber(String.valueOf(docSale.getDate().getTime()));
-        docSale.setComment("Ебать ты высокий!");
-        WrapperXML_DocSale XMLDocSaleWrapper = new WrapperXML_DocSale(docSale);
 
-
-
-        try {
-            persister.write(XMLDocSaleWrapper, writer);
-        } catch (Exception e) {
-            e.printStackTrace();
-            finish();
-        }
-
-        String s = writer.toString();
-
-        EditText e = (EditText) findViewById(R.id.edtLog);
-        e.setText(s);
-        //showToast(s);
-
-        PatchDocument request = ServiceGenerator.createXMLService(PatchDocument.class);
-        RequestBody body = RequestBody.create(MediaType.parse("text/plain"), s);
-        Call<ResponseBody> call = request.call(docSale.getRef_Key(), body);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                String location = response.headers().get("Location");
-                if(location == null){
-                    return;
-                }
-                int i = location.indexOf("guid'");
-                if(i > 0){
-                    String guid = location.substring(i + 5, location.length() - 3);
-                    showToast(guid);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                showToast(t.toString());
-
-            }
-        });
-
-
+        DocSale doc2 = DocSale.getObject(DocSale.class, Constants.ZERO_GUID);
+        String xml = CommunicationWithServer.writeDocSaleToXMLString(doc2);
+        Log.d(TAG, "test: xml =" + xml);
     }
+
 }

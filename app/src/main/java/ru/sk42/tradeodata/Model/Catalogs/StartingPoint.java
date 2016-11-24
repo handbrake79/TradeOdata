@@ -30,6 +30,13 @@ public class StartingPoint extends CDO {
     @JsonProperty
     private String Description;
 
+    public static StartingPoint newInstance() {
+        StartingPoint obj = new StartingPoint();
+        obj.setRef_Key(Constants.ZERO_GUID);
+        obj.setDescription("");
+        return obj;
+    }
+
     public StartingPoint() {
     }
 

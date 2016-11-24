@@ -34,7 +34,6 @@ public class Organisation extends CDO {
     }
 
 
-
     public String getDescription() {
         return Description;
     }
@@ -86,4 +85,7 @@ public class Organisation extends CDO {
         return this.getDescription().toString();
     }
 
+    public static Organisation newInstance() {
+        return Organisation.getObject(Organisation.class, Constants.ORGANISATION_GUID);
+    }
 }

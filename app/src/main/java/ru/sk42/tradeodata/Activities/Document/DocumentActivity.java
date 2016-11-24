@@ -37,6 +37,7 @@ import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapt
 import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsListActivity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
+import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
@@ -286,6 +287,11 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             }
 
         }
+    }
+
+    @Override
+    public void onCommentChanged(String mComment) {
+        docSale.setComment(mComment);
     }
 
     @Override
@@ -631,6 +637,10 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     public void saveLocal() {
 
+        //проверим некоторые поля на null
+        if(docSale.getDiscountCard() == null){
+            docSale.setDiscountCard(DiscountCard.newInstance());
+        }
         try {
             docSale.save();
         } catch (SQLException e) {
@@ -689,14 +699,20 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
                 saveLocal();
                 break;
             case SAVE_1C:
-                saveLocal();
-                callServiceSaveTo1C();
+                if(docSale.getProducts().size() > 0) {
+                    saveLocal();
+                    callServiceSaveTo1C();
+                }
+                else {
+                    showMessage("В документе нет товаров");
+                }
         }
     }
 
     private void callServiceSaveTo1C() {
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("mode", Constants.DATALOADER_MODE.SAVE_TO_1C.name());
+        i.putExtra("ref_Key", docSale.getRef_Key());
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");
         startService(i);

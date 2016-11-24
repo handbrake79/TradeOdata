@@ -169,7 +169,8 @@ public class CommunicationWithServer extends IntentService {
     //вернет guid, если
     private void saveTo1C() {
         final SaveResult result = new SaveResult();
-        DocSale docSale = DocSale.getDocument(Constants.ZERO_GUID); // пока сохраняем новый док в базу с нулевым гидом
+        String ref_Key = intent.getStringExtra("ref_Key");
+        DocSale docSale = DocSale.getDocument(ref_Key); // пока сохраняем новый док в базу с нулевым гидом
 
 
         String xml = writeDocSaleToXMLString(docSale);
@@ -184,15 +185,20 @@ public class CommunicationWithServer extends IntentService {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     result.code = response.raw().code();
-                    String location = response.headers().get("Location");
-                    if (location == null) {
-                        result.guid = Constants.ZERO_GUID;
-                        result.error = "location not found!";
+                    if (result.code == 200) {
+                        String location = response.headers().get("Location");
+                        if (location == null) {
+                            result.guid = Constants.ZERO_GUID;
+                            result.error = "location not found!";
+                        }
+                        int i = location.indexOf("guid'");
+                        if (i > 0) {
+                            result.guid = location.substring(i + 5, location.length() - 3);
+                            result.ok = true;
+                        }
                     }
-                    int i = location.indexOf("guid'");
-                    if (i > 0) {
-                        result.guid = location.substring(i + 5, location.length() - 3);
-                        result.ok = true;
+                    else {
+                        result.error = response.raw().message();
                     }
                 }
 
@@ -222,11 +228,9 @@ public class CommunicationWithServer extends IntentService {
         }
 
         String msg;
-        if(result.ok){
+        if (result.ok) {
             msg = "Документ успешно сохранен";
-        }
-        else
-        {
+        } else {
             msg = "Ошибка сохранения: " + result.error;
         }
 
@@ -604,7 +608,7 @@ public class CommunicationWithServer extends IntentService {
     }
 
     private void loadMissingDataForSingleDocument(String ref_Key) {
-        if(ref_Key == null) {
+        if (ref_Key == null) {
             ref_Key = intent.getStringExtra("ref_Key");
         }
         DocSale doc = DocSale.getDocument(ref_Key);
@@ -683,8 +687,7 @@ public class CommunicationWithServer extends IntentService {
                     return;
                 }
 
-                if(list.size() == 1)
-                {
+                if (list.size() == 1) {
                     DocSale docSale = list.getValues().iterator().next();
                     try {
                         docSale.save();
@@ -766,7 +769,7 @@ public class CommunicationWithServer extends IntentService {
     }
 
 
-    private String writeDocSaleToXMLString(DocSale docSale) {
+    public static String writeDocSaleToXMLString(DocSale docSale) {
         String xmlString;
 
         Registry registry = new Registry();
@@ -786,7 +789,9 @@ public class CommunicationWithServer extends IntentService {
         try {
             persister.write(XMLDocSaleWrapper, writer);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d("*** 1c communication", "writeDocSaleToXMLString: " + e.getLocalizedMessage().toString());
+            //e.printStackTrace();
+
         }
 
         xmlString = writer.toString();
