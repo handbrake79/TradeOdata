@@ -1,5 +1,7 @@
 package ru.sk42.tradeodata.Model.Document;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -85,9 +87,20 @@ public class DocSale extends CDO {
     }
 
 
+    @DatabaseField(generatedId = true)
+    private long id;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
 
     @JsonProperty("Ref_Key")
-    @DatabaseField(id = true)
+    @DatabaseField
     @Element(name = "Ref_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String ref_Key;
@@ -308,6 +321,20 @@ public class DocSale extends CDO {
     private String currency_Key;
     @DatabaseField
     private String author_key;
+    @DatabaseField
+    private boolean shippingAsService;
+
+    @Element(name = "ДоставкаОтраженаУслугами")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public boolean isShippingAsService() {
+        return shippingAsService;
+    }
+
+    @Element(name = "ДоставкаОтраженаУслугами")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    public void setShippingAsService(boolean shippingAsService) {
+        this.shippingAsService = shippingAsService;
+    }
 
     @Element(name = "Ответственный_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
@@ -624,21 +651,16 @@ public class DocSale extends CDO {
 
     @Override
     public void save() throws SQLException {
-        //для строки товаров и для строки услуг 1с не предоставляет уникальный ключ строки
-        //ключ состоит из номера строки  + гуид документа
-        //в ормлайте мы не можем сделать составной ключ
-        //так что для товаров и услуг в ормлайте устанавливаем авто-генерируемый айди
-        //перед сохранением удаляем все строки
-        //делаем новые записи в базу
-
         deleteProductRecords();
         deleteServiceRecords();
 
+        MyHelper.getDocSaleDao().createOrUpdate(this);
 
         for (SaleRecordProduct row :
                 this.getProducts()) {
             row.setDocSale(this);
             row.save();
+            Log.d(TAG, "save: ");
         }
         for (SaleRecordService row :
                 this.getServices()) {
@@ -646,15 +668,13 @@ public class DocSale extends CDO {
             row.save();
         }
 
-        MyHelper.getDocSaleDao().createOrUpdate(this);
+//        MyHelper.getDocSaleDao().createOrUpdate(this);
 
     }
 
     private void deleteProductRecords() {
         try {
-            List<SaleRecordProduct> list = MyHelper.getSaleRecordProductDao().queryForEq("ref_Key", getRef_Key());
-
-            MyHelper.getSaleRecordProductDao().delete(list);
+            MyHelper.getSaleRecordProductDao().delete(MyHelper.getSaleRecordProductDao().queryForEq("docSale_id", getId()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -662,7 +682,7 @@ public class DocSale extends CDO {
 
     private void deleteServiceRecords() {
         try {
-            MyHelper.getSaleRowServiceDao().delete(MyHelper.getSaleRowServiceDao().queryForEq("ref_Key", this.getRef_Key()));
+            MyHelper.getSaleRowServiceDao().delete(MyHelper.getSaleRowServiceDao().queryForEq("docSale_id", getId()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -993,5 +1013,21 @@ public class DocSale extends CDO {
             t += rec.getTotal();
         }
         return t;
+    }
+
+    public static DocSale getByID(long id) {
+        try {
+            List<DocSale> list = MyHelper.getDocSaleDao().queryForEq("id", id);
+            if(list.size() != 1){
+                return null;
+
+            }
+            else {
+                return list.get(0);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -5,6 +5,7 @@ import org.simpleframework.xml.Default;
 import org.simpleframework.xml.DefaultType;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Namespace;
+import org.simpleframework.xml.Order;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.convert.Convert;
 
@@ -18,9 +19,40 @@ import ru.sk42.tradeodata.Model.Document.DocSale;
 /**
  * Created by PostRaw on 14.03.2016.
  */
-@Root(name = "entry",strict=false)
+@Root(name = "entry", strict = false)
 @Default(DefaultType.FIELD)
+@Order(elements = {
+        "category",
+        "title",
+        "updated",
+        "author",
+        "summary",
+        "content"
+})
 public class WrapperXML_DocSale {
+
+    @Element(required = true, name = "category")
+    String category = "";
+
+    @Attribute
+    String term = "StandardODATA.Catalog_Товары";
+
+    @Attribute
+    String scheme = "http://schemas.microsoft.com/ado/2007/08/dataservices/scheme";
+
+    @Element(required = true, name = "title")
+    String title = "";
+    @Attribute
+    String type = "text";
+
+    @Element
+    @Convert(DateConverter.class)
+    Date updated = GregorianCalendar.getInstance().getTime();
+
+    @Element
+    String author = "";
+    @Element
+    String summary = "";
 
     Content content;
 
@@ -34,16 +66,17 @@ public class WrapperXML_DocSale {
 }
 
 @Default(DefaultType.FIELD)
-class Content{
+class Content {
 
     public Content() {
     }
+
 
     @Attribute
     String type = "application/xml";
 
     @Element(name = "properties")
-    @Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
     DocSale docSale;
 
     public Content(DocSale docSale) {
@@ -66,17 +99,18 @@ class Content{
         this.docSale = docSale;
     }
 }
+
 @Default(DefaultType.FIELD)
-@Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices", prefix="d")
-class Properties{
+@Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+class Properties {
     public Properties() {
         Calendar c = GregorianCalendar.getInstance();
-        c.add(Calendar.YEAR,10);
+        c.add(Calendar.YEAR, 10);
         date = c.getTime();
     }
 
     @Element(name = "Date")
-    @Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices", prefix="d")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     @Convert(DateConverter.class)
     Date date;
 

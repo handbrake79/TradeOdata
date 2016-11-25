@@ -5,7 +5,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
@@ -17,7 +16,6 @@ import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -92,7 +90,7 @@ import ru.sk42.tradeodata.XML.DateConverter;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
+ * TODO: Customize class - update mIntent actions, extra parameters and static
  * helper methods.
  */
 public class CommunicationWithServer extends IntentService {
@@ -100,7 +98,8 @@ public class CommunicationWithServer extends IntentService {
     NotificationManager manager;
     final String TAG = "Service ***";
     ResultReceiver resultReceiver;
-    Intent intent;
+    Intent mIntent;
+    Bundle mResultBundle = new Bundle();
 
     public CommunicationWithServer() {
         super("CommunicationWithServer");
@@ -108,13 +107,12 @@ public class CommunicationWithServer extends IntentService {
 
     public void onCreate() {
         super.onCreate();
-//        Log.d(LOG_TAG, "onCreate");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        this.intent = intent;
+        this.mIntent = intent;
         String from = intent.getStringExtra("from");
         resultReceiver = intent.getParcelableExtra("receiverTag");
         String mode = intent.getStringExtra("mode");
@@ -138,7 +136,7 @@ public class CommunicationWithServer extends IntentService {
             }
 
             if (mode.equals(Constants.DATALOADER_MODE.REQUEST_SINGLE_DOCUMENT.name())) {
-                loadSingleDocument();
+                loadSingleDocumentFromServer();
                 return;
             }
 
@@ -156,94 +154,15 @@ public class CommunicationWithServer extends IntentService {
     private class SaveResult {
         public SaveResult() {
             ok = false;
-            guid = "";
+            ref_Key = "";
             error = "";
         }
 
         boolean ok;
-        String guid;
+        String ref_Key;
         String error;
         int code;
     }
-
-    //вернет guid, если
-    private void saveTo1C() {
-        final SaveResult result = new SaveResult();
-        String ref_Key = intent.getStringExtra("ref_Key");
-        DocSale docSale = DocSale.getDocument(ref_Key); // пока сохраняем новый док в базу с нулевым гидом
-
-
-        String xml = writeDocSaleToXMLString(docSale);
-
-        RequestBody body = RequestBody.create(MediaType.parse("text/plain"), xml);
-        if (docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
-            //это новый документ, гуида еще нет
-            //вызываем метод Пост
-            PostDocument mPostRequest = ServiceGenerator.createXMLService(PostDocument.class);
-            Call<ResponseBody> call = mPostRequest.call(body);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    result.code = response.raw().code();
-                    if (result.code == 200) {
-                        String location = response.headers().get("Location");
-                        if (location == null) {
-                            result.guid = Constants.ZERO_GUID;
-                            result.error = "location not found!";
-                        }
-                        int i = location.indexOf("guid'");
-                        if (i > 0) {
-                            result.guid = location.substring(i + 5, location.length() - 3);
-                            result.ok = true;
-                        }
-                    }
-                    else {
-                        result.error = response.raw().message();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    result.error = t.toString();
-                }
-            });
-        }
-
-        if (!docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
-            //вызываем метод patch такой документ уже есть в базе 1с
-            PatchDocument mPatchRequest = ServiceGenerator.createXMLService(PatchDocument.class);
-            Call<ResponseBody> call = mPatchRequest.call(docSale.getRef_Key(), body);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    result.code = response.raw().code();
-                    //разбираемся
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    result.error = t.toString();
-                }
-            });
-        }
-
-        String msg;
-        if (result.ok) {
-            msg = "Документ успешно сохранен";
-        } else {
-            msg = "Ошибка сохранения: " + result.error;
-        }
-
-        Bundle bundle = new Bundle();
-        bundle.putString("guid", result.guid);
-        bundle.putString("error", msg);
-        bundle.putInt("code", result.code);
-        bundle.putString("guid", result.guid);
-
-        resultReceiver.send(Constants.SAVE_DOCUMENT_RESULT, bundle);
-
-    }
-
 
     private void Preload() {
 
@@ -296,10 +215,10 @@ public class CommunicationWithServer extends IntentService {
 
     private void loadShippingRates() {
 
-        int count = 0;
+        long count = 0;
 
         try {
-            count = MyHelper.getShippingRouteDao().queryForAll().size();
+            count = MyHelper.getShippingRouteDao().countOf();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -380,7 +299,6 @@ public class CommunicationWithServer extends IntentService {
         }
     }
 
-
     private void loadVehicleTypes() {
         VehicleType object = new VehicleType();
 
@@ -398,7 +316,6 @@ public class CommunicationWithServer extends IntentService {
             e.printStackTrace();
         }
     }
-
 
     private void loadStores() {
         Store object = new Store();
@@ -427,6 +344,7 @@ public class CommunicationWithServer extends IntentService {
             UnitsList list = response.body();
             TableUtils.dropTable(MyHelper.getUnitDao(), false);
             TableUtils.createTable(MyHelper.getUnitDao());
+            sendFeedback("Сохраняем " + String.valueOf(list.getValues().size()) + " единиц измерения");
             list.save();
         } catch (Exception e) {
             e.printStackTrace();
@@ -439,7 +357,7 @@ public class CommunicationWithServer extends IntentService {
         if (!isLoadRequired(object)) return;
 
         ContractsRequest request = ServiceGenerator.createService(ContractsRequest.class);
-        Call<ContractsList> call = request.call(RetroConstants.getMap("Owner_Key eq guid'" + Constants.CUSTOMER_GUID + "'"));
+        Call<ContractsList> call = request.call(RetroConstants.getMap("Owner_Key eq ref_Key'" + Constants.CUSTOMER_GUID + "'"));
         try {
             Response<ContractsList> response = call.execute();
             ContractsList list = response.body();
@@ -450,7 +368,6 @@ public class CommunicationWithServer extends IntentService {
             e.printStackTrace();
         }
     }
-
 
     private void loadDiscountCards() {
 
@@ -466,12 +383,12 @@ public class CommunicationWithServer extends IntentService {
             DiscountCardsList list = response.body();
             TableUtils.dropTable(MyHelper.getDiscountCardDao(), false);
             TableUtils.createTable(MyHelper.getDiscountCardDao());
+            sendFeedback("Сохраняем " + String.valueOf(list.getValues().size()) + " дисконтных карт");
             list.save();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     private void loadProducts() {
         Product shipping = Product.getObject(Product.class, Constants.SHIPPING_GUID);
@@ -479,7 +396,7 @@ public class CommunicationWithServer extends IntentService {
         if (shipping == null || unload == null) {
 
             ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
-            Call<ProductsList> call = request.call(RetroConstants.getMap("Ref_Key eq guid'" + Constants.SHIPPING_GUID + "'" + " or Ref_Key eq guid'" + Constants.UNLOAD_GUID + "'"));
+            Call<ProductsList> call = request.call(RetroConstants.getMap("Ref_Key eq ref_Key'" + Constants.SHIPPING_GUID + "'" + " or Ref_Key eq ref_Key'" + Constants.UNLOAD_GUID + "'"));
             try {
                 Response<ProductsList> response = call.execute();
                 ProductsList list = response.body();
@@ -494,7 +411,6 @@ public class CommunicationWithServer extends IntentService {
             Constants.UNLOAD_SERVICE = unload;
         }
     }
-
 
     private void loadCharacts() {
         Charact object = new Charact();
@@ -534,7 +450,6 @@ public class CommunicationWithServer extends IntentService {
         }
     }
 
-
     private void loadRoutes() {
         Route object = new Route();
 
@@ -547,6 +462,7 @@ public class CommunicationWithServer extends IntentService {
             Response<RoutesList> response = call1.execute();
             RoutesList list = response.body();
             MyHelper.getRouteDao().delete(MyHelper.getRouteDao().queryForAll());
+            sendFeedback("Сохраняем " + String.valueOf(list.getValues().size()) + " маршрутов");
             list.save();
             Route.createStub();
         } catch (Exception e) {
@@ -573,7 +489,6 @@ public class CommunicationWithServer extends IntentService {
         }
     }
 
-
     private Integer getRecordsCountFromServer(CDO object) {
         RecordsCountRequest request = ServiceGenerator.createService(RecordsCountRequest.class);
         String filter = object.getRetroFilterString();
@@ -595,7 +510,6 @@ public class CommunicationWithServer extends IntentService {
         return count;
     }
 
-
     private void loadMissingDataForDocumentsList() {
         MissingDataLoader.LoadMissingDataForObject(null, DocSaleList.class);
         for (DocSale docSale :
@@ -609,7 +523,7 @@ public class CommunicationWithServer extends IntentService {
 
     private void loadMissingDataForSingleDocument(String ref_Key) {
         if (ref_Key == null) {
-            ref_Key = intent.getStringExtra("ref_Key");
+            ref_Key = mIntent.getStringExtra("ref_Key");
         }
         DocSale doc = DocSale.getDocument(ref_Key);
         MissingDataLoader.LoadMissingDataForObject(doc, DocSale.class);
@@ -622,7 +536,7 @@ public class CommunicationWithServer extends IntentService {
     private void loadDocuments() {
 
         Calendar d1 = GregorianCalendar.getInstance();
-        d1.setTimeInMillis(intent.getLongExtra("StartDate", 0));
+        d1.setTimeInMillis(mIntent.getLongExtra("StartDate", 0));
         Calendar d2 = GregorianCalendar.getInstance();
         d2.setTimeInMillis(d1.getTimeInMillis());
         d2.add(Calendar.DATE, 1);
@@ -631,7 +545,6 @@ public class CommunicationWithServer extends IntentService {
         String df2 = Uttils.DATE_FORMAT_1C.format(d2.getTime());
 
         String filter = "Date gt datetime'" + df1 + "' and Date lt datetime'" + df2 + "'" + " and Контрагент_Key eq guid'" + Constants.CUSTOMER_GUID + "'" + " and Ответственный_Key eq guid'" + SettingsOld.getCurrentUser().getRef_Key() + "'";
-
 
         sendFeedback("Загрузка документов на " + Uttils.DATE_FORMATTER.format(d1.getTime()));
 
@@ -643,6 +556,8 @@ public class CommunicationWithServer extends IntentService {
                 DocSaleList list = response.body();
                 if (list == null) {
                     Log.wtf(TAG, "onResponse: DocSaleList is null", new Exception());
+                    mResultBundle.putString("error", "Произошла ошибка передачи данных");
+                    sendServiceFinished("Произошла ошибка передачи данных");
                     return;
                 }
 
@@ -652,6 +567,9 @@ public class CommunicationWithServer extends IntentService {
                     list.save();
                 } catch (Exception e) {
                     Log.w(TAG, "list.save(): " + e.toString());
+                    mResultBundle.putString("error", "Произошла ошибка передачи данных");
+                    sendServiceFinished("Произошла ошибка сохранения данных");
+                    return;
                 }
 
                 loadMissingDataForDocumentsList();
@@ -663,15 +581,24 @@ public class CommunicationWithServer extends IntentService {
             @Override
             public void onFailure(Call<DocSaleList> call, Throwable t) {
                 Log.d(TAG, "onFailure: " + t.toString());
-
+                mResultBundle.putString("error", "Произошла ошибка передачи данных");
+                sendServiceFinished("Произошла ошибка запроса данных");
             }
         });
 
 
     }
 
-    private void loadSingleDocument() {
-        final String ref_Key = intent.getStringExtra("ref_Key");
+    private void loadSingleDocumentFromServer() {
+
+        try {
+            Log.d(TAG, "loadSingleDocumentFromServer: колво документов в базе = " + String.valueOf(MyHelper.getDocSaleDao().countOf()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        final String ref_Key = mIntent.getStringExtra("ref_Key");
+        final long id = mIntent.getLongExtra("id", -1);
         String filter = "Ref_Key eq guid'" + ref_Key + "'";
 
         sendFeedback("Загрузка документа с сервера");
@@ -689,6 +616,9 @@ public class CommunicationWithServer extends IntentService {
 
                 if (list.size() == 1) {
                     DocSale docSale = list.getValues().iterator().next();
+                    if(id != -1) {
+                        docSale.setId(id);
+                    }
                     try {
                         docSale.save();
                     } catch (Exception e) {
@@ -704,10 +634,8 @@ public class CommunicationWithServer extends IntentService {
             @Override
             public void onFailure(Call<DocSaleList> call, Throwable t) {
                 Log.d(TAG, "onFailure: " + t.toString());
-
             }
         });
-
 
     }
 
@@ -724,15 +652,14 @@ public class CommunicationWithServer extends IntentService {
     private void sendServiceFinished(String msg) {
         sendNotification(msg);
         sendFeedback(msg);
-        resultReceiver.send(Constants.LOAD_FINISHED, null);
+        resultReceiver.send(Constants.LOAD_FINISHED, mResultBundle);
     }
 
-
     private boolean isLoadRequired(CDO object) {
-        Integer serverRecordsCount = getRecordsCountFromServer(object);
-        Integer localRecordsCount = 0;
+        long serverRecordsCount = getRecordsCountFromServer(object);
+        long localRecordsCount = 0;
         try {
-            localRecordsCount = object.getDao().queryForAll().size();
+            localRecordsCount = object.getDao().countOf();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -746,14 +673,16 @@ public class CommunicationWithServer extends IntentService {
         if (object instanceof StartingPoint)
             localRecordsCount--;
 
-        String msg = object.getMaintainedTableName() + " локально " + localRecordsCount.toString() + " записей, на сервере " + serverRecordsCount.toString() + " записей";
+        String msg = object.getMaintainedTableName() + " " + String.valueOf(localRecordsCount) + "/" + String.valueOf(serverRecordsCount) + " записей";
         Log.d(TAG, "isLoadRequired: класс " + msg);
 
-        if (serverRecordsCount.intValue() != localRecordsCount.intValue()) {
+        if (serverRecordsCount != localRecordsCount) {
             sendFeedback(msg);
             return true;
-        } else
+        } else {
+            sendFeedback(msg);
             return false;
+        }
 
     }
 
@@ -767,7 +696,6 @@ public class CommunicationWithServer extends IntentService {
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.notify(0, noti);
     }
-
 
     public static String writeDocSaleToXMLString(DocSale docSale) {
         String xmlString;
@@ -794,9 +722,112 @@ public class CommunicationWithServer extends IntentService {
 
         }
 
-        xmlString = writer.toString();
+        xmlString = "<?xml  version=\"1.0\" encoding=\"utf-8\"?>\n" + writer.toString();
         return xmlString;
     }
 
+    //вернет ref_Key, если
+    private void saveTo1C() {
+
+        final SaveResult result = new SaveResult();
+        long id = mIntent.getLongExtra("id", -1);
+        final DocSale docSale = DocSale.getByID(id); // пока сохраняем новый док в базу с нулевым гидом
+
+        String xml = writeDocSaleToXMLString(docSale);
+
+        RequestBody body = RequestBody.create(MediaType.parse("text/plain"), xml);
+        if (docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
+            //это новый документ, гуида еще нет
+            //вызываем метод Пост
+            PostDocument mPostRequest = ServiceGenerator.createXMLService(PostDocument.class);
+            Call<ResponseBody> call = mPostRequest.call(body);
+            call.enqueue(new Callback<ResponseBody>() {
+                             @Override
+                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                 result.code = response.raw().code();
+                                 if (result.code == 200 || result.code == 201) {
+                                     String location = response.headers().get("location");
+                                     if (location == null) {
+                                         result.ref_Key = Constants.ZERO_GUID;
+                                         result.error = "location not found!";
+                                     }
+                                     int i = location.indexOf("guid'");
+                                     if (i > 0) {
+                                         result.ref_Key = location.substring(i + 5, location.length() - 2);
+                                         result.ok = true;
+                                         onSaveComplete(result);
+                                     }
+                                 } else {
+                                     result.error = response.raw().message();
+                                     onSaveComplete(result);
+                                 }
+                             }
+
+                             @Override
+                             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                 result.error = t.toString();
+                                 onSaveComplete(result);
+                             }
+                         }
+            );
+        }
+
+        if (!docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
+            //вызываем метод patch такой документ уже есть в базе 1с
+            PatchDocument mPatchRequest = ServiceGenerator.createXMLService(PatchDocument.class);
+            Call<ResponseBody> call = mPatchRequest.call(docSale.getRef_Key(), body);
+            call.enqueue(new Callback<ResponseBody>() {
+                             @Override
+                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                 result.code = response.raw().code();
+                                 if (result.code == 200) {
+                                     result.ref_Key = docSale.getRef_Key();
+                                     result.error = "документ сохранен";
+                                     result.ok = true;
+                                     onSaveComplete(result);
+                                 } else {
+                                     //Разбираемся что за хня
+                                     Log.d(TAG, "onResponse: хуйня какая-то опять...");
+                                     onSaveComplete(result);
+                                 }
+                             }
+
+                             @Override
+                             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                 result.error = t.toString();
+                                 onSaveComplete(result);
+                             }
+                         }
+            );
+        }
+    }
+
+    private void onSaveComplete(SaveResult result) {
+        String msg;
+        if (result.ok) {
+            msg = "Документ успешно сохранен";
+        } else {
+            msg = "Ошибка сохранения: " + result.error;
+        }
+
+        mResultBundle = new Bundle();
+        mResultBundle.putBoolean("ok", result.ok);
+        mResultBundle.putString("error", msg);
+        mResultBundle.putInt("code", result.code);
+        mResultBundle.putString("ref_Key", result.ref_Key);
+        if(result.ok){
+            mIntent.putExtra("ref_Key", result.ref_Key);
+            try {
+                Log.d(TAG, "onSaveComplete: колво документов в базе = " + String.valueOf(MyHelper.getDocSaleDao().countOf()));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            loadSingleDocumentFromServer();
+        }
+        else
+        {
+            resultReceiver.send(Constants.LOAD_FINISHED, mResultBundle);
+        }
+    }
 
 }

@@ -21,7 +21,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 /**
  * Created by PostRaw on 31.03.2016.
  */
-@DatabaseTable(tableName = "SaleRecordProduct")
+@DatabaseTable
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Element
 public class SaleRecordProduct extends SaleRecord {
@@ -37,8 +37,6 @@ public class SaleRecordProduct extends SaleRecord {
     @Element(name = "Качество_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     static final String xmlkachestvo = "d05404a0-6bce-449b-a798-41ebe5e5b977";
-
-
 
     static final String TAG = "SaleRecordProduct***";
 

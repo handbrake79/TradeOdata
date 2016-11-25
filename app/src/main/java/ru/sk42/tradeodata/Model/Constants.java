@@ -22,15 +22,12 @@ public class Constants {
     public static  Product SHIPPING_SERVICE;
     public static  Product UNLOAD_SERVICE;
 
-
-
     public static final String ZERO_GUID = "00000000-0000-0000-0000-000000000000";
     public static final String ORGANISATION_GUID = "2dbd363a-d053-4721-801b-c45a27de99a3";
     public static final String CUSTOMER_GUID = "b779d1b9-be4f-4bfa-a65b-10641c5d1370";
     public static final String CURRENCY_GUID = "e8a12aca-26fe-11e1-b72e-984be1645106";
     public static int ModeNewOrder = 0;
     public static int ModeExistingOrder = 1;
-
 
     public static String getCurrentTimeStamp() {
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//dd/MM/yyyy

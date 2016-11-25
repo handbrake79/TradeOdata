@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 
@@ -26,7 +27,7 @@ public class DocSaleList {
     public static DocSaleList getList() {
         DocSaleList list = new DocSaleList();
         try {
-            list.setValues((Collection<DocSale>) MyHelper.getDocSaleDao().queryForAll());
+            list.setValues(MyHelper.getDocSaleDao().queryForAll());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -50,9 +51,10 @@ public class DocSaleList {
 
     public void save() throws SQLException {
 
-            for (DocSale doc : this.getValues()
+            for (DocSale docSale : this.getValues()
                     ) {
-                doc.save();
+                List<DocSale> list = MyHelper.getDocSaleDao().queryForAll();
+                docSale.save();
 
             }
 

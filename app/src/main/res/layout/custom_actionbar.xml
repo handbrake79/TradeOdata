@@ -4,6 +4,7 @@
     android:orientation="horizontal"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <TextView
+        android:textColor="@color/primary_dark"
         android:id="@+id/customt_actionbar_caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

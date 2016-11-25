@@ -309,8 +309,8 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
     public void deleteDocSaleList() {
 
         try {
-            Dao<SaleRecordProduct, Object> daop = getDao(SaleRecordProduct.class);
-            daop.delete(daop.queryForAll());
+            Dao<SaleRecordProduct, Object> daoSaleRecordProduct = getDao(SaleRecordProduct.class);
+            daoSaleRecordProduct.delete(daoSaleRecordProduct.queryForAll());
 
             Dao<SaleRecordService, Object> daos = getDao(SaleRecordService.class);
             daos.delete(daos.queryForAll());

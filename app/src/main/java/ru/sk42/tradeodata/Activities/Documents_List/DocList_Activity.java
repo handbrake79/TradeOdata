@@ -17,12 +17,14 @@ import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import ru.sk42.tradeodata.Activities.Document.DocumentActivity;
 import ru.sk42.tradeodata.Activities.InteractionInterface;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
@@ -38,7 +40,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
     public ServiceResultReciever mReceiver;
 
-    Calendar startDate = GregorianCalendar.getInstance();
+    Calendar startDate;
 
     ProgressDialog progress;
 
@@ -64,7 +66,16 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         mReceiver = new ServiceResultReciever(new Handler());
         mReceiver.setReceiver(this);
 
-        startDate = SettingsOld.getStartDate();
+        startDate = GregorianCalendar.getInstance();
+        long count = 0;
+        try {
+            count = MyHelper.getDocSaleDao().countOf();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(count == 0){
+            requestDocList();
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

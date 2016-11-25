@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements ServiceResultReci
         i.putExtra("receiverTag", mReceiver);
         startService(i);
 
-        //test();
 
     }
 
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultReci
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 
-    void test(){
+    void test() {
         DocSale doc1 = DocSale.newInstance();
         try {
             doc1.save();

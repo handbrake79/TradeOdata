@@ -13,6 +13,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
+import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 
 /**
@@ -107,6 +108,9 @@ public class SettingsOld {
         } catch (ParseException e) {
             startDate = getStartOfDay(Calendar.getInstance().getTime());
         }
+
+        Constants.SHIPPING_SERVICE = Product.getObject(Product.class, Constants.SHIPPING_GUID);
+        Constants.UNLOAD_SERVICE = Product.getObject(Product.class, Constants.UNLOAD_GUID);
 
         renewCurrentUser();
     }

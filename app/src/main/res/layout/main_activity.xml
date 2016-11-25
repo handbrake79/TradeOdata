@@ -29,8 +29,8 @@
         android:layout_height="wrap_content"
         android:onClick="btnDocListClick"
         android:text="Документы"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/btnSettings"
@@ -38,6 +38,8 @@
         android:layout_height="wrap_content"
         android:onClick="btnSettingsOnClick"
         android:text="Настройки"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/btnDocs"
+        android:layout_alignStart="@+id/btnDocs"
+        android:layout_marginBottom="54dp" />
 </RelativeLayout>

@@ -31,7 +31,7 @@
         <activity
             android:name=".Activities.Documents_List.DocList_Activity"
             android:label="@string/title_activity_documents__list_"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+            />
 
         <service
             android:name=".Services.CommunicationWithServer"

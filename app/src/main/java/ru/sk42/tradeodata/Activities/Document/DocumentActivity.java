@@ -83,6 +83,16 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     private DocSale docSale;
     private String docRef_Key;
 
+    long getDoc_id() {
+        return doc_id;
+    }
+
+    void setDoc_id(long doc_id) {
+        this.doc_id = doc_id;
+    }
+
+    private long doc_id;
+
     @Bind(R.id.doc_footer_total_text)
     TextView mTotalText;
 
@@ -230,7 +240,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         if (mode == Constants.ModeExistingOrder) {
-            callDataLoaderService();
+            networkLoadMissingObjectFrom1C();
         }
 
     }
@@ -584,53 +594,6 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         docSale = DocSale.getObject(DocSale.class, getDocRef_Key());
     }
 
-
-    private void callDataLoaderService() {
-        Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name());
-        i.putExtra("from", "Document");
-        i.putExtra("ref_Key", getDocRef_Key());
-        i.putExtra("receiverTag", mReceiver);
-        startService(i);
-    }
-
-
-    @Override
-    public void onReceiveResult(int code, Bundle data) {
-        if (code == Constants.LOAD_FINISHED) {
-            Log.d(TAG, "onReceiveResult: SFO COMPLETED");
-            //Видимо здесь нужно показывать фрагмент
-            reloadDocSale();
-            setActionBarTitle();
-            refreshTotal();
-        }
-
-        if (code == Constants.SAVE_DOCUMENT_RESULT) {
-            boolean ok = data.getBoolean("ok");
-            if (!ok) {
-                showMessage(data.getString("error"));
-            }
-            if (ok) {
-                //документ на сервере мог измениться, например могли быть применены скидки
-                //нужно перезагрузить документ с сервера
-                if (docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
-                    docSale.setRef_Key(data.getString("guid"));
-                    saveLocal();
-                }
-                callReloadFromServer();
-            }
-        }
-    }
-
-    private void callReloadFromServer() {
-        Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.DATALOADER_MODE.REQUEST_SINGLE_DOCUMENT.name());
-        i.putExtra("ref_Key", docSale.getRef_Key());
-        i.putExtra("receiverTag", mReceiver);
-        i.putExtra("from", "DocList");
-        startService(i);
-    }
-
     private void showMessage(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
@@ -638,7 +601,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     public void saveLocal() {
 
         //проверим некоторые поля на null
-        if(docSale.getDiscountCard() == null){
+        if (docSale.getDiscountCard() == null) {
             docSale.setDiscountCard(DiscountCard.newInstance());
         }
         try {
@@ -699,22 +662,58 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
                 saveLocal();
                 break;
             case SAVE_1C:
-                if(docSale.getProducts().size() > 0) {
+                if (docSale.getProducts().size() > 0) {
                     saveLocal();
-                    callServiceSaveTo1C();
-                }
-                else {
+                    nerworkSaveTo1C();
+                } else {
                     showMessage("В документе нет товаров");
                 }
         }
     }
 
-    private void callServiceSaveTo1C() {
+    private void nerworkSaveTo1C() {
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("mode", Constants.DATALOADER_MODE.SAVE_TO_1C.name());
-        i.putExtra("ref_Key", docSale.getRef_Key());
+        i.putExtra("id", docSale.getId());
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");
+        try {
+            Log.d(TAG, "nerworkSaveTo1C: колво документов в базе = " + String.valueOf(MyHelper.getDocSaleDao().countOf()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         startService(i);
     }
+
+    private void networkLoadMissingObjectFrom1C() {
+        Intent i = new Intent(this, CommunicationWithServer.class);
+        i.putExtra("mode", Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name());
+        i.putExtra("from", "Document");
+        i.putExtra("ref_Key", getDocRef_Key());
+        i.putExtra("receiverTag", mReceiver);
+        startService(i);
+    }
+
+    @Override
+    public void onReceiveResult(int code, Bundle mResult) {
+        if (code == Constants.LOAD_FINISHED) {
+            try {
+                Log.d(TAG, "onReceiveResult: колво документов в базе = " + String.valueOf(MyHelper.getDocSaleDao().countOf()));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "onReceiveResult: SFO COMPLETED");
+            if(mResult.containsKey("error")){
+                String error = mResult.getString("error", "Ошибка не передана сервисом!");
+                showMessage(error);
+            }
+            docRef_Key = mResult.getString("ref_Key","");
+            //Видимо здесь нужно показывать фрагмент
+            reloadDocSale();
+            setActionBarTitle();
+            refreshTotal();
+        }
+    }
+
+
 }

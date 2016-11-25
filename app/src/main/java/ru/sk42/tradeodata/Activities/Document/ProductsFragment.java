@@ -34,7 +34,6 @@ public class ProductsFragment extends Fragment {
         super.onDetach();
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -57,7 +56,6 @@ public class ProductsFragment extends Fragment {
         adapter = new ProductRecordsAdapter(docSale.getProductsList(), (SaleRecordInterface) getActivity());
         mProductsRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-
     }
 
     public void notifyDataChanged() {
