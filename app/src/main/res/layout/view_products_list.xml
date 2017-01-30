@@ -17,33 +17,38 @@
         android:id="@+id/products_list_card_caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="60dp">
 
             <TextView
-                android:layout_marginLeft="5dp"
-                android:textSize="15sp"
-                android:layout_centerVertical="true"
+                android:textColor="@color/accent"
                 android:id="@+id/products_list_group_caption"
-                android:text="Название группы"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"
+                android:text="Название группы"
+                android:textSize="15sp" />
 
             <ImageButton
                 android:id="@+id/products_list_button_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/icon_return" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
     <FrameLayout
-        android:layout_below="@id/products_list_card_caption"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/frame_view_products_list">
+        android:id="@+id/frame_view_products_list"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/products_list_card_caption">
 
     </FrameLayout>
 

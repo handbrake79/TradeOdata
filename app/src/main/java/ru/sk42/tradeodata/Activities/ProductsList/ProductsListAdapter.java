@@ -53,8 +53,9 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
         holder.tvDescription.setText(items.get(position).getDescription());
         if (holder.mItem.isFolder()) {
             holder.tvCode.setVisibility(View.GONE);
-//            holder.mView.setBackgroundColor(Color.CYAN);
+//            holder.mView.setBackgroundColor(Color.GRAY);
         } else {
+            holder.tvCode.setVisibility(View.VISIBLE);
 //            holder.mView.setBackgroundColor(Color.WHITE);
         }
 
