@@ -10,7 +10,6 @@ import android.content.res.Configuration;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.speech.RecognizerIntent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -26,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,8 +38,8 @@ import com.generalscan.bluetooth.BluetoothConnect;
 import com.generalscan.bluetooth.BluetoothSettings;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -775,6 +773,11 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void deleteRecord(SaleRecord record) {
+        if(docSale.getPosted())
+        {
+            showMessage("Документ проведен, изменения запрещены.");
+            return;
+        }
         docSale.getProducts().remove(record);
         recalc();
     }
@@ -828,6 +831,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         if (docSale.getDiscountCard() == null) {
             docSale.setDiscountCard(DiscountCard.newInstance());
         }
+
+        docSale.setDate(new Date());
+
         try {
             docSale.save();
         } catch (SQLException e) {
@@ -898,10 +904,22 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
     private void print() {
-        showMessage("НЕ РЕАЛИЗОВАНО");
+        Intent i = new Intent(this, CommunicationWithServer.class);
+        i.putExtra("mode", Constants.SERVICE_REQUEST.PRINT_DOCUMENT.name());
+        i.putExtra(Constants.DOC_NUMBER, docSale.getNumber());
+        i.putExtra(Constants.PRINTER_NAME, Settings.getPrinterStatic());
+        i.putExtra("receiverTag", mReceiver);
+        i.putExtra("from", "DocList");
+        startService(i);
+
     }
 
     private void saveTo1C(boolean post) {
+        if(post && docSale.getNeedShipping() && docSale.getWeight() == 0){
+            showMessage("Не указан вес товаров, оформление доставки невозможно!");
+            return;
+        }
+
         if (docSale.getPosted()) {
             showMessage("Документ проведен, изменения запрещены.");
             return;
@@ -917,9 +935,11 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             showMessage("Документ не записан в 1С, проведение возможно только после записи.");
             return;
         }
+
+
         if (post) {
             Intent i = new Intent(this, CommunicationWithServer.class);
-            i.putExtra("mode", Constants.DATALOADER_MODE.POST_IN_1C.name());
+            i.putExtra("mode", Constants.SERVICE_REQUEST.POST_IN_1C.name());
             i.putExtra("id", docSale.getId());
             i.putExtra("receiverTag", mReceiver);
             i.putExtra("from", "DocList");
@@ -927,7 +947,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
         } else {
             Intent i = new Intent(this, CommunicationWithServer.class);
-            i.putExtra("mode", Constants.DATALOADER_MODE.SAVE_TO_1C.name());
+            i.putExtra("mode", Constants.SERVICE_REQUEST.SAVE_TO_1C.name());
             i.putExtra("id", docSale.getId());
             i.putExtra("receiverTag", mReceiver);
             i.putExtra("from", "DocList");
@@ -937,7 +957,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     private void networkLoadMissingObjectFrom1C() {
         Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name());
+        i.putExtra("mode", Constants.SERVICE_REQUEST.LOAD_MISSING_FOR_DOCUMENT.name());
         i.putExtra("from", "Document");
         i.putExtra(Constants.REF_KEY_LABEL, getDocRef_Key());
         i.putExtra("receiverTag", mReceiver);
@@ -946,7 +966,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onReceiveResult(int code, Bundle mResult) {
-        if (code == Constants.BARCODE_REQUEST_FINISHED) {
+        if (code == Constants.PRODUCT_INFO_REQUEST_FINISHED) {
             if (mResult.getBoolean("ok")) {
                 Intent intent = new Intent(this, ProductInfoActivity.class);
                 intent.putExtra(Constants.REF_KEY_LABEL, mResult.getString(Constants.REF_KEY_LABEL));
@@ -989,13 +1009,24 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
                 refreshTotal();
             }
         }
+
+        if(code == Constants.PRINT_REQUEST_FINISHED){
+            boolean ok = mResult.getBoolean("ok");
+            if(ok){
+                showMessage("Документ отправлен на печать");
+            }
+            else{
+                showMessage("Ошибка печати на сервере");
+
+            }
+        }
     }
 
     private void onBarcodeAquired(String barcode) {
         barcode = barcode.replaceAll("[^0-9.]", "");
         showMessage(barcode);
         Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.DATALOADER_MODE.REQUEST_BARCODE.name());
+        i.putExtra("mode", Constants.SERVICE_REQUEST.REQUEST_BARCODE.name());
         i.putExtra(Constants.BARCODE_LABEL, barcode);
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");

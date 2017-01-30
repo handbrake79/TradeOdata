@@ -15,10 +15,14 @@ public class Constants {
     public static final int SCANNER_EVENT = 654;
     public static final String SCANNER_DATA_LABEL = "scanner_data";
     public static final String BARCODE_LABEL = "barcode";
-    public static final int BARCODE_REQUEST_FINISHED = 656;
     public static final String REF_KEY_LABEL = "ref_Key";
     public static final String ID = "id";
+    public static final String DOC_NUMBER = "docNumber";
+    public static final String PRINTER_NAME = "printerName";
+    public static final int PRODUCT_INFO_REQUEST_FINISHED = 656;
+    public static final int PRINT_REQUEST_FINISHED = 17;
     public static ArrayList<String> DOCUMENT_ACTIONS;
+
     static {
         DOCUMENT_ACTIONS = new ArrayList<>();
         DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_SAVE));
@@ -29,6 +33,7 @@ public class Constants {
     }
 
     public static ArrayList<String> SETTINGS_ACTIONS;
+
     static {
         SETTINGS_ACTIONS = new ArrayList<>();
         SETTINGS_ACTIONS.add(St.getApp().getString(R.string.CONNECTION_SETTINGS));
@@ -46,8 +51,8 @@ public class Constants {
     public static final int LOAD_FINISHED = 1;
     public static final String CONTRACT_GUID = "e8a12ae1-26fe-11e1-b72e-984be1645106";
 
-    public static  Product SHIPPING_SERVICE;
-    public static  Product UNLOAD_SERVICE;
+    public static Product SHIPPING_SERVICE;
+    public static Product UNLOAD_SERVICE;
 
     public static final String ZERO_GUID = "00000000-0000-0000-0000-000000000000";
     public static final String ORGANISATION_GUID = "2dbd363a-d053-4721-801b-c45a27de99a3";
@@ -64,8 +69,17 @@ public class Constants {
     }
 
 
-    public enum DATALOADER_MODE {
-        PRELOAD, LOAD_MISSING_FOR_LIST_OF_DOCUMENTS, REQUEST_DOCUMENTS, SAVE_TO_1C, REQUEST_SINGLE_DOCUMENT, LOAD_MISSING_FOR_DOCUMENT, POST_IN_1C, REQUEST_BARCODE,REQUEST_PRODUCT_INFO;
+    public enum SERVICE_REQUEST {
+        PRELOAD,
+        LOAD_MISSING_FOR_LIST_OF_DOCUMENTS,
+        REQUEST_DOCUMENTS,
+        SAVE_TO_1C,
+        REQUEST_SINGLE_DOCUMENT,
+        LOAD_MISSING_FOR_DOCUMENT,
+        POST_IN_1C,
+        REQUEST_BARCODE,
+        REQUEST_PRODUCT_INFO,
+        PRINT_DOCUMENT;
     }
 
     public class COLORS {

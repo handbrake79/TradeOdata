@@ -13,7 +13,7 @@
         android:padding="5dp"
         android:theme="@style/AppTheme">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -30,11 +30,6 @@
                 android:textColor="@color/accent"
                 android:textStyle="bold" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tv_DocSale_Products_Charact"
@@ -50,8 +45,14 @@
                 android:text="Характеристика"
                 android:textColor="@color/bpRed" />
 
+            <ImageButton
+                android:layout_alignParentRight="true"
+                android:id="@+id/order_product_row_delete_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_delete" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <!--/вторая строка/-->
         <LinearLayout

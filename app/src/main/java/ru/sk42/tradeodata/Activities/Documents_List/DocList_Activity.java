@@ -217,7 +217,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("StartDate", startDate.getTimeInMillis());
-        i.putExtra("mode", Constants.DATALOADER_MODE.REQUEST_DOCUMENTS.name());
+        i.putExtra("mode", Constants.SERVICE_REQUEST.REQUEST_DOCUMENTS.name());
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");
         startService(i);

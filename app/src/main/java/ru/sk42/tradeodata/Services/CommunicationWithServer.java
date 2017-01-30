@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -47,10 +48,14 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
+import ru.sk42.tradeodata.Model.Printer;
+import ru.sk42.tradeodata.Model.Printers;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Activities.Settings.Settings;
 import ru.sk42.tradeodata.NetworkRequests.BarcodeRequest;
 import ru.sk42.tradeodata.NetworkRequests.PostDocument;
+import ru.sk42.tradeodata.NetworkRequests.PrintRequest;
+import ru.sk42.tradeodata.NetworkRequests.PrintersRequest;
 import ru.sk42.tradeodata.NetworkRequests.ProductInfoRequest;
 import ru.sk42.tradeodata.NetworkRequests.SingleDocRequest;
 import ru.sk42.tradeodata.XML.WrapperXML_DocSale;
@@ -113,55 +118,104 @@ public class CommunicationWithServer extends IntentService {
         String mode = intent.getStringExtra("mode");
         Log.d(TAG, "onHandleIntent: FROM = " + from);
         if (mode != null) {
-            if (mode.equals(Constants.DATALOADER_MODE.PRELOAD.name())) {
+            if (mode.equals(Constants.SERVICE_REQUEST.PRELOAD.name())) {
                 Preload();
                 return;
             }
-            if (mode.equals(Constants.DATALOADER_MODE.LOAD_MISSING_FOR_LIST_OF_DOCUMENTS.name())) {
+            if (mode.equals(Constants.SERVICE_REQUEST.LOAD_MISSING_FOR_LIST_OF_DOCUMENTS.name())) {
                 loadMissingDataForDocumentsList();
                 return;
             }
-            if (mode.equals(Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name())) {
+            if (mode.equals(Constants.SERVICE_REQUEST.LOAD_MISSING_FOR_DOCUMENT.name())) {
                 loadMissingDataForSingleDocument(null);
                 return;
             }
-            if (mode.equals(Constants.DATALOADER_MODE.REQUEST_DOCUMENTS.name())) {
+            if (mode.equals(Constants.SERVICE_REQUEST.REQUEST_DOCUMENTS.name())) {
                 loadDocuments();
                 return;
             }
 
-            if (mode.equals(Constants.DATALOADER_MODE.REQUEST_SINGLE_DOCUMENT.name())) {
+            if (mode.equals(Constants.SERVICE_REQUEST.REQUEST_SINGLE_DOCUMENT.name())) {
                 loadSingleDocumentFromServer();
                 return;
             }
 
-            if (mode.equals(Constants.DATALOADER_MODE.SAVE_TO_1C.name())) {
+            if (mode.equals(Constants.SERVICE_REQUEST.SAVE_TO_1C.name())) {
                 saveDocumentTo1C();
                 return;
             }
 
-            if (mode.equals(Constants.DATALOADER_MODE.POST_IN_1C.name())) {
+            if (mode.equals(Constants.SERVICE_REQUEST.POST_IN_1C.name())) {
                 postDocumentIn1C();
                 return;
             }
 
-            if (mode.equals(Constants.DATALOADER_MODE.REQUEST_BARCODE.name())) {
+            if (mode.equals(Constants.SERVICE_REQUEST.REQUEST_BARCODE.name())) {
                 requestBarcode();
                 return;
             }
 
-            if(mode.equals(Constants.DATALOADER_MODE.REQUEST_PRODUCT_INFO.name())){
+            if (mode.equals(Constants.SERVICE_REQUEST.REQUEST_PRODUCT_INFO.name())) {
                 requestProductInfo();
                 return;
             }
 
+            if (mode.equals(Constants.SERVICE_REQUEST.PRINT_DOCUMENT.name())) {
+                printDocument();
+                return;
+            }
         }
 
 
     }
 
+    private void printDocument() {
+        final String docNumber = mIntent.getStringExtra(Constants.DOC_NUMBER);
+        final String printerName = mIntent.getStringExtra(Constants.PRINTER_NAME);
+
+        final RequestResult result = new RequestResult();
+
+        PrintRequest request = ServiceGenerator.createService(PrintRequest.class);
+        Call<String> call = request.call(docNumber, printerName);
+        call.enqueue(
+                new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        result.code = response.raw().code();
+                        if (result.code == 200) {
+                            result.msg = "Документ поставлен в очередь печати";
+                            result.ok = true;
+                        } else {
+                            //Разбираемся что за хня
+                            Log.d(TAG, "onResponse: хуйня какая-то опять...");
+                            result.msg = "Ошибка печати!";
+                            result.ok = false;
+                        }
+                        onPrintRequest(result);
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Log.e(TAG, "onFailure: ");
+                    }
+                }
+        );
+    }
+
+
+    private void onPrintRequest(RequestResult result) {
+        mResultBundle = new Bundle();
+        mResultBundle.putBoolean("ok", result.ok);
+        mResultBundle.putString("msg", result.msg);
+        resultReceiver.send(Constants.PRINT_REQUEST_FINISHED, mResultBundle);
+
+    }
+
+
     private void requestProductInfo() {
-        String guid = product.getRef_Key();
+        final String guid = mIntent.getStringExtra(Constants.REF_KEY_LABEL);
+        final RequestResult result = new RequestResult();
+
         ProductInfoRequest request = ServiceGenerator.createService(ProductInfoRequest.class);
         Call<ProductInfo> call = request.call(guid);
         call.enqueue(new Callback<ProductInfo>() {
@@ -176,8 +230,11 @@ public class CommunicationWithServer extends IntentService {
                         e.printStackTrace();
                     }
                     productInfo.save();
+                    result.msg = "По GUID " + guid + " найден товар " + productInfo.getDescription();
+                    result.ref_Key = productInfo.getRef_Key();
+                    result.ok = true;
                     DataLoader.LoadMissingDataForObject(productInfo, ProductInfo.class);
-                    mListener.onRequestSuccess(productInfo);
+                    onProductInfoRequest(result);
                 }
             }
 
@@ -207,16 +264,14 @@ public class CommunicationWithServer extends IntentService {
                         e.printStackTrace();
                     }
                     productInfo.save();
-                    result.error = "По штрихкоду " + barcode + " найден товар " + productInfo.getDescription();
+                    result.msg = "По штрихкоду " + barcode + " найден товар " + productInfo.getDescription();
                     result.ref_Key = productInfo.getRef_Key();
                     result.ok = true;
                     DataLoader.LoadMissingDataForObject(productInfo, ProductInfo.class);
                     onProductInfoRequest(result);
 
-                }
-                else
-                {
-                    result.error = "Штрихкод не найден: " + barcode;
+                } else {
+                    result.msg = "Штрихкод не найден: " + barcode;
                     onProductInfoRequest(result);
                 }
             }
@@ -233,12 +288,12 @@ public class CommunicationWithServer extends IntentService {
         public RequestResult() {
             ok = false;
             ref_Key = "";
-            error = "";
+            msg = "";
         }
 
         boolean ok;
         String ref_Key;
-        String error;
+        String msg;
         int code;
     }
 
@@ -246,8 +301,8 @@ public class CommunicationWithServer extends IntentService {
 
         sendFeedback("Начали загрузку с сервера 1С");
 
-        sendFeedback("loadProducts");
-        loadProducts();
+        sendFeedback("Получаем список подключенных принтеров");
+        getPrinters();
 
         sendFeedback("loadCustomers");
         loadCustomers();
@@ -289,6 +344,26 @@ public class CommunicationWithServer extends IntentService {
         loadShippingRates();
 
         sendServiceFinished("Загрузка справочников завершена");
+    }
+
+    private void getPrinters() {
+        PrintersRequest request = ServiceGenerator.createService(PrintersRequest.class);
+        Call<Printers> call = request.call();
+        try{
+            Response<Printers> response = call.execute();
+            List<String> printers = response.body().getPrinters();
+            MyHelper.getPrinterDao().delete(MyHelper.getPrinterDao().queryForAll());
+            for (String name : printers
+                    ) {
+                Printer mPrinter = new Printer();
+                mPrinter.setPrinterName(name);
+                MyHelper.getInstance().getDao(Printer.class).createOrUpdate(mPrinter);
+            }
+            Log.d(TAG, "getPrinters: " + response.toString());
+        }
+        catch (Exception e){
+
+        }
     }
 
     private void loadShippingRates() {
@@ -636,7 +711,7 @@ public class CommunicationWithServer extends IntentService {
                 DocSaleList list = response.body();
                 if (list == null) {
                     Log.wtf(TAG, "onResponse: DocSaleList is null", new Exception());
-                    mResultBundle.putString("error", "Произошла ошибка передачи данных");
+                    mResultBundle.putString("msg", "Произошла ошибка передачи данных");
                     sendServiceFinished("Произошла ошибка передачи данных");
                     return;
                 }
@@ -647,7 +722,7 @@ public class CommunicationWithServer extends IntentService {
                     list.save();
                 } catch (Exception e) {
                     Log.w(TAG, "list.save(): " + e.toString());
-                    mResultBundle.putString("error", "Произошла ошибка передачи данных");
+                    mResultBundle.putString("msg", "Произошла ошибка передачи данных");
                     sendServiceFinished("Произошла ошибка сохранения данных");
                     return;
                 }
@@ -661,7 +736,7 @@ public class CommunicationWithServer extends IntentService {
             @Override
             public void onFailure(Call<DocSaleList> call, Throwable t) {
                 Log.d(TAG, "onFailure: " + t.toString());
-                mResultBundle.putString("error", "Произошла ошибка передачи данных");
+                mResultBundle.putString("msg", "Произошла ошибка передачи данных");
                 sendServiceFinished("Произошла ошибка запроса данных");
             }
         });
@@ -802,7 +877,7 @@ public class CommunicationWithServer extends IntentService {
                                      String location = response.headers().get("location");
                                      if (location == null) {
                                          result.ref_Key = Constants.ZERO_GUID;
-                                         result.error = "location not found!";
+                                         result.msg = "location not found!";
                                      }
                                      int i = location.indexOf("guid'");
                                      if (i > 0) {
@@ -811,14 +886,14 @@ public class CommunicationWithServer extends IntentService {
                                          onSaveComplete(result);
                                      }
                                  } else {
-                                     result.error = response.raw().message();
+                                     result.msg = response.raw().message();
                                      onSaveComplete(result);
                                  }
                              }
 
                              @Override
                              public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                 result.error = t.toString();
+                                 result.msg = t.toString();
                                  onSaveComplete(result);
                              }
                          }
@@ -835,7 +910,7 @@ public class CommunicationWithServer extends IntentService {
                                  result.code = response.raw().code();
                                  if (result.code == 200) {
                                      result.ref_Key = docSale.getRef_Key();
-                                     result.error = "документ сохранен";
+                                     result.msg = "документ сохранен";
                                      result.ok = true;
                                      onSaveComplete(result);
                                  } else {
@@ -847,7 +922,7 @@ public class CommunicationWithServer extends IntentService {
 
                              @Override
                              public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                 result.error = t.toString();
+                                 result.msg = t.toString();
                                  onSaveComplete(result);
                              }
                          }
@@ -870,7 +945,7 @@ public class CommunicationWithServer extends IntentService {
                              result.code = response.raw().code();
                              if (result.code == 200) {
                                  result.ref_Key = docSale.getRef_Key();
-                                 result.error = "документ сохранен";
+                                 result.msg = "документ сохранен";
                                  result.ok = true;
                                  onPostComplete(result);
                              } else {
@@ -882,7 +957,7 @@ public class CommunicationWithServer extends IntentService {
 
                          @Override
                          public void onFailure(Call<ResponseBody> call, Throwable t) {
-                             result.error = t.toString();
+                             result.msg = t.toString();
                              onPostComplete(result);
                          }
                      }
@@ -894,12 +969,12 @@ public class CommunicationWithServer extends IntentService {
         if (result.ok) {
             msg = "Документ успешно сохранен";
         } else {
-            msg = "Ошибка сохранения: " + result.error;
+            msg = "Ошибка сохранения: " + result.msg;
         }
 
         mResultBundle = new Bundle();
         mResultBundle.putBoolean("ok", result.ok);
-        mResultBundle.putString("error", msg);
+        mResultBundle.putString("msg", msg);
         mResultBundle.putInt("code", result.code);
         mResultBundle.putString(Constants.REF_KEY_LABEL, result.ref_Key);
         if (result.ok) {
@@ -914,17 +989,18 @@ public class CommunicationWithServer extends IntentService {
             sendServiceFinished(msg);
         }
     }
+
     private void onPostComplete(RequestResult result) {
         String msg;
         if (result.ok) {
             msg = "Документ проведен!";
         } else {
-            msg = "Ошибка сохранения: " + result.error;
+            msg = "Ошибка сохранения: " + result.msg;
         }
 
         mResultBundle = new Bundle();
         mResultBundle.putBoolean("ok", result.ok);
-        mResultBundle.putString("error", msg);
+        mResultBundle.putString("msg", msg);
         mResultBundle.putInt("code", result.code);
         mResultBundle.putString(Constants.REF_KEY_LABEL, result.ref_Key);
         if (result.ok) {
@@ -940,18 +1016,18 @@ public class CommunicationWithServer extends IntentService {
         if (result.ok) {
             msg = "Данные о товаре получены";
         } else {
-            msg = "Ошибка: " + result.error;
+            msg = "Ошибка: " + result.msg;
         }
 
         mResultBundle = new Bundle();
         mResultBundle.putBoolean("ok", result.ok);
-        mResultBundle.putString("error", msg);
+        mResultBundle.putString("msg", msg);
         mResultBundle.putString(Constants.REF_KEY_LABEL, result.ref_Key);
-        sendBarcodeRequestFinished();
+        sendProductInfoRequestFinished();
     }
 
-    private void sendBarcodeRequestFinished() {
-        resultReceiver.send(Constants.BARCODE_REQUEST_FINISHED, mResultBundle);
+    private void sendProductInfoRequestFinished() {
+        resultReceiver.send(Constants.PRODUCT_INFO_REQUEST_FINISHED, mResultBundle);
     }
 
 

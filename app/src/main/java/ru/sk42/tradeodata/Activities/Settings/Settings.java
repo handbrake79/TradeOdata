@@ -33,6 +33,17 @@ public class Settings {
     @DatabaseField
     private String password;
 
+    public String getPrinter() {
+        return printer;
+    }
+
+    public void setPrinter(String printer) {
+        this.printer = printer;
+    }
+
+    @DatabaseField
+    private String printer;
+
     public int getScannerStartDelayMillis() {
         return scannerStartDelayMillis;
     }
@@ -224,6 +235,14 @@ public class Settings {
     public static String getPasswordStatic(){
         return getSettings().password;
     }
+    public static String getPrinterStatic(){
+        return getSettings().getPrinter();
+    }
 
 
+    public static void setPrinterStatic(String printerName) {
+        Settings settings = getSettings();
+        settings.setPrinter(printerName);
+        settings.save();
+    }
 }

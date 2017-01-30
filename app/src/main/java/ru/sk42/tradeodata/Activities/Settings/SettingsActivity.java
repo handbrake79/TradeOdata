@@ -3,6 +3,7 @@ package ru.sk42.tradeodata.Activities.Settings;
 import android.content.res.Configuration;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -36,7 +37,7 @@ import ru.sk42.tradeodata.R;
  * href="http://developer.android.com/guide/topics/ui/settings.html">St
  * API Guide</a> for more information on developing a St UI.
  */
-public class SettingsActivity extends AppCompatActivity implements UserListFragment.OnListFragmentInteractionListener {
+public class SettingsActivity extends AppCompatActivity implements SettingsInterface {
 
     static final String TAG = "SETTINGS";
     public static Printers printers;
@@ -166,6 +167,13 @@ public class SettingsActivity extends AppCompatActivity implements UserListFragm
                 break;
             case 2:
                 //printer
+                PrinterFragment printerFragment = PrinterFragment.newInstance(1);
+
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.settings_frame, printerFragment, printerFragment.getClass().getName())
+                        .addToBackStack(printerFragment.getClass().getName())
+                        .commit();
                 break;
             case 3:
                 ScannerFragment fragment = ScannerFragment.newInstance();
@@ -193,9 +201,17 @@ public class SettingsActivity extends AppCompatActivity implements UserListFragm
     }
 
     @Override
-    public void onListFragmentInteraction(User user) {
-        Settings.setCurrentUserStatic(user);
-        Toast.makeText(this, "Выбран пользователь " + user.getDescription(), Toast.LENGTH_SHORT).show();
+    public void onValueSelected(Object object) {
+        if(object instanceof User) {
+            User user = (User) object;
+            Settings.setCurrentUserStatic(user);
+           Toast.makeText(this, "Выбран пользователь " + user.getDescription(), Toast.LENGTH_SHORT).show();
+        }
+        if(object instanceof String){
+            Settings.getSettings().setPrinterStatic((String) object);
+
+            Toast.makeText(this, "Выбран принтер " + Settings.getPrinterStatic(), Toast.LENGTH_SHORT).show();
+        }
 
     }
 

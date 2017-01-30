@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.Activities.Settings;
+package ru.sk42.tradeodata.Activities.Settings.adapters;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ru.sk42.tradeodata.Activities.Settings.SettingsInterface;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.R;
@@ -17,10 +18,10 @@ import ru.sk42.tradeodata.R;
 public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerViewAdapter.ViewHolder> {
 
     private final List<User> mValues;
-    private final UserListFragment.OnListFragmentInteractionListener mListener;
+    private final SettingsInterface mListener;
     private int selected;
 
-    public UserRecyclerViewAdapter(List<User> items, UserListFragment.OnListFragmentInteractionListener listener) {
+    public UserRecyclerViewAdapter(List<User> items, SettingsInterface listener) {
         mValues = items;
         mListener = listener;
         selected = -1;
@@ -49,7 +50,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
 //                if (null != mListener) {
 //                    // Notify the active callbacks interface (the activity, if the
 //                    // fragment is attached to one) that an item has been selected.
-//                    mListener.onListFragmentInteraction(holder.mUser);
+//                    mListener.onValueSelected(holder.mUser);
 //                }
 //            }
 //        });
@@ -79,7 +80,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
                     if (null != mListener) {
                         // Notify the active callbacks interface (the activity, if the
                         // fragment is attached to one) that an item has been selected.
-                        mListener.onListFragmentInteraction(mUser);
+                        mListener.onValueSelected(mUser);
                     }
                 }
             });

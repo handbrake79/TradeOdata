@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -123,6 +124,9 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
         @Bind(R.id.product_record_minus)
         TextView tvMinus;
 
+        @Bind(R.id.order_product_row_delete_button)
+        ImageButton mDeleteButton;
+
         public SaleRecordProduct mItem;
 
         public ViewHolder(View view) {
@@ -155,6 +159,14 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
                     mListener.onRecordSelected(getSelectedObject());
+                }
+            });
+
+            mDeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectedItem = getLayoutPosition();
+                    mListener.deleteRecord(getSelectedObject());
                 }
             });
         }

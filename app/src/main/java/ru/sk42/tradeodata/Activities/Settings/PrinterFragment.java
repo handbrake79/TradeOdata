@@ -11,21 +11,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.sql.SQLException;
+import java.util.List;
+
+import ru.sk42.tradeodata.Activities.Settings.adapters.PrintersRecyclerViewAdapter;
 import ru.sk42.tradeodata.Activities.Settings.adapters.UserRecyclerViewAdapter;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.User;
+import ru.sk42.tradeodata.Model.Printer;
 import ru.sk42.tradeodata.R;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link SettingsInterface}
  * interface.
  */
-public class UserListFragment extends Fragment {
+public class PrinterFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -37,13 +39,13 @@ public class UserListFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public UserListFragment() {
+    public PrinterFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static UserListFragment newInstance(int columnCount) {
-        UserListFragment fragment = new UserListFragment();
+    public static PrinterFragment newInstance(int columnCount) {
+        PrinterFragment fragment = new PrinterFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -73,13 +75,13 @@ public class UserListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            List<User> listUsers = null;
+            List<Printer> printers = null;
             try {
-                listUsers = MyHelper.getUserDao().queryForAll();
+                printers = MyHelper.getPrinterDao().queryForAll();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            recyclerView.setAdapter(new UserRecyclerViewAdapter(listUsers, mListener));
+            recyclerView.setAdapter(new PrintersRecyclerViewAdapter(printers, mListener));
             DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.HORIZONTAL);
             recyclerView.addItemDecoration(dividerItemDecoration);
         }

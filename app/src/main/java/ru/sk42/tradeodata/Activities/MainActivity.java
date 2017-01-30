@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         Charact.createStub();
         Intent i = new Intent(MainActivity.this, CommunicationWithServer.class);
         i.putExtra("from", "MainAct");
-        i.putExtra("mode", Constants.DATALOADER_MODE.PRELOAD.name());
+        i.putExtra("mode", Constants.SERVICE_REQUEST.PRELOAD.name());
         i.putExtra("receiverTag", mReceiver);
         startService(i);
     }

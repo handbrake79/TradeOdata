@@ -1,15 +1,12 @@
 package ru.sk42.tradeodata.Activities.ProductsList;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -122,7 +119,7 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
 
     public void requestProductInfo(String product_key){
         Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.DATALOADER_MODE.REQUEST_PRODUCT_INFO.name());
+        i.putExtra("mode", Constants.SERVICE_REQUEST.REQUEST_PRODUCT_INFO.name());
         i.putExtra("ref_Key", product_key);
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");
@@ -134,6 +131,19 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
+        if(resultCode == Constants.PRODUCT_INFO_REQUEST_FINISHED){
+            boolean ok = resultData.getBoolean("ok", false);
+            if(ok){
+                String ref_Key = resultData.getString(Constants.REF_KEY_LABEL);
+                ProductInfoFragment fragment = ProductInfoFragment.newInstance(ref_Key);
 
+                getSupportFragmentManager().beginTransaction()
+                        .replace(frame_view_products_list, fragment)
+                        .addToBackStack(fragment.getClass().getName())
+                        .commit();
+
+
+            }
+        }
     }
 }
