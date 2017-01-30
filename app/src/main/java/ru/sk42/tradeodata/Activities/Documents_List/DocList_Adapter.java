@@ -47,7 +47,9 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
 
         holder.mItem = mValues.get(position);
         holder.mDate.setText(Uttils.DATE_FORMATTER.format(holder.mItem.getDate()));
-        holder.mNumber.setText(holder.mItem.getNumber());
+        String title = holder.mItem.getNumber().isEmpty() ? "Без номера ": holder.mItem.getNumber();
+
+        holder.mNumber.setText(title);
         holder.mAuthor.setText(holder.mItem.getAuthor().getDescription());
         holder.mTotal.setText(Uttils.formatDoubleToMoney(holder.mItem.getTotal()));
 
@@ -59,10 +61,10 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         holder.mPosted.setText(holder.mItem.getPostedDescr());
 
         holder.mContract.setText(holder.mItem.getContract().getDescription());
-        Integer productsCount, servicesCount;
-        productsCount = holder.mItem.getProducts().size();
-        servicesCount = holder.mItem.getServices().size();
-        holder.mProductCount.setText("Товаров " + productsCount.toString() + ", услуг " + servicesCount.toString());
+       // Integer productsCount, servicesCount;
+//        productsCount = holder.mItem.getProducts().size();
+//        servicesCount = holder.mItem.getServices().size();
+//        //holder.mProductCount.setText("Товаров " + productsCount.toString());
         if (holder.mItem.getNeedShipping()) {
             holder.mShipping.setVisibility(View.VISIBLE);
         } else {
@@ -94,7 +96,6 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         public final TextView mTotal;
         public final TextView mPosted;
         public final TextView mContract;
-        public final TextView mProductCount;
         public final ImageView mShipping;
         public DocSale mItem;
 
@@ -109,7 +110,6 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
             mTotal = (TextView) view.findViewById(R.id.docList_Total);
             mPosted = (TextView) view.findViewById(R.id.docList_Posted);
             mContract = (TextView) view.findViewById(R.id.docList_Contract);
-            mProductCount = (TextView) view.findViewById(R.id.docList_ProductCount);
             mShipping = (ImageView) view.findViewById(R.id.icon_shipping);
 
         }

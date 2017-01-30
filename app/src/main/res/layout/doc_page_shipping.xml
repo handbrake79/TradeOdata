@@ -9,20 +9,21 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:elevation="2dp"
         android:orientation="vertical">
 
-        <android.support.v7.widget.SwitchCompat
-            android:id="@+id/input_need_shipping_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="30dp"
-            android:splitTrack="true"
-            android:text="Нужна доставка"
-            android:textOff="Нет"
-            android:textOn="Да" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/input_need_shipping_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="25dp"
+                android:splitTrack="true"
+                android:text="Нужна доставка"
+                android:textOff="Нет"
+                android:textOn="Да" />
+
 
         <LinearLayout
             android:id="@+id/llShippingLayout"
@@ -30,107 +31,108 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/dotted_underline" />
-
             <!--DATE-->
 
 
-            <RelativeLayout
+            <!--TIME-->
+            <LinearLayout
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:padding="5dp">
+                android:orientation="horizontal">
 
                 <android.support.design.widget.TextInputLayout
+                    android:layout_gravity="center"
                     android:id="@+id/tilDate"
                     style="@style/Widget.Design.TextInputLayout"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:elevation="6dp"
-                    android:hint="Дата доставки"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:foregroundGravity="right"
 
+                    android:gravity="right"
+                    android:hint="Дата доставки"
                     android:orientation="horizontal"
                     app:hintEnabled="true">
 
 
                     <!--<EditText-->
-                    <android.support.design.widget.TextInputEditText
-                        android:selectAllOnFocus="true"
-                        android:id="@+id/input_shipping_date"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="24sp"
+                    <TextView
 
-                        />
+                        android:id="@+id/input_shipping_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:hint="Дата доставки"
+                        android:selectAllOnFocus="true"
+
+                        android:singleLine="true"
+                        android:text="01.01.2017"
+                        android:textIsSelectable="false"
+                        android:textSize="20sp" />
 
 
                 </android.support.design.widget.TextInputLayout>
 
-            </RelativeLayout>
-            <!--TIME-->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:padding="5dp">
-
-                <TextView
-                    android:id="@+id/doc_page_shipping_time_caption"
+                <android.support.design.widget.TextInputLayout
+                    android:layout_gravity="center"
+                    style="@style/Widget.Design.TextInputLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/input_time_from"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="5dp"
-                    android:text="c " />
-
-                <EditText
-                    android:selectAllOnFocus="true"
-                    android:id="@+id/input_time_from"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-
-                    android:layout_alignParentTop="true"
                     android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@+id/doc_page_shipping_time_caption"
-                    android:hint="время с"
-                    android:inputType="number"
-                    android:text="0:00" />
+                    android:hint="с"
+                    android:orientation="horizontal"
+                    app:hintAnimationEnabled="true"
+                    app:hintEnabled="true">
 
-                <TextView
-                    android:id="@+id/doc_page_shipping_time_caption_to"
+                    <TextView
+                        android:id="@+id/input_time_from"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_toRightOf="@+id/tilDate"
+                        android:hint="с"
+                        android:inputType="number"
+                        android:selectAllOnFocus="true"
+                        android:textSize="18sp"
+                        android:text="0:00"
+                        android:textIsSelectable="false" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_marginLeft="20dp"
+                    android:layout_gravity="center"
+                    style="@style/Widget.Design.TextInputLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/input_time_from"
-                    android:layout_toRightOf="@+id/input_time_from"
-                    android:text=" по " />
+                    android:hint="до"
+                    android:orientation="horizontal"
+                    app:hintAnimationEnabled="true"
+                    app:hintEnabled="true">
 
-                <EditText
-                    android:selectAllOnFocus="true"
-                    android:id="@+id/input_time_to"
+                    <TextView
+                        android:id="@+id/input_time_to"
+                        android:layout_width="wrap_content"
 
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@+id/doc_page_shipping_time_caption_to"
-                    android:hint="по"
-                    android:inputType="number"
-                    android:text="0:00" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/input_time_from"
+                        android:hint="по"
+                        android:inputType="number"
+                        android:selectAllOnFocus="true"
+                        android:textSize="18sp"
+                        android:text="0:00"
+                        android:textIsSelectable="false" />
+                </android.support.design.widget.TextInputLayout>
 
 
-            </RelativeLayout>
+            </LinearLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
+                android:orientation="vertical">
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
@@ -138,42 +140,89 @@
                     android:hint="Адрес доставки">
 
                     <android.support.design.widget.TextInputEditText
-                        android:selectAllOnFocus="true"
                         android:id="@+id/input_shipping_address"
                         android:layout_width="match_parent"
-
                         android:layout_height="wrap_content"
 
                         android:layout_alignParentRight="true"
+
                         android:layout_below="@+id/caption_address"
-                        android:ems="10"
-                        android:inputType="textMultiLine" />
+                        android:inputType="textMultiLine"
+                        android:selectAllOnFocus="true" />
                 </android.support.design.widget.TextInputLayout>
-            </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/til_ContactPerson"
+                    android:layout_width="180dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Контактное лицо"
+                    app:hintEnabled="true">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/input_contact_person"
+                        android:layout_width="180dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_alignParentRight="true"
+
+                        android:layout_below="@+id/caption_address"
+                        android:inputType="textPersonName"
+                        android:selectAllOnFocus="true" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/til_ContactPersonPhone"
+                    android:layout_width="180dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Телефон"
+                    app:hintEnabled="true">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/input_contact_person_phone"
+                        android:layout_width="180dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_alignParentRight="true"
+
+                        android:layout_below="@+id/caption_address"
+                        android:digits="0123456789+"
+                        android:inputType="phone"
+                        android:selectAllOnFocus="true" />
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
 
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:padding="5dp">
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/input_vehicle_type"
+                    android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
                     android:text="Тип ТС" />
 
                 <Spinner
-                    style="@style/Base.Widget.AppCompat.Spinner.Underlined"
                     android:id="@+id/input_vehicle_type"
-                    android:layout_width="150dp"
+                    style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="250dp"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
                     android:gravity="right"
-                    android:minWidth="200dp"
                     android:text="ТипТС"
                     tools:text="Тип ТС" />
 
@@ -182,27 +231,27 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:padding="5dp">
+                android:gravity="center_vertical">
 
 
                 <TextView
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_alignBaseline="@+id/input_starting_point"
                     android:layout_alignParentLeft="true"
+                    android:gravity="center_vertical"
                     android:text="Начальная точка" />
 
                 <Spinner
-                    style="@style/Base.Widget.AppCompat.Spinner.Underlined"
                     android:id="@+id/input_starting_point"
+                    style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="200dp"
 
-                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_marginLeft="5sp"
-                    android:ems="10"
+                    android:gravity="center_vertical"
                     android:inputType="textPersonName"
                     android:minWidth="200dp"
                     android:text="ТипТС"
@@ -213,13 +262,12 @@
             <RelativeLayout
                 android:id="@+id/rlroute"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="5dp"
-                android:padding="5dp">
+                android:layout_height="50dp">
 
                 <TextView
                     android:id="@+id/shipping_route_caption"
                     android:layout_width="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/input_route_text"
                     android:layout_alignParentLeft="true"
@@ -230,10 +278,10 @@
                     android:id="@+id/input_route_text"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginLeft="5dp"
                     android:layout_toRightOf="@id/shipping_route_caption"
-                    android:hint="Маршрут"
-                    android:layout_alignParentEnd="true" />
+                    android:hint="Маршрут" />
 
             </RelativeLayout>
 
@@ -241,29 +289,28 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center_vertical"
                 android:layout_gravity="center_vertical"
-                android:padding="5dp">
+                android:gravity="center_vertical">
 
                 <android.support.design.widget.TextInputLayout
-                    android:layout_alignParentLeft="true"
                     android:id="@+id/til_shipping_cost"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
                     android:hint="Стоимость доставки">
 
                     <android.support.design.widget.TextInputEditText
-                        android:enabled="false"
-                        android:selectAllOnFocus="true"
                         android:id="@+id/input_shipping_cost"
-                        android:textStyle="bold"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
+                        android:enabled="false"
                         android:gravity="right"
                         android:inputType="numberDecimal"
-                        android:minWidth="200dp" />
+                        android:minWidth="200dp"
+                        android:selectAllOnFocus="true"
+                        android:textColor="@color/accent"
+                        android:textStyle="bold" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -273,22 +320,18 @@
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/input_need_unload_checkbox"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
 
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_marginTop="20dp"
-                android:elevation="5dp"
-                android:padding="5dp"
+                android:layout_marginTop="5dp"
                 android:text="Нужна разгрузка" />
 
             <RelativeLayout
                 android:id="@+id/rlUnloadLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="45dp"
-                android:padding="5dp">
+                android:layout_marginBottom="50dp">
 
 
                 <android.support.design.widget.TextInputLayout
@@ -300,13 +343,12 @@
 
 
                     <android.support.design.widget.TextInputEditText
-                        android:selectAllOnFocus="true"
                         android:id="@+id/input_workers_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:inputType="number"
                         android:minWidth="150dp"
-                        />
+                        android:selectAllOnFocus="true" />
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout
@@ -320,14 +362,14 @@
 
 
                     <android.support.design.widget.TextInputEditText
-                        android:selectAllOnFocus="true"
                         android:id="@+id/input_unload_cost"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@+id/doc_page_shipping_unloadcost_text"
                         android:layout_alignParentRight="true"
                         android:inputType="number"
-                        android:minWidth="150dp" />
+                        android:minWidth="150dp"
+                        android:selectAllOnFocus="true" />
                 </android.support.design.widget.TextInputLayout>
 
             </RelativeLayout>

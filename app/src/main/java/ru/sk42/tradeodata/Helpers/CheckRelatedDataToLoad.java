@@ -89,11 +89,17 @@ public class CheckRelatedDataToLoad {
             ArrayList<String> listStores = guidsToLoadMap.get(Store.class);
             ArrayList<String> listCharact = guidsToLoadMap.get(Charact.class);
 
+            String productGuid = ((ProductInfo) obj).getRef_Key();
+            Product p = Product.getObject(Product.class, productGuid);
+            if(p == null){
+                guidsToLoadMap.get(Product.class).add(productGuid);
+            }
+
             Iterator<Stock> it = ((ProductInfo) obj).getStocks().iterator();
             while (it.hasNext()) {
                 Stock row = it.next();
 
-                String guid = row.getCharact().getRef_Key();
+                String guid = row.getCharact_Key();
                 if (!listCharact.contains(guid) && row.getCharact() == null) {
                     listCharact.add(guid);
                 }
@@ -103,7 +109,7 @@ public class CheckRelatedDataToLoad {
                     listStores.add(guid);
                 }
 
-                guid = row.getUnit().getRef_Key();
+                guid = row.getUnit_Key();
                 if (!listUnits.contains(guid) && row.getUnit() == null) {
                     listUnits.add(guid);
                 }
@@ -112,6 +118,8 @@ public class CheckRelatedDataToLoad {
             }
 
         }
+
+
 
         return guidsToLoadMap;
     }
@@ -195,7 +203,7 @@ public class CheckRelatedDataToLoad {
         //получим имя таблицы в 1С, которой соответствует текущий класс
         ArrayList<String> urls = new ArrayList<>();
         StringBuilder url = new StringBuilder();
-        //String sConstUrl = SettingsOld.getServerAddress() + SettingsOld.getInfoBaseName() + "/odata/standard.odata/" + tableName + "?$format=json&$filter=";
+        //String sConstUrl = St.getServerAddress() + St.getInfoBaseName() + "/odata/standard.odata/" + tableName + "?$format=json&$filter=";
         String sConstUrl = "";
         url.append(sConstUrl);
         int iUrlCount = 0;

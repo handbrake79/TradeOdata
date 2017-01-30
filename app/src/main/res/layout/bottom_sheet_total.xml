@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_toLeftOf="@+id/footer_total_products_caption2"
-                android:text="10000,00" />
+                android:text="0" />
 
             <TextView
                 android:id="@+id/footer_total_products_caption2"
@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_toLeftOf="@+id/footer_total_services_caption2"
-                android:text="10000,00" />
+                android:text="0" />
 
             <TextView
                 android:id="@+id/footer_total_services_caption2"
@@ -113,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_toLeftOf="@id/doc_total_shipping_rub_caption"
-                android:text="10000,00" />
+                android:text="0" />
 
 
         </RelativeLayout>
@@ -136,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_toLeftOf="@+id/doc_total_unload_rub_caption"
-                android:text="10000.00" />
+                android:text="0" />
 
             <TextView
                 android:id="@+id/doc_total_unload_rub_caption"
@@ -171,7 +171,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_toLeftOf="@+id/doc_total_workers_man_text"
-                android:text="10000,00" />
+                android:text="0" />
 
             <TextView
                 android:id="@+id/doc_total_workers_man_text"
@@ -212,7 +212,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_toLeftOf="@id/doc_total_shipping_total_rub"
-                android:text="10000,00" />
+                android:text="0" />
             android:textStyle="bold" />
 
         </RelativeLayout>

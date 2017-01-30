@@ -10,16 +10,9 @@ import android.util.Log;
 
 import com.j256.ormlite.table.TableUtils;
 
-import org.simpleframework.xml.convert.Registry;
-import org.simpleframework.xml.convert.RegistryStrategy;
-import org.simpleframework.xml.core.Persister;
-import org.simpleframework.xml.strategy.Strategy;
-
 import java.io.IOException;
-import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import okhttp3.MediaType;
@@ -32,7 +25,6 @@ import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
-import ru.sk42.tradeodata.Model.Catalogs.Contract;
 import ru.sk42.tradeodata.Model.Catalogs.Currency;
 import ru.sk42.tradeodata.Model.Catalogs.Customer;
 import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
@@ -55,7 +47,12 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
-import ru.sk42.tradeodata.RetroRequests.SingleDocRequest;
+import ru.sk42.tradeodata.Model.ProductInfo;
+import ru.sk42.tradeodata.Activities.Settings.Settings;
+import ru.sk42.tradeodata.NetworkRequests.BarcodeRequest;
+import ru.sk42.tradeodata.NetworkRequests.PostDocument;
+import ru.sk42.tradeodata.NetworkRequests.ProductInfoRequest;
+import ru.sk42.tradeodata.NetworkRequests.SingleDocRequest;
 import ru.sk42.tradeodata.XML.WrapperXML_DocSale;
 import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
@@ -63,28 +60,26 @@ import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.DocSaleList;
-import ru.sk42.tradeodata.Model.SettingsOld;
 import ru.sk42.tradeodata.R;
-import ru.sk42.tradeodata.RetroRequests.CharRequest;
-import ru.sk42.tradeodata.RetroRequests.ContractsRequest;
-import ru.sk42.tradeodata.RetroRequests.CurrencyRequest;
-import ru.sk42.tradeodata.RetroRequests.CustomersRequest;
-import ru.sk42.tradeodata.RetroRequests.DiscountCardsRequest;
-import ru.sk42.tradeodata.RetroRequests.DocsRequest;
-import ru.sk42.tradeodata.RetroRequests.OrganisationsRequest;
-import ru.sk42.tradeodata.RetroRequests.PatchDocument;
-import ru.sk42.tradeodata.RetroRequests.PostDocument;
-import ru.sk42.tradeodata.RetroRequests.ProductsRequest;
-import ru.sk42.tradeodata.RetroRequests.RecordsCountRequest;
-import ru.sk42.tradeodata.RetroRequests.RetroConstants;
-import ru.sk42.tradeodata.RetroRequests.RoutesRequest;
-import ru.sk42.tradeodata.RetroRequests.ShippingRatesRequest;
-import ru.sk42.tradeodata.RetroRequests.StartingPointsRequest;
-import ru.sk42.tradeodata.RetroRequests.StoresRequest;
-import ru.sk42.tradeodata.RetroRequests.UnitsRequest;
-import ru.sk42.tradeodata.RetroRequests.UsersRequest;
-import ru.sk42.tradeodata.RetroRequests.VehicleTypesRequest;
-import ru.sk42.tradeodata.XML.DateConverter;
+import ru.sk42.tradeodata.NetworkRequests.CharRequest;
+import ru.sk42.tradeodata.NetworkRequests.ContractsRequest;
+import ru.sk42.tradeodata.NetworkRequests.CurrencyRequest;
+import ru.sk42.tradeodata.NetworkRequests.CustomersRequest;
+import ru.sk42.tradeodata.NetworkRequests.DiscountCardsRequest;
+import ru.sk42.tradeodata.NetworkRequests.DocsRequest;
+import ru.sk42.tradeodata.NetworkRequests.OrganisationsRequest;
+import ru.sk42.tradeodata.NetworkRequests.SaveExistingDocument;
+import ru.sk42.tradeodata.NetworkRequests.SaveNewDocument;
+import ru.sk42.tradeodata.NetworkRequests.ProductsRequest;
+import ru.sk42.tradeodata.NetworkRequests.RecordsCountRequest;
+import ru.sk42.tradeodata.NetworkRequests.RetroConstants;
+import ru.sk42.tradeodata.NetworkRequests.RoutesRequest;
+import ru.sk42.tradeodata.NetworkRequests.ShippingRatesRequest;
+import ru.sk42.tradeodata.NetworkRequests.StartingPointsRequest;
+import ru.sk42.tradeodata.NetworkRequests.StoresRequest;
+import ru.sk42.tradeodata.NetworkRequests.UnitsRequest;
+import ru.sk42.tradeodata.NetworkRequests.UsersRequest;
+import ru.sk42.tradeodata.NetworkRequests.VehicleTypesRequest;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -141,18 +136,101 @@ public class CommunicationWithServer extends IntentService {
             }
 
             if (mode.equals(Constants.DATALOADER_MODE.SAVE_TO_1C.name())) {
-                saveTo1C();
+                saveDocumentTo1C();
                 return;
             }
 
+            if (mode.equals(Constants.DATALOADER_MODE.POST_IN_1C.name())) {
+                postDocumentIn1C();
+                return;
+            }
+
+            if (mode.equals(Constants.DATALOADER_MODE.REQUEST_BARCODE.name())) {
+                requestBarcode();
+                return;
+            }
+
+            if(mode.equals(Constants.DATALOADER_MODE.REQUEST_PRODUCT_INFO.name())){
+                requestProductInfo();
+                return;
+            }
 
         }
 
 
     }
 
-    private class SaveResult {
-        public SaveResult() {
+    private void requestProductInfo() {
+        String guid = product.getRef_Key();
+        ProductInfoRequest request = ServiceGenerator.createService(ProductInfoRequest.class);
+        Call<ProductInfo> call = request.call(guid);
+        call.enqueue(new Callback<ProductInfo>() {
+            @Override
+            public void onResponse(Call<ProductInfo> call, Response<ProductInfo> response) {
+                ProductInfo productInfo = response.body();
+                if (productInfo != null) {
+                    try {
+                        MyHelper.getProductInfoDao().delete(MyHelper.getProductInfoDao().queryForAll());
+                        MyHelper.getStockDao().delete(MyHelper.getStockDao().queryForAll());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    productInfo.save();
+                    DataLoader.LoadMissingDataForObject(productInfo, ProductInfo.class);
+                    mListener.onRequestSuccess(productInfo);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProductInfo> call, Throwable t) {
+                Log.e(TAG, "onFailure: ");
+            }
+        });
+
+    }
+
+    private void requestBarcode() {
+
+        final RequestResult result = new RequestResult();
+        final String barcode = mIntent.getStringExtra(Constants.BARCODE_LABEL);
+        final BarcodeRequest request = ServiceGenerator.createService(BarcodeRequest.class);
+        Call<ProductInfo> call = request.call(barcode);
+        call.enqueue(new Callback<ProductInfo>() {
+            @Override
+            public void onResponse(Call<ProductInfo> call, Response<ProductInfo> response) {
+                ProductInfo productInfo = response.body();
+                if (productInfo != null) {
+                    try {
+                        MyHelper.getProductInfoDao().delete(MyHelper.getProductInfoDao().queryForAll());
+                        MyHelper.getStockDao().delete(MyHelper.getStockDao().queryForAll());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    productInfo.save();
+                    result.error = "По штрихкоду " + barcode + " найден товар " + productInfo.getDescription();
+                    result.ref_Key = productInfo.getRef_Key();
+                    result.ok = true;
+                    DataLoader.LoadMissingDataForObject(productInfo, ProductInfo.class);
+                    onProductInfoRequest(result);
+
+                }
+                else
+                {
+                    result.error = "Штрихкод не найден: " + barcode;
+                    onProductInfoRequest(result);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProductInfo> call, Throwable t) {
+                Log.e(TAG, "onFailure: ");
+            }
+        });
+
+    }
+
+    private class RequestResult {
+        public RequestResult() {
             ok = false;
             ref_Key = "";
             error = "";
@@ -181,13 +259,13 @@ public class CommunicationWithServer extends IntentService {
         loadStores();
 
         sendFeedback("loadDiscountCards");
-        loadDiscountCards();
+        //loadDiscountCards();
 
         sendFeedback("loadCharacts");
-        loadCharacts();
+        //loadCharacts();
 
         sendFeedback("loadUnits");
-        loadUnits();
+        //loadUnits();
 
         sendFeedback("loadContracts");
         loadContracts();
@@ -352,18 +430,18 @@ public class CommunicationWithServer extends IntentService {
     }
 
     private void loadContracts() {
-        Contract object = new Contract();
+//        Contract object = new Contract();
 
-        if (!isLoadRequired(object)) return;
+//        if (!isLoadRequired(object)) return;
 
         ContractsRequest request = ServiceGenerator.createService(ContractsRequest.class);
-        Call<ContractsList> call = request.call(RetroConstants.getMap("Owner_Key eq ref_Key'" + Constants.CUSTOMER_GUID + "'"));
+        Call<ContractsList> call = request.call(RetroConstants.getMap("Ref_Key eq guid'" + Constants.CONTRACT_GUID + "'"));
         try {
             Response<ContractsList> response = call.execute();
             ContractsList list = response.body();
-            TableUtils.dropTable(MyHelper.getContractDao(), false);
-            TableUtils.createTable(MyHelper.getContractDao());
-            list.save();
+//            TableUtils.dropTable(MyHelper.getContractDao(), false);
+//            TableUtils.createTable(MyHelper.getContractDao());
+            list.getValues().iterator().next().save();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -385,6 +463,8 @@ public class CommunicationWithServer extends IntentService {
             TableUtils.createTable(MyHelper.getDiscountCardDao());
             sendFeedback("Сохраняем " + String.valueOf(list.getValues().size()) + " дисконтных карт");
             list.save();
+            DiscountCard card = DiscountCard.newInstance();
+            card.save();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -396,7 +476,7 @@ public class CommunicationWithServer extends IntentService {
         if (shipping == null || unload == null) {
 
             ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
-            Call<ProductsList> call = request.call(RetroConstants.getMap("Ref_Key eq ref_Key'" + Constants.SHIPPING_GUID + "'" + " or Ref_Key eq ref_Key'" + Constants.UNLOAD_GUID + "'"));
+            Call<ProductsList> call = request.call(RetroConstants.getMap("Ref_Key eq guid'" + Constants.SHIPPING_GUID + "'" + " or Ref_Key eq guid'" + Constants.UNLOAD_GUID + "'"));
             try {
                 Response<ProductsList> response = call.execute();
                 ProductsList list = response.body();
@@ -444,7 +524,6 @@ public class CommunicationWithServer extends IntentService {
             UsersList list = response.body();
             MyHelper.getUserDao().delete(MyHelper.getUserDao().queryForAll());
             list.save();
-            SettingsOld.renewCurrentUser();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -498,7 +577,7 @@ public class CommunicationWithServer extends IntentService {
             filter = "?$filter=" + filter;
         }
 
-        Call<Integer> call = request.call(SettingsOld.getInfoBaseName() + "/odata/standard.odata/" + object.getMaintainedTableName() + "/$count" + filter);
+        Call<Integer> call = request.call(Settings.getInfoBaseNameStatic() + "/odata/standard.odata/" + object.getMaintainedTableName() + "/$count" + filter);
         Integer count = 0;
         try {
             Response<Integer> response = call.execute();
@@ -511,7 +590,7 @@ public class CommunicationWithServer extends IntentService {
     }
 
     private void loadMissingDataForDocumentsList() {
-        MissingDataLoader.LoadMissingDataForObject(null, DocSaleList.class);
+        DataLoader.LoadMissingDataForObject(null, DocSaleList.class);
         for (DocSale docSale :
                 DocSaleList.getList().getValues()) {
             docSale.setForeignObjects();
@@ -523,10 +602,11 @@ public class CommunicationWithServer extends IntentService {
 
     private void loadMissingDataForSingleDocument(String ref_Key) {
         if (ref_Key == null) {
-            ref_Key = mIntent.getStringExtra("ref_Key");
+            ref_Key = mIntent.getStringExtra(Constants.REF_KEY_LABEL);
         }
+        mResultBundle.putString(Constants.REF_KEY_LABEL, ref_Key);
         DocSale doc = DocSale.getDocument(ref_Key);
-        MissingDataLoader.LoadMissingDataForObject(doc, DocSale.class);
+        DataLoader.LoadMissingDataForObject(doc, DocSale.class);
         doc.setForeignObjects();
 
         sendServiceFinished("Загрузка объектов по ссылкам для документа завершена");
@@ -544,7 +624,7 @@ public class CommunicationWithServer extends IntentService {
         String df1 = Uttils.DATE_FORMAT_1C.format(d1.getTime());
         String df2 = Uttils.DATE_FORMAT_1C.format(d2.getTime());
 
-        String filter = "Date gt datetime'" + df1 + "' and Date lt datetime'" + df2 + "'" + " and Контрагент_Key eq guid'" + Constants.CUSTOMER_GUID + "'" + " and Ответственный_Key eq guid'" + SettingsOld.getCurrentUser().getRef_Key() + "'";
+        String filter = "Date gt datetime'" + df1 + "' and Date lt datetime'" + df2 + "'" + " and Контрагент_Key eq guid'" + Constants.CUSTOMER_GUID + "'" + " and Ответственный_Key eq guid'" + Settings.getCurrentUserStatic().getRef_Key() + "'";
 
         sendFeedback("Загрузка документов на " + Uttils.DATE_FORMATTER.format(d1.getTime()));
 
@@ -597,7 +677,7 @@ public class CommunicationWithServer extends IntentService {
             e.printStackTrace();
         }
 
-        final String ref_Key = mIntent.getStringExtra("ref_Key");
+        final String ref_Key = mIntent.getStringExtra(Constants.REF_KEY_LABEL);
         final long id = mIntent.getLongExtra("id", -1);
         String filter = "Ref_Key eq guid'" + ref_Key + "'";
 
@@ -616,7 +696,7 @@ public class CommunicationWithServer extends IntentService {
 
                 if (list.size() == 1) {
                     DocSale docSale = list.getValues().iterator().next();
-                    if(id != -1) {
+                    if (id != -1) {
                         docSale.setId(id);
                     }
                     try {
@@ -650,7 +730,7 @@ public class CommunicationWithServer extends IntentService {
     }
 
     private void sendServiceFinished(String msg) {
-        sendNotification(msg);
+        //sendNotification(msg);
         sendFeedback(msg);
         resultReceiver.send(Constants.LOAD_FINISHED, mResultBundle);
     }
@@ -672,6 +752,8 @@ public class CommunicationWithServer extends IntentService {
             localRecordsCount--;
         if (object instanceof StartingPoint)
             localRecordsCount--;
+        if (object instanceof DiscountCard)
+            localRecordsCount--; //потому что дефолтную пустую карту создаем автоматически
 
         String msg = object.getMaintainedTableName() + " " + String.valueOf(localRecordsCount) + "/" + String.valueOf(serverRecordsCount) + " записей";
         Log.d(TAG, "isLoadRequired: класс " + msg);
@@ -697,49 +779,20 @@ public class CommunicationWithServer extends IntentService {
         manager.notify(0, noti);
     }
 
-    public static String writeDocSaleToXMLString(DocSale docSale) {
-        String xmlString;
-
-        Registry registry = new Registry();
-        Strategy strategy = new RegistryStrategy(registry);
-        DateConverter dateConverter = new DateConverter();
-        try {
-            registry.bind(Date.class, dateConverter);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Persister persister = new Persister(strategy);
-        StringWriter writer = new StringWriter();
-
-        WrapperXML_DocSale XMLDocSaleWrapper = new WrapperXML_DocSale(docSale);
-
-
-        try {
-            persister.write(XMLDocSaleWrapper, writer);
-        } catch (Exception e) {
-            Log.d("*** 1c communication", "writeDocSaleToXMLString: " + e.getLocalizedMessage().toString());
-            //e.printStackTrace();
-
-        }
-
-        xmlString = "<?xml  version=\"1.0\" encoding=\"utf-8\"?>\n" + writer.toString();
-        return xmlString;
-    }
-
     //вернет ref_Key, если
-    private void saveTo1C() {
+    private void saveDocumentTo1C() {
 
-        final SaveResult result = new SaveResult();
+        final RequestResult result = new RequestResult();
         long id = mIntent.getLongExtra("id", -1);
         final DocSale docSale = DocSale.getByID(id); // пока сохраняем новый док в базу с нулевым гидом
 
-        String xml = writeDocSaleToXMLString(docSale);
+        String xml = WrapperXML_DocSale.writeDocSaleToXMLString(docSale);
 
         RequestBody body = RequestBody.create(MediaType.parse("text/plain"), xml);
         if (docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
             //это новый документ, гуида еще нет
             //вызываем метод Пост
-            PostDocument mPostRequest = ServiceGenerator.createXMLService(PostDocument.class);
+            SaveNewDocument mPostRequest = ServiceGenerator.createXMLService(SaveNewDocument.class);
             Call<ResponseBody> call = mPostRequest.call(body);
             call.enqueue(new Callback<ResponseBody>() {
                              @Override
@@ -774,7 +827,7 @@ public class CommunicationWithServer extends IntentService {
 
         if (!docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
             //вызываем метод patch такой документ уже есть в базе 1с
-            PatchDocument mPatchRequest = ServiceGenerator.createXMLService(PatchDocument.class);
+            SaveExistingDocument mPatchRequest = ServiceGenerator.createXMLService(SaveExistingDocument.class);
             Call<ResponseBody> call = mPatchRequest.call(docSale.getRef_Key(), body);
             call.enqueue(new Callback<ResponseBody>() {
                              @Override
@@ -802,7 +855,41 @@ public class CommunicationWithServer extends IntentService {
         }
     }
 
-    private void onSaveComplete(SaveResult result) {
+    private void postDocumentIn1C() {
+
+        final RequestResult result = new RequestResult();
+        long id = mIntent.getLongExtra("id", -1);
+        final DocSale docSale = DocSale.getByID(id); // пока сохраняем новый док в базу с нулевым гидом
+
+        //вызываем метод patch такой документ уже есть в базе 1с
+        PostDocument mPostRequest = ServiceGenerator.createXMLService(PostDocument.class);
+        Call<ResponseBody> call = mPostRequest.call(docSale.getRef_Key());
+        call.enqueue(new Callback<ResponseBody>() {
+                         @Override
+                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                             result.code = response.raw().code();
+                             if (result.code == 200) {
+                                 result.ref_Key = docSale.getRef_Key();
+                                 result.error = "документ сохранен";
+                                 result.ok = true;
+                                 onPostComplete(result);
+                             } else {
+                                 //Разбираемся что за хня
+                                 Log.d(TAG, "onResponse: хуйня какая-то опять...");
+                                 onPostComplete(result);
+                             }
+                         }
+
+                         @Override
+                         public void onFailure(Call<ResponseBody> call, Throwable t) {
+                             result.error = t.toString();
+                             onPostComplete(result);
+                         }
+                     }
+        );
+    }
+
+    private void onSaveComplete(RequestResult result) {
         String msg;
         if (result.ok) {
             msg = "Документ успешно сохранен";
@@ -814,20 +901,58 @@ public class CommunicationWithServer extends IntentService {
         mResultBundle.putBoolean("ok", result.ok);
         mResultBundle.putString("error", msg);
         mResultBundle.putInt("code", result.code);
-        mResultBundle.putString("ref_Key", result.ref_Key);
-        if(result.ok){
-            mIntent.putExtra("ref_Key", result.ref_Key);
+        mResultBundle.putString(Constants.REF_KEY_LABEL, result.ref_Key);
+        if (result.ok) {
+            mIntent.putExtra(Constants.REF_KEY_LABEL, result.ref_Key);
             try {
                 Log.d(TAG, "onSaveComplete: колво документов в базе = " + String.valueOf(MyHelper.getDocSaleDao().countOf()));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             loadSingleDocumentFromServer();
-        }
-        else
-        {
-            resultReceiver.send(Constants.LOAD_FINISHED, mResultBundle);
+        } else {
+            sendServiceFinished(msg);
         }
     }
+    private void onPostComplete(RequestResult result) {
+        String msg;
+        if (result.ok) {
+            msg = "Документ проведен!";
+        } else {
+            msg = "Ошибка сохранения: " + result.error;
+        }
+
+        mResultBundle = new Bundle();
+        mResultBundle.putBoolean("ok", result.ok);
+        mResultBundle.putString("error", msg);
+        mResultBundle.putInt("code", result.code);
+        mResultBundle.putString(Constants.REF_KEY_LABEL, result.ref_Key);
+        if (result.ok) {
+            mIntent.putExtra(Constants.REF_KEY_LABEL, result.ref_Key);
+            loadSingleDocumentFromServer();
+        } else {
+            sendServiceFinished(msg);
+        }
+    }
+
+    private void onProductInfoRequest(RequestResult result) {
+        String msg;
+        if (result.ok) {
+            msg = "Данные о товаре получены";
+        } else {
+            msg = "Ошибка: " + result.error;
+        }
+
+        mResultBundle = new Bundle();
+        mResultBundle.putBoolean("ok", result.ok);
+        mResultBundle.putString("error", msg);
+        mResultBundle.putString(Constants.REF_KEY_LABEL, result.ref_Key);
+        sendBarcodeRequestFinished();
+    }
+
+    private void sendBarcodeRequestFinished() {
+        resultReceiver.send(Constants.BARCODE_REQUEST_FINISHED, mResultBundle);
+    }
+
 
 }

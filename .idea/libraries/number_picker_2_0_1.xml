@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="number-picker-2.0.1">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.shawnlin/number-picker/2.0.1/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.shawnlin/number-picker/2.0.1/res" />
+      <root url="file://$USER_HOME$/.android/build-cache/ca6808dc3d2e465ccedced1f37ded215988e49db/output/res" />
+      <root url="jar://$USER_HOME$/.android/build-cache/ca6808dc3d2e465ccedced1f37ded215988e49db/output/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

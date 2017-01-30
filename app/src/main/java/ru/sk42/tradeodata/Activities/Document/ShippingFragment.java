@@ -9,6 +9,9 @@ import android.speech.RecognizerIntent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
+import android.telephony.PhoneNumberUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -38,7 +41,6 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
@@ -52,7 +54,7 @@ import static ru.sk42.tradeodata.Helpers.Uttils.TIME_FORMATTER;
 // In this case, the fragment displays simple text based on the page
 public class ShippingFragment extends Fragment {
 
-    private ShippingInterface mListenerShipping;
+    private DocumentListenerInterface mListenerShipping;
 
     private Calendar mDate = GregorianCalendar.getInstance();
     private Calendar mTimeFrom = GregorianCalendar.getInstance();
@@ -84,13 +86,13 @@ public class ShippingFragment extends Fragment {
     Spinner mStartingPointSpinner;
 
     @Bind(R.id.input_time_from)
-    EditText mTimeFromText;
+    TextView mTimeFromText;
 
     @Bind(R.id.input_time_to)
-    EditText mTimeToText;
+    TextView mTimeToText;
 
     @Bind(R.id.input_shipping_date)
-    EditText mShippingDateText;
+    TextView mShippingDateText;
 
     @Bind(R.id.input_shipping_address)
     EditText mShippingAddressEditText;
@@ -119,6 +121,18 @@ public class ShippingFragment extends Fragment {
 
     @Bind(R.id.til_Workers)
     TextInputLayout tilWorkers;
+
+    @Bind(R.id.input_contact_person)
+    EditText mContactPerson;
+
+    @Bind(R.id.input_contact_person_phone)
+    EditText mContactPersonPhone;
+
+    @Bind(R.id.til_ContactPerson)
+    TextInputLayout tilContactPerson;
+
+    @Bind(R.id.til_ContactPersonPhone)
+    TextInputLayout tilContactPersonPhone;
 
     @Override
     public void onDetach() {
@@ -238,17 +252,10 @@ public class ShippingFragment extends Fragment {
             }
         });
 
-        mShippingAddressEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                promptSpeechInput();
-            }
-        });
         mShippingAddressEditText.setText(docSale.getShippingAddress());
         mShippingAddressEditText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
-
                 if (mShippingAddressEditText.getText() != null) {
                     mListenerShipping.onAddressChanged(mShippingAddressEditText.getText().toString());
                 }
@@ -307,6 +314,66 @@ public class ShippingFragment extends Fragment {
             }
         });
 
+        mContactPerson.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+                if (mContactPerson.getText() != null) {
+                    String text = "";
+                    try {
+                        text = String.valueOf(mContactPerson.getText().toString());
+                    } catch (Exception e) {
+                        text = "";
+                    }
+                    mListenerShipping.onContactPersonChanged(text, tilContactPerson);
+                }
+                return false;
+            }
+        });
+        mContactPersonPhone.addTextChangedListener(new TextWatcher() {
+            private boolean mFormatting; // this is a flag which prevents the  stack overflow.
+            private int mAfter;
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int after) {
+                //nothing to do here...
+                mAfter  =   after; // flag to detect backspace..
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Make sure to ignore calls to afterTextChanged caused by the work done below
+                if (!mFormatting) {
+                    mFormatting = true;
+                    // using US formatting...
+                    if(mAfter!=0) // in case back space ain't clicked...
+                        PhoneNumberUtils.formatNumber(editable,PhoneNumberUtils.getFormatTypeForLocale(Locale.US));
+                    mFormatting = false;
+                }
+            }
+        });
+        mContactPersonPhone.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+                if (mContactPersonPhone.getText() != null) {
+                    String text = "";
+                    try {
+                        text = String.valueOf(mContactPersonPhone.getText().toString());
+                    } catch (Exception e) {
+                        text = "";
+                    }
+                    mListenerShipping.onContactPersonPhoneChanged(text, tilContactPersonPhone);
+                }
+                return false;
+            }
+        });
+
 
         mNeedShippingSwitch.setChecked(docSale.getNeedShipping());
         toggleShippingElements(mNeedShippingSwitch.isChecked());
@@ -318,6 +385,10 @@ public class ShippingFragment extends Fragment {
         mUnloadCostEditText.setText(Uttils.formatInt(docSale.getUnloadCost()));
 
         mWorkersCountEditText.setText(Uttils.formatInt(docSale.getWorkersCount()));
+
+        mContactPerson.setText(docSale.getContactPerson());
+
+        mContactPersonPhone.setText(docSale.getContactPersonPhone());
 
         toggleShippingElements(docSale.getNeedShipping());
 
@@ -565,60 +636,24 @@ public class ShippingFragment extends Fragment {
 
     private void onTimeToChanged() {
         setTimeToText(mTimeTo);
-        mListenerShipping.onTimeToChanged(mTimeTo, mTimeFromText);
+        mListenerShipping.onTimeToChanged(mTimeTo, mTimeToText);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof ShippingInterface) {
-            mListenerShipping = (ShippingInterface) context;
+        if (context instanceof DocumentListenerInterface) {
+            mListenerShipping = (DocumentListenerInterface) context;
 
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement ShippingInterface");
+                    + " must implement DocumentListenerInterface");
         }
 
     }
 
 
-    /**
-     * Showing google speech input dialog
-     */
-    private void promptSpeechInput() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-                getString(R.string.speech_prompt));
-        try {
-            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-        } catch (ActivityNotFoundException a) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    getString(R.string.speech_not_supported),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case REQ_CODE_SPEECH_INPUT: {
-                if (resultCode == RESULT_OK && null != data) {
-
-                    ArrayList<String> result = data
-                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    mShippingAddressEditText.setText(result.get(0));
-                    mListenerShipping.onAddressChanged(mShippingAddressEditText.getText().toString());
-                }
-                break;
-            }
-
-        }
-    }
 
 }

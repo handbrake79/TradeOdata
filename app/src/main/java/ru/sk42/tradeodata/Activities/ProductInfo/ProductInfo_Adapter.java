@@ -49,7 +49,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
         holder.mItem = mValues.get(position);
 
         //holder.mProduct.setText(product.getDescription());
-        holder.mProduct.setText(mValues.get(position).getProductInfo().getDescription());
+        //holder.mProduct.setText(mValues.get(position).getProductInfo().getDescription());
         holder.mStore.setText(mValues.get(position).getStoreDescription());
         holder.mCharact.setText(mValues.get(position).getCharact_Description());
         holder.mPrice.setText(mValues.get(position).getPrice().toString());
@@ -70,7 +70,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
         public final TextView mPrice;
         public final TextView mQty;
         public final TextView mUnit;
-        public final TextView mProduct;
+     //  public final TextView mProduct;
         public Stock mItem;
 
         public ViewHolder(final View view) {
@@ -78,7 +78,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
             itemView.setClickable(true);
             //  mView = view;
 
-            mProduct = (TextView) view.findViewById(R.id.tv_ProductInfo_Product);
+            //mProduct = (TextView) view.findViewById(R.id.tv_ProductInfo_Product);
             mCharact = (TextView) view.findViewById(R.id.tv_ProductInfo_Charact);
             mStore = (TextView) view.findViewById(R.id.tv_ProductInfo_Store);
             mQty = (TextView) view.findViewById(R.id.tv_ProductInfo_Qty);

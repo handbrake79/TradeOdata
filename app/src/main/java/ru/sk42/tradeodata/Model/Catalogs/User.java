@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.RetroRequests.RetroConstants;
+import ru.sk42.tradeodata.NetworkRequests.RetroConstants;
 
 
 /**
@@ -88,4 +88,10 @@ public class User extends CDO {
     }
 
 
+    public static User getInstance() {
+        User user = new User();
+        user.setRef_Key(Constants.ZERO_GUID);
+        user.setDescription("Пользователь не выбран!");
+        return user;
+    }
 }

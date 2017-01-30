@@ -1,74 +1,120 @@
 package ru.sk42.tradeodata.Activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.view.WindowManager;
 import android.widget.Toast;
 
-import org.simpleframework.xml.convert.Registry;
-import org.simpleframework.xml.convert.RegistryStrategy;
-import org.simpleframework.xml.core.Persister;
-import org.simpleframework.xml.strategy.Strategy;
-
-import java.io.StringWriter;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity;
+import ru.sk42.tradeodata.Activities.Settings.SettingsActivity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
-import ru.sk42.tradeodata.XML.WrapperXML_DocSale;
+import ru.sk42.tradeodata.Activities.Settings.Settings;
+import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Document.DocSale;
-import ru.sk42.tradeodata.Model.SettingsOld;
+import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.R;
-import ru.sk42.tradeodata.RetroRequests.PatchDocument;
-import ru.sk42.tradeodata.Services.ServiceGenerator;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
-import ru.sk42.tradeodata.Services.ServiceResultReciever;
-import ru.sk42.tradeodata.XML.DateConverter;
+import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
-public class MainActivity extends AppCompatActivity implements ServiceResultReciever.Receiver {
+public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.Receiver {
 
-    ServiceResultReciever mReceiver;
+    ServiceResultReceiver mReceiver;
     long prevtime, curtime;
     ProgressDialog progressDialog;
 
-    String TAG = "*** MainAct";
+    private static boolean mNetworkAvailable = false;
+
+    private static String TAG = "*** MainAct";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        progressDialog = new ProgressDialog(this);
+        initApplication();
 
-        MyHelper.getInstance(getApplication());
+    }
 
-//        MyHelper.dropAndCreateTables();
-        MyHelper.createTables();
+    public void deleteDatabaseAndReload(View view) {
+        MyHelper.dropAndCreateTables();
+        initApplication();
+    }
 
-        SettingsOld.setApplication(getApplication());
-        SettingsOld.readSettings();
-        mReceiver = new ServiceResultReciever(new Handler());
-        mReceiver.setReceiver(this);
-        Intent i = new Intent(this, CommunicationWithServer.class);
+    public class CheckServerAvailabilityAsync extends AsyncTask<String, Void, Boolean> {
+        protected Boolean doInBackground(String... params) {
+            ConnectivityManager connMan = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = connMan.getActiveNetworkInfo();
+            if (netInfo != null && netInfo.isConnected()) {
+                try {
+                    URL urlServer = new URL(Settings.getServerAddressStatic() + St.getInfoBaseName());
+                    HttpURLConnection urlConn = (HttpURLConnection) urlServer.openConnection();
+                    urlConn.setConnectTimeout(3000); //<- 3Seconds Timeout
+                    urlConn.connect();
+                    if (urlConn.getResponseCode() == 200) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (MalformedURLException e1) {
+                    return false;
+                } catch (IOException e) {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                callPreload();
+            } else {
+                progressDialog.hide();
+                MainActivity.this.showToast("Сервер недоступен!");
+            }
+        }
+    }
+
+    private void callPreload() {
+        mReceiver = new ServiceResultReceiver(new Handler());
+        mReceiver.setReceiver(MainActivity.this);
+        Charact.createStub();
+        Intent i = new Intent(MainActivity.this, CommunicationWithServer.class);
         i.putExtra("from", "MainAct");
         i.putExtra("mode", Constants.DATALOADER_MODE.PRELOAD.name());
         i.putExtra("receiverTag", mReceiver);
         startService(i);
+    }
 
+    private void initApplication() {
+
+        progressDialog = new ProgressDialog(this);
+
+        MyHelper.getInstance(getApplication());
+        //MyHelper.dropAndCreateTables();
+        MyHelper.createTables();
+
+        St.setApplication(getApplication());
+        St.readSettings();
+
+        progressDialog.setTitle("Проверка доступности сервера");
+        progressDialog.show();
+        AsyncTask<String, Void, Boolean> task = new CheckServerAvailabilityAsync();
+        task.execute();
 
     }
 
@@ -107,7 +153,21 @@ public class MainActivity extends AppCompatActivity implements ServiceResultReci
 
         if (resultCode == 1) {
             progressDialog.dismiss();
+
+
             showToast("Предварительная загрузка завершена");
+
+            //TODO         // переписать нормально
+            try {
+                Settings.setDefaultStartingPointStatic(MyHelper.getStartingPointDao().queryForEq(Constants.REF_KEY_LABEL, "96487975-3968-426e-9dff-50f4da82431e").get(0));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                Settings.setDefaultVehicleTypeStatic(MyHelper.getVehicleTypesDao().queryForEq(Constants.REF_KEY_LABEL, "b56961f4-294a-11e2-a8fe-984be1645107").get(0));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
             return;
         }
@@ -127,19 +187,6 @@ public class MainActivity extends AppCompatActivity implements ServiceResultReci
 
     void showToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-    }
-
-    void test() {
-        DocSale doc1 = DocSale.newInstance();
-        try {
-            doc1.save();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        DocSale doc2 = DocSale.getObject(DocSale.class, Constants.ZERO_GUID);
-        String xml = CommunicationWithServer.writeDocSaleToXMLString(doc2);
-        Log.d(TAG, "test: xml =" + xml);
     }
 
 }

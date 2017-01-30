@@ -30,7 +30,7 @@
     Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Выбрать"
+        android:text="Выбрать111"
         android:id="@+id/btnSelect" />
 
 </LinearLayout>

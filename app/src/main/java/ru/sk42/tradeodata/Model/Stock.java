@@ -30,8 +30,36 @@ public class Stock extends CDO {
     private Store store;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonProperty("Charact_Key")
+    @JsonProperty("Charact")
     private Charact charact;
+
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @JsonProperty("Unit")
+    private Unit unit;
+
+    @DatabaseField
+    @JsonProperty("Charact_Key")
+    private String charact_Key;
+
+    @DatabaseField
+    @JsonProperty("Unit_Key")
+    private String unit_Key;
+
+    public String getCharact_Key() {
+        return charact_Key;
+    }
+
+    public void setCharact_Key(String charact_Key) {
+        this.charact_Key = charact_Key;
+    }
+
+    public String getUnit_Key() {
+        return unit_Key;
+    }
+
+    public void setUnit_Key(String unit_Key) {
+        this.unit_Key = unit_Key;
+    }
 
     @DatabaseField
     @JsonProperty("Price")
@@ -40,10 +68,6 @@ public class Stock extends CDO {
     @DatabaseField
     @JsonProperty("Qty")
     private Float qty;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonProperty("Unit_Key")
-    private Unit unit;
 
     public Stock() {
     }

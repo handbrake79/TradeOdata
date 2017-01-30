@@ -1,5 +1,7 @@
 package ru.sk42.tradeodata.XML;
 
+import android.util.Log;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Default;
 import org.simpleframework.xml.DefaultType;
@@ -8,7 +10,12 @@ import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.Order;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.convert.Convert;
+import org.simpleframework.xml.convert.Registry;
+import org.simpleframework.xml.convert.RegistryStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
 
+import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -62,6 +69,35 @@ public class WrapperXML_DocSale {
 
     public WrapperXML_DocSale() {
         this.content = new Content();
+    }
+
+    public static String writeDocSaleToXMLString(DocSale docSale) {
+        String xmlString;
+
+        Registry registry = new Registry();
+        Strategy strategy = new RegistryStrategy(registry);
+        DateConverter dateConverter = new DateConverter();
+        try {
+            registry.bind(Date.class, dateConverter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Persister persister = new Persister(strategy);
+        StringWriter writer = new StringWriter();
+
+        WrapperXML_DocSale XMLDocSaleWrapper = new WrapperXML_DocSale(docSale);
+
+
+        try {
+            persister.write(XMLDocSaleWrapper, writer);
+        } catch (Exception e) {
+            Log.d("*** 1c communication", "writeDocSaleToXMLString: " + e.getLocalizedMessage().toString());
+            //e.printStackTrace();
+
+        }
+
+        xmlString = "<?xml  version=\"1.0\" encoding=\"utf-8\"?>\n" + writer.toString();
+        return xmlString;
     }
 }
 

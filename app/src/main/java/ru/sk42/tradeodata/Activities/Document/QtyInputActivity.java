@@ -15,7 +15,7 @@ public class QtyInputActivity extends AppCompatActivity implements QtyPickerFrag
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qty_input);
+        setContentView(R.layout.qty_input);
 
         Intent intent = getIntent();
         long id = intent.getLongExtra("id", -1);

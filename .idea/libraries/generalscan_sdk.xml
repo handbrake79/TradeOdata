@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="generalscan_sdk">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/generalscan_sdk.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

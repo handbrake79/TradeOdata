@@ -1,31 +1,43 @@
 package ru.sk42.tradeodata.Activities.Document;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.Configuration;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognizerIntent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.generalscan.NotifyStyle;
+import com.generalscan.OnConnectedListener;
+import com.generalscan.OnDisconnectListener;
+import com.generalscan.SendConstant;
+import com.generalscan.bluetooth.BluetoothConnect;
+import com.generalscan.bluetooth.BluetoothSettings;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,7 +46,11 @@ import java.util.Calendar;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
-import ru.sk42.tradeodata.Activities.ProductsListBrowser.ProductsListActivity;
+import ru.sk42.tradeodata.Activities.Document.Adapters.DrawerAdapter;
+import ru.sk42.tradeodata.Activities.ProductInfo.ProductInfoActivity;
+import ru.sk42.tradeodata.Activities.ProductsList.ProductsListActivity;
+import ru.sk42.tradeodata.Activities.Scanner.ReadBroadcast;
+import ru.sk42.tradeodata.Activities.Settings.Settings;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
@@ -46,50 +62,45 @@ import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
+import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
-import ru.sk42.tradeodata.Services.ServiceResultReciever;
+import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
 public class DocumentActivity extends AppCompatActivity implements SaleRecordInterface,
-        ServiceResultReciever.Receiver,
-        ShippingInterface {
+        ServiceResultReceiver.Receiver,
+        DocumentListenerInterface {
 
     private static final String TAG = "Document ACTIVITY***";
+    private static final int REQ_CODE_SPEECH_INPUT = 75334; //speech
+    public static final int SHOW_PRODUCTS_LIST = 100;
+    public static final int ON_RECORD_SELECTED = 300;
+
+    Toolbar myToolbar;
+    Activity mActivity;
+    private ReadBroadcast mReadBroadcast;
+    private String barcode = "";
 
     ActionBarDrawerToggle mDrawerToggle;
-
-    ArrayList<String> mActionNames = new ArrayList();
 
     DocumentFragmentPageAdapter fragmentPagerAdapter;
     ViewPager viewPager;
 
     PagerSlidingTabStrip pagerSlidingTabStrip;
 
+    private SaleRecord currentRecord;
+
     boolean exit = false;
 
-    public ServiceResultReciever mReceiver;
+    public ServiceResultReceiver mReceiver;
 
-
-    enum mActions {
-        SAVE_LOCAL,
-        SAVE_1C,
-        POST,
-        CLOSE
+    public void onToolbarClick(View view) {
     }
 
-    Menu menu;
     ProgressDialog progressDialog;
     private DocSale docSale;
     private String docRef_Key;
-
-    long getDoc_id() {
-        return doc_id;
-    }
-
-    void setDoc_id(long doc_id) {
-        this.doc_id = doc_id;
-    }
 
     private long doc_id;
 
@@ -137,8 +148,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
-        getMenuInflater().inflate(R.menu.document, menu);
+        getMenuInflater().inflate(R.menu.doc_menu_toolbar, menu);
         return true;
     }
 
@@ -148,6 +158,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.document__activity);
         ButterKnife.bind(this, this);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         progressDialog = new ProgressDialog(this);
 
@@ -161,14 +174,15 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         // Attach the view pager to the tab strip
         pagerSlidingTabStrip.setViewPager(viewPager);
 
-        mReceiver = new ServiceResultReciever(new Handler());
+        mReceiver = new ServiceResultReceiver(new Handler());
         mReceiver.setReceiver(this);
 
         Intent intent = getIntent();
         int mode = intent.getIntExtra("mode", Constants.ModeNewOrder);
 
         if (mode == Constants.ModeExistingOrder) {
-            docRef_Key = intent.getStringExtra("ref_Key");
+            docRef_Key = intent.getStringExtra(Constants.REF_KEY_LABEL);
+            doc_id = intent.getLongExtra(Constants.ID, -1);
         }
 
         if (mode == Constants.ModeNewOrder) {
@@ -177,7 +191,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
 
         if (docSale == null)
-            reloadDocSale();
+            loadDocumentFromDB();
 
         pagerSlidingTabStrip.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -196,26 +210,23 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             }
         });
 
-        mActionNames.add("Сохранить");
-        mActionNames.add("Передать в 1С");
-        mActionNames.add("Провести в 1С");
-        mActionNames.add("Закрыть");
-
-
+        int[] colors = {0, 0xFFFF0000, 0}; // red for the example
+        mDrawerList.setDivider(new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors));
+        mDrawerList.setDividerHeight(1);
         // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.list_item, mActionNames));
+        mDrawerList.setAdapter(new DrawerAdapter<String>(this,
+                R.layout.list_item_layout, Constants.DOCUMENT_ACTIONS));
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(DocumentActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(DocumentActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                Toast.makeText(DocumentActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(DocumentActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -239,16 +250,133 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         };
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+        myToolbar = (Toolbar) findViewById(R.id.toolbar_document);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+
+        //**
         if (mode == Constants.ModeExistingOrder) {
             networkLoadMissingObjectFrom1C();
         }
 
+        //Scanner
+        mActivity = this;
+        BluetoothConnect.CurrentNotifyStyle = NotifyStyle.NotificationStyle1;
+        BluetoothConnect.BindService(mActivity);
+
+        /**
+         * 连接成功
+         */
+        BluetoothConnect.SetOnConnectedListener(new OnConnectedListener() {
+
+            @Override
+            public void Connected() {
+                //Toast.makeText(mActivity, "Сканер подключен", Toast.LENGTH_SHORT).show();
+            }
+
+        });
+        /**
+         * 断开连接
+         */
+        BluetoothConnect.SetOnDisconnectListener(new OnDisconnectListener() {
+
+            @Override
+            public void Disconnected() {
+                //Toast.makeText(mActivity, "Сканер отключен", Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                connectScaner();
+            }
+        }, Settings.getScannerStartDelayMillisStatic());
+
+        setActionBarTitle();
+
+
     }
+
+    public void pairScaner() {
+        BluetoothSettings.ACTION_BLUETOOTH_SETTINGS(mActivity);
+    }
+
+    public void setScaner() {
+        BluetoothSettings.SetScaner(mActivity);
+    }
+
+    public void connectScaner() {
+        try {
+            BluetoothConnect.Connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setBroadcast() {
+        // 设置数据广播
+        mReadBroadcast = new ReadBroadcast(mReceiver);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SendConstant.GetDataAction);
+        filter.addAction(SendConstant.GetReadDataAction);
+        filter.addAction(SendConstant.GetBatteryDataAction);
+        registerReceiver(mReadBroadcast, filter);
+    }
+
+    @Override
+    protected void onStart() {
+        // 设置读取数据的广播
+        setBroadcast();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        if (mReadBroadcast != null) {
+            // 取消广播
+            this.unregisterReceiver(mReadBroadcast);
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        BluetoothConnect.UnBindService(mActivity);
+        super.onDestroy();
+    }
+
 
     public boolean onOptionsItemSelected(MenuItem item) {
         // TODO Auto-generated method isEmpty
-        if (item.getItemId() == R.id.product_selection_menu_item)
-            showProductsListFragment();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
+                    mDrawerLayout.closeDrawer(Gravity.LEFT);
+                } else {
+                    mDrawerLayout.openDrawer(Gravity.LEFT);
+                }
+                break;
+            case R.id.action_view_product_list:
+                showProductsListFragment();
+                break;
+            case R.id.action_scanner_pair:
+                pairScaner();
+                break;
+            case R.id.action_scanner_set:
+                setScaner();
+                break;
+            case R.id.action_scanner_connect:
+                connectScaner();
+                break;
+
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -375,7 +503,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
     @Override
-    public void onDateChanged(Calendar shippingDate, EditText editText) {
+    public void onDateChanged(Calendar shippingDate, TextView editText) {
         if (Uttils.isShippingDateValid(shippingDate)) {
             docSale.setShippingDate(shippingDate.getTime());
             editText.setError(null);
@@ -385,7 +513,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
     @Override
-    public void onTimeFromChanged(Calendar timeFrom, EditText editText) {
+    public void onTimeFromChanged(Calendar timeFrom, TextView editText) {
         docSale.setShippingTimeFrom(timeFrom.getTime());
         if (Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())) {
             editText.setError(null);
@@ -395,7 +523,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
     @Override
-    public void onTimeToChanged(Calendar timeTo, EditText editText) {
+    public void onTimeToChanged(Calendar timeTo, TextView editText) {
         docSale.setShippingTimeTo(timeTo.getTime());
         if (Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())) {
             editText.setError(null);
@@ -448,6 +576,12 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             return;
         }
         VehicleType vehicleType = VehicleType.getObjectByName(mVehicleType);
+        if (vehicleType.getMaxTonnage() < docSale.getWeight()) {
+            if (textView != null) {
+                textView.setError("Слишком большой вес!");
+                return;
+            }
+        }
         docSale.setVehicleType(vehicleType);
 
         recalc();
@@ -461,6 +595,41 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
 
 
+    }
+
+    @Override
+    public void onContactPersonChanged(String text, TextInputLayout tilContactPerson) {
+        docSale.setContactPerson(text);
+
+        if (tilContactPerson != null) {
+            if (text.isEmpty() && docSale.getNeedShipping()) {
+                tilContactPerson.setError("Укажите, кому звонить!");
+            } else {
+                tilContactPerson.setError(null);
+            }
+        }
+
+    }
+
+    @Override
+    public void onContactPersonPhoneChanged(String text, TextInputLayout tilContactPersonPhone) {
+        docSale.setContactPersonPhone(text);
+
+        if (tilContactPersonPhone != null) {
+            if (text.isEmpty() && docSale.getNeedShipping()) {
+                tilContactPersonPhone.setError("Укажите телефон!");
+            } else {
+                tilContactPersonPhone.setError(null);
+            }
+        }
+
+
+    }
+
+    @Override
+    public void setDiscountCard(DiscountCard card) {
+        docSale.setDiscountCard(card);
+        showMessage("Скидка будет применена при записи документа");
     }
 
     class SaveDialogListener implements DialogInterface.OnClickListener {
@@ -481,10 +650,33 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
     }
 
+    class QtyMinusDialogListener implements DialogInterface.OnClickListener {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int which) {
+            switch (which) {
+                case Dialog.BUTTON_POSITIVE:
+                    deleteCurrentProductRecord();
+                    break;
+                case Dialog.BUTTON_NEGATIVE:
+                    break;
+                case Dialog.BUTTON_NEUTRAL:
+                    break;
+            }
+        }
+    }
+
+    private void deleteCurrentProductRecord() {
+        deleteRecord(currentRecord);
+    }
+
 
     private void showProductsListFragment() {
+        if (docSale.getPosted()) {
+            showMessage("Документ проведен, изменения запрещены.");
+            return;
+        }
         Intent intent = new Intent(this, ProductsListActivity.class);
-        startActivityForResult(intent, 100);
+        startActivityForResult(intent, SHOW_PRODUCTS_LIST);
     }
 
     @Override
@@ -492,7 +684,8 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         if (data == null) {
             return;
         }
-        if (requestCode == 100 && resultCode == 0) {
+
+        if (requestCode == SHOW_PRODUCTS_LIST && resultCode == 0) {
 
             Stock stock = null;
             int id = data.getIntExtra("id", -1);
@@ -508,7 +701,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             }
         }
 
-        if (requestCode == 300 && resultCode == 0) {
+        if (requestCode == ON_RECORD_SELECTED && resultCode == 0) {
 
             SaleRecordProduct record = null;
             long id = data.getLongExtra("id", -1);
@@ -546,6 +739,10 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void plus(SaleRecord record) {
+        if (docSale.getPosted()) {
+            showMessage("Документ проведен, изменения запрещены.");
+            return;
+        }
         double q = record.getQty() + 1;
         record.setQty(q);
         recalc();
@@ -553,7 +750,22 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void minus(SaleRecord record) {
+        if (docSale.getPosted()) {
+            showMessage("Документ проведен, изменения запрещены.");
+            return;
+        }
         double q = record.getQty();
+        if (q <= 1) {
+            currentRecord = record;
+            QtyMinusDialogListener listener = new QtyMinusDialogListener();
+
+            AlertDialog.Builder adb = new AlertDialog.Builder(this)
+                    .setTitle(currentRecord.getProduct().getDescription())
+                    .setPositiveButton("Да", listener)
+                    .setNegativeButton("Нет", listener)
+                    .setMessage("Удалить?");
+            adb.create().show();
+        }
         if (q > 1) {
             q--;
             record.setQty(q);
@@ -569,6 +781,11 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onRecordSelected(SaleRecord record) {
+        try {
+            docSale.save();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         if (record.getProduct_Key().equals(Constants.SHIPPING_GUID) ||
                 record.getProduct_Key().equals(Constants.UNLOAD_GUID)) {
             return; //для услуг по доставке и разгрузке не редактируем кол-во
@@ -582,16 +799,23 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
 
     private void setActionBarTitle() {
-        ActionBar actionBar = getSupportActionBar();
-        String title = docSale.getNumber() + " от " + Uttils.DATE_FORMATTER.format(docSale.getDate());
-        actionBar.setTitle(title);
-        actionBar.setWindowTitle("WindowTitle");
-        actionBar.setSubtitle((!docSale.getRef_Key().equals(Constants.ZERO_GUID) ? "записан, " : "не записан, ") + (docSale.getPosted() ? " проведен" : "не проведен"));
-
+        if (docSale.getPosted()) {
+            myToolbar.setBackgroundColor(Constants.COLORS.DISABLED);
+        } else {
+            myToolbar.setBackgroundColor(Constants.COLORS.REGULAR_COLOR);
+        }
+        String title = docSale.getNumber().isEmpty() ? "Без номера " : docSale.getNumber();
+        //title += " от " + Uttils.DATE_FORMATTER.format(docSale.getDate());
+        myToolbar.setTitle(title);
+        myToolbar.setSubtitle((!docSale.getRef_Key().equals(Constants.ZERO_GUID) ? "записан, " : "не записан, ") + (docSale.getPosted() ? " проведен" : "не проведен"));
     }
 
-    private void reloadDocSale() {
-        docSale = DocSale.getObject(DocSale.class, getDocRef_Key());
+    private void loadDocumentFromDB() {
+        if (!getDocRef_Key().equals(Constants.ZERO_GUID)) {
+            docSale = DocSale.getObject(DocSale.class, getDocRef_Key());
+        } else {
+            docSale = DocSale.getByID(doc_id);
+        }
     }
 
     private void showMessage(String text) {
@@ -647,55 +871,102 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     }
 
+    //Это в дравере
     private void selectItem(int position) {
         mDrawerList.setItemChecked(position, true);
         mDrawerLayout.closeDrawer(mDrawerList);
-        mActions selectedAction = mActions.values()[position];
-        switch (selectedAction) {
-            case CLOSE:
-                onBackPressed();
-                break;
-            case POST:
-                //callPost();
-                break;
-            case SAVE_LOCAL:
-                saveLocal();
-                break;
-            case SAVE_1C:
-                if (docSale.getProducts().size() > 0) {
-                    saveLocal();
-                    nerworkSaveTo1C();
-                } else {
-                    showMessage("В документе нет товаров");
-                }
+        String selectedAction = Constants.DOCUMENT_ACTIONS.get(position);
+        if (St.getApp().getResources().getString(R.string.ACTION_PRINT).equals(selectedAction)) {
+            print();
+        }
+
+        if (St.getApp().getResources().getString(R.string.ACTION_CLOSE).equals(selectedAction)) {
+            onBackPressed();
+        }
+
+        if (St.getApp().getResources().getString(R.string.ACTION_SAVE).equals(selectedAction)) {
+            saveLocal();
+        }
+
+        if (St.getApp().getResources().getString(R.string.ACTION_SAVE_1C).equals(selectedAction)) {
+            saveTo1C(false);
+        }
+
+        if (St.getApp().getResources().getString(R.string.ACTION_POST_1C).equals(selectedAction)) {
+            saveTo1C(true);
         }
     }
 
-    private void nerworkSaveTo1C() {
-        Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.DATALOADER_MODE.SAVE_TO_1C.name());
-        i.putExtra("id", docSale.getId());
-        i.putExtra("receiverTag", mReceiver);
-        i.putExtra("from", "DocList");
-        try {
-            Log.d(TAG, "nerworkSaveTo1C: колво документов в базе = " + String.valueOf(MyHelper.getDocSaleDao().countOf()));
-        } catch (SQLException e) {
-            e.printStackTrace();
+    private void print() {
+        showMessage("НЕ РЕАЛИЗОВАНО");
+    }
+
+    private void saveTo1C(boolean post) {
+        if (docSale.getPosted()) {
+            showMessage("Документ проведен, изменения запрещены.");
+            return;
         }
-        startService(i);
+
+        if (docSale.getProducts().size() > 0) {
+            saveLocal();
+        } else {
+            showMessage("В документе нет товаров");
+            return;
+        }
+        if (docSale.getRef_Key().equals(Constants.ZERO_GUID) && post) {
+            showMessage("Документ не записан в 1С, проведение возможно только после записи.");
+            return;
+        }
+        if (post) {
+            Intent i = new Intent(this, CommunicationWithServer.class);
+            i.putExtra("mode", Constants.DATALOADER_MODE.POST_IN_1C.name());
+            i.putExtra("id", docSale.getId());
+            i.putExtra("receiverTag", mReceiver);
+            i.putExtra("from", "DocList");
+            startService(i);
+
+        } else {
+            Intent i = new Intent(this, CommunicationWithServer.class);
+            i.putExtra("mode", Constants.DATALOADER_MODE.SAVE_TO_1C.name());
+            i.putExtra("id", docSale.getId());
+            i.putExtra("receiverTag", mReceiver);
+            i.putExtra("from", "DocList");
+            startService(i);
+        }
     }
 
     private void networkLoadMissingObjectFrom1C() {
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("mode", Constants.DATALOADER_MODE.LOAD_MISSING_FOR_DOCUMENT.name());
         i.putExtra("from", "Document");
-        i.putExtra("ref_Key", getDocRef_Key());
+        i.putExtra(Constants.REF_KEY_LABEL, getDocRef_Key());
         i.putExtra("receiverTag", mReceiver);
         startService(i);
     }
 
     @Override
     public void onReceiveResult(int code, Bundle mResult) {
+        if (code == Constants.BARCODE_REQUEST_FINISHED) {
+            if (mResult.getBoolean("ok")) {
+                Intent intent = new Intent(this, ProductInfoActivity.class);
+                intent.putExtra(Constants.REF_KEY_LABEL, mResult.getString(Constants.REF_KEY_LABEL));
+                startActivityForResult(intent, SHOW_PRODUCTS_LIST);
+            } else {
+                showMessage(mResult.getString("error"));
+
+            }
+        }
+        if (code == Constants.SCANNER_EVENT) {
+            String barchar = mResult.getString(Constants.SCANNER_DATA_LABEL, "");
+            if ((barchar.equals("\n") || barchar.equals("\r")) && barcode.length() > 0) {
+
+                onBarcodeAquired(barcode);
+                barcode = "";
+            }
+            if (!barchar.equals("\n") && !barchar.equals("\r")) {
+                barcode += barchar;
+            }
+        }
         if (code == Constants.LOAD_FINISHED) {
             try {
                 Log.d(TAG, "onReceiveResult: колво документов в базе = " + String.valueOf(MyHelper.getDocSaleDao().countOf()));
@@ -703,16 +974,46 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
                 e.printStackTrace();
             }
             Log.d(TAG, "onReceiveResult: SFO COMPLETED");
-            if(mResult.containsKey("error")){
-                String error = mResult.getString("error", "Ошибка не передана сервисом!");
-                showMessage(error);
+            boolean ok = mResult.getBoolean("ok");
+            if (!ok) {
+                if (mResult.containsKey("error")) {
+                    String error = mResult.getString("error", "Ошибка не передана сервисом!");
+                    showMessage(error);
+                }
+            } else {
+                docRef_Key = mResult.getString(Constants.REF_KEY_LABEL, "");
+                //Видимо здесь нужно показывать фрагмент
+                loadDocumentFromDB();
+                setActionBarTitle();
+                fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
+                refreshTotal();
             }
-            docRef_Key = mResult.getString("ref_Key","");
-            //Видимо здесь нужно показывать фрагмент
-            reloadDocSale();
-            setActionBarTitle();
-            refreshTotal();
         }
+    }
+
+    private void onBarcodeAquired(String barcode) {
+        barcode = barcode.replaceAll("[^0-9.]", "");
+        showMessage(barcode);
+        Intent i = new Intent(this, CommunicationWithServer.class);
+        i.putExtra("mode", Constants.DATALOADER_MODE.REQUEST_BARCODE.name());
+        i.putExtra(Constants.BARCODE_LABEL, barcode);
+        i.putExtra("receiverTag", mReceiver);
+        i.putExtra("from", "DocList");
+        startService(i);
+
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
 

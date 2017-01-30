@@ -1,15 +1,42 @@
 package ru.sk42.tradeodata.Model;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import ru.sk42.tradeodata.Model.Catalogs.Product;
+import ru.sk42.tradeodata.R;
 
 /**
  * Created by PostRaw on 18.03.2016.
  */
 public class Constants {
+
+    public static final int SCANNER_EVENT = 654;
+    public static final String SCANNER_DATA_LABEL = "scanner_data";
+    public static final String BARCODE_LABEL = "barcode";
+    public static final int BARCODE_REQUEST_FINISHED = 656;
+    public static final String REF_KEY_LABEL = "ref_Key";
+    public static final String ID = "id";
+    public static ArrayList<String> DOCUMENT_ACTIONS;
+    static {
+        DOCUMENT_ACTIONS = new ArrayList<>();
+        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_SAVE));
+        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_SAVE_1C));
+        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_POST_1C));
+        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_PRINT));
+        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_CLOSE));
+    }
+
+    public static ArrayList<String> SETTINGS_ACTIONS;
+    static {
+        SETTINGS_ACTIONS = new ArrayList<>();
+        SETTINGS_ACTIONS.add(St.getApp().getString(R.string.CONNECTION_SETTINGS));
+        SETTINGS_ACTIONS.add("Пользователь");
+        SETTINGS_ACTIONS.add("Принтер");
+        SETTINGS_ACTIONS.add("Настройки сканера");
+        SETTINGS_ACTIONS.add("Прочие настройки");
+    }
 
     public static final String SHIPPING_GUID = "254bbb25-6395-422b-8f00-fd126ec82289";
     public static final String UNLOAD_GUID = "7ca2e35d-7f03-4869-9e54-eabe1af8eeba";
@@ -38,15 +65,18 @@ public class Constants {
 
 
     public enum DATALOADER_MODE {
-        PRELOAD, LOAD_MISSING_FOR_LIST_OF_DOCUMENTS, REQUEST_DOCUMENTS, SAVE_TO_1C, REQUEST_SINGLE_DOCUMENT, LOAD_MISSING_FOR_DOCUMENT
+        PRELOAD, LOAD_MISSING_FOR_LIST_OF_DOCUMENTS, REQUEST_DOCUMENTS, SAVE_TO_1C, REQUEST_SINGLE_DOCUMENT, LOAD_MISSING_FOR_DOCUMENT, POST_IN_1C, REQUEST_BARCODE,REQUEST_PRODUCT_INFO;
     }
 
     public class COLORS {
 
         public static final int SELECTED_COLOR = 4370350;
         public static final int REGULAR_COLOR = 13882323;
+        public static final int LIGHT_YELLOW = 0xffff66;
+
 
         public static final int DISABLED = 0x939393;
         public static final int ENABLED = 0xffff;
     }
+
 }

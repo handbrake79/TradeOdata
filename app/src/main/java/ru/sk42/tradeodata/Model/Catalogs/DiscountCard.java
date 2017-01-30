@@ -1,7 +1,5 @@
 package ru.sk42.tradeodata.Model.Catalogs;
 
-import android.os.Bundle;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
@@ -13,7 +11,7 @@ import java.sql.SQLException;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.RetroRequests.RetroConstants;
+import ru.sk42.tradeodata.NetworkRequests.RetroConstants;
 
 
 /**
@@ -24,15 +22,34 @@ import ru.sk42.tradeodata.RetroRequests.RetroConstants;
 public class DiscountCard extends CDO {
 
     public static DiscountCard newInstance() {
-        DiscountCard card = new DiscountCard();
-        card.setRef_Key(Constants.ZERO_GUID);
-        card.setDescription("");
-        return card;
+        DiscountCard card = DiscountCard.getObject(DiscountCard.class, Constants.ZERO_GUID);
+        if(card == null) {
+            card = new DiscountCard();
+            card.setRef_Key(Constants.ZERO_GUID);
+            card.setDescription("");
+            card.save();
+            return card;
+        }
+        else {
+            return card;
+        }
     }
 
     @DatabaseField(id = true, columnName = "Ref_Key")
     @JsonProperty("Ref_Key")
     private String ref_Key;
+
+    @DatabaseField
+    @JsonProperty("КодКарты")
+    private String code;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     @JsonProperty
     @DatabaseField

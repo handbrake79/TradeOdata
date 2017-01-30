@@ -40,7 +40,8 @@ import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
-import ru.sk42.tradeodata.Model.SettingsOld;
+import ru.sk42.tradeodata.Activities.Settings.Settings;
+import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.XML.DateConverter;
 
 /**
@@ -56,6 +57,7 @@ public class DocSale extends CDO {
 
     public static DocSale newInstance() {
         DocSale docSale = new DocSale();
+        docSale.setDeviceID();
         docSale.setRef_Key(Constants.ZERO_GUID);
         docSale.setNumber("");
         docSale.setComment("Создано в андроиде");
@@ -68,7 +70,7 @@ public class DocSale extends CDO {
         docSale.setShippingTimeFrom(new Date());
         docSale.setShippingTimeTo(new Date());
 
-        docSale.setAuthor(SettingsOld.getCurrentUser());
+        docSale.setAuthor(Settings.getCurrentUserStatic());
         docSale.setCustomer(Customer.newInstance());
         docSale.setContract(Contract.newInstance());
         docSale.setCurrency(Currency.newInstance());
@@ -82,6 +84,11 @@ public class DocSale extends CDO {
         docSale.setShippingAddress("");
         docSale.setPassVehicle("");
         docSale.setPassPerson("");
+        docSale.setStartingPoint(Settings.getDefaultStartingPointStatic());
+        docSale.setVehicleType(Settings.getDefaultVehicleTypeStatic());
+        docSale.setContactPerson("");
+        docSale.setContactPersonPhone("");
+
 
         return docSale;
     }
@@ -98,6 +105,24 @@ public class DocSale extends CDO {
         this.id = id;
     }
 
+    public String getDeviceID() {
+        deviceID = android.provider.Settings.Secure.getString(St.getApp().getApplicationContext().getContentResolver(),
+                android.provider.Settings.Secure.ANDROID_ID);
+        return deviceID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = getDeviceID();
+    }
+    public void setDeviceID() {
+        this.deviceID = getDeviceID();
+    }
+
+    @Element(name = "deviceID")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    @DatabaseField
+    private String deviceID;
+
 
     @JsonProperty("Ref_Key")
     @DatabaseField
@@ -105,6 +130,22 @@ public class DocSale extends CDO {
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String ref_Key;
 
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getContactPersonPhone() {
+        return contactPersonPhone;
+    }
+
+    public void setContactPersonPhone(String contactPersonPhone) {
+        this.contactPersonPhone = contactPersonPhone;
+    }
 
     @Element(name = "ВидОперации")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
@@ -257,6 +298,19 @@ public class DocSale extends CDO {
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String shippingAddress;
 
+    @JsonProperty("КонтактноеЛицо")
+    @Element(name = "КонтактноеЛицо")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    @DatabaseField
+    private String contactPerson;
+
+    @JsonProperty("ТелефонКонтактногоЛица")
+    @Element(name = "ТелефонКонтактногоЛица")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    @DatabaseField
+    private String contactPersonPhone;
+
+
     @JsonProperty("КоличествоГрузчиков")
     @DatabaseField
     @Element(name = "КоличествоГрузчиков")
@@ -287,19 +341,25 @@ public class DocSale extends CDO {
     @Attribute(name = "type")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
     @Path("d:Товары")
-    private String docsaleType = "Collection(StandardODATA.Document_РеализацияТоваровУслуг_Товары_RowType)";
+    private String docsaleTypeProducts = "Collection(StandardODATA.Document_РеализацияТоваровУслуг_Товары_RowType)";
 
     @JsonProperty("Товары")
-    @Path("d:Товары")
     @ForeignCollectionField(eager = true, maxEagerLevel = 3)
+    @Path("d:Товары")
     @ElementList(inline = true, entry = "d:element")
     private Collection<SaleRecordProduct> products;
 
 
+    @Attribute(name = "type")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
+    @Path("d:Услуги")
+    private String docsaleTypeServices = "Collection(StandardODATA.Document_РеализацияТоваровУслуг_Услуги_RowType)";
+
+
     @JsonProperty("Услуги")
     @ForeignCollectionField(eager = true, maxEagerLevel = 3)
-//    @ElementList(name = "Услуги", entry = "element", inline = true)
-//    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    @Path("d:Услуги")
+    @ElementList(inline = true, entry = "d:element")
     private Collection<SaleRecordService> services;
 
 
@@ -656,14 +716,20 @@ public class DocSale extends CDO {
 
         MyHelper.getDocSaleDao().createOrUpdate(this);
 
+        int linenumber = 0;
         for (SaleRecordProduct row :
                 this.getProducts()) {
+            linenumber++;
+            row.setLineNumber(linenumber);
             row.setDocSale(this);
             row.save();
             Log.d(TAG, "save: ");
         }
+        linenumber = 0;
         for (SaleRecordService row :
                 this.getServices()) {
+            linenumber++;
+            row.setLineNumber(linenumber);
             row.setDocSale(this);
             row.save();
         }
@@ -949,6 +1015,7 @@ public class DocSale extends CDO {
             this.setShippingCost(routeCost);
 
             addShippingToServicesCollection();
+            setShippingAsService(true);
 
         } else {
 

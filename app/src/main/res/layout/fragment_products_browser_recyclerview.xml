@@ -10,7 +10,7 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".Activities.ProductsListBrowser.ProductsListFragment"
+    tools:context=".Activities.ProductsList.ProductsListFragment"
     tools:listitem="@layout/fragment_products_browser_category_item"
 
     android:background="@drawable/background_tab"

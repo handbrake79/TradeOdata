@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_margin="10dp"
+    android:elevation="4dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_margin="10dp"
+        android:textSize="20sp"
+        android:gravity="left"
+        android:text="Пункт меню"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_item_text"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/list_item_icon"
+        android:layout_toEndOf="@+id/list_item_icon" />
+
+    <ImageView
+        android:layout_margin="10dp"
+        android:id="@+id/list_item_icon"
+        android:gravity="center"
+        android:layout_height="30dp"
+        android:layout_width="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/account_box_outline"
+        />
+</RelativeLayout>

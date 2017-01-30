@@ -23,7 +23,7 @@ public abstract class CDO {
             Log.d("CDO", "getObject: ");
         try {
             List<T> list =
-                    MyHelper.getInstance().getDao(clazz).queryForEq("ref_Key", key);
+                    MyHelper.getInstance().getDao(clazz).queryForEq(Constants.REF_KEY_LABEL, key);
             if (list.size() > 0)
                 return list.get(0);
         } catch (SQLException e) {

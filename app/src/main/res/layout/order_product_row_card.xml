@@ -4,167 +4,213 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <RelativeLayout
-        android:background="@color/cardview_light_background"
+    <LinearLayout
         android:id="@+id/rl_order_product_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        android:orientation="vertical"
         android:padding="5dp"
         android:theme="@style/AppTheme">
 
-        <TextView
-            android:id="@+id/tv_DocSale_Products_Product"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:text="Номенклатура" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tv_DocSale_Products_Charact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            <TextView
+                android:id="@+id/tv_DocSale_Products_Product"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:text="Номенклатура"
+                android:textColor="@color/accent"
+                android:textStyle="bold" />
 
-            android:layout_alignEnd="@+id/tv_DocSale_Products_Product"
+        </LinearLayout>
 
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/tv_DocSale_Products_Product"
-            android:text="Характеристика" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+            <TextView
+                android:id="@+id/tv_DocSale_Products_Charact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_alignEnd="@+id/tv_DocSale_Products_Product"
+                android:layout_alignParentLeft="true"
+
+                android:layout_alignParentStart="true"
+                android:layout_alignRight="@+id/tv_DocSale_Products_Product"
+                android:layout_below="@+id/tv_DocSale_Products_Product"
+                android:text="Характеристика"
+                android:textColor="@color/bpRed" />
+
+
+        </LinearLayout>
 
         <!--/вторая строка/-->
-
-        <TextView
-            android:textColor="@color/accent"
-            android:id="@+id/tv_DocSale_Products_Store"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/tv_DocSale_Products_Charact"
-            android:text="Склад" />
-
-
-
-        <TextView
-            android:id="@+id/product_record_price_caption"
-            android:layout_alignBottom="@+id/product_record_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/tv_DocSale_Products_Store"
-            android:layout_marginLeft="3dp"
-            android:text="Цена"/>
-
-        <TextView
-            android:id="@+id/product_record_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_DocSale_Products_Charact"
-            android:textColor="@color/accent"
-            android:layout_marginLeft="3dp"
-
-            android:layout_toRightOf="@+id/product_record_price_caption"
-            android:text="123 456.45" />
-
-        <TextView
-            android:id="@+id/product_record_unit_caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_DocSale_Products_Charact"
-            android:text=" за "
-            android:layout_toRightOf="@+id/product_record_price"
-            />
-
-        <TextView
-            android:id="@+id/tv_DocSale_Products_Unit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_DocSale_Products_Charact"
-            android:layout_marginLeft="3dp"
-
-            android:layout_toRightOf="@+id/product_record_unit_caption"
-            android:text="Ед.изм." />
-
-        <TextView
-            android:id="@+id/product_record_minus"
-            android:textColor="@color/cardview_dark_background"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_below="@+id/tv_DocSale_Products_Charact"
-            android:layout_marginRight="3dp"
-            android:layout_toStartOf="@+id/tv_DocSale_Products_Qty"
-            android:text="-"
-            android:textStyle="bold"
-
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            tools:text="-" />
-
-        <TextView
-            android:id="@+id/tv_DocSale_Products_Qty"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_DocSale_Products_Charact"
-            android:layout_toLeftOf="@+id/product_record_plus"
-            android:textSize="14dp"
-            android:textColor="@color/accent"
-            android:text="1234.567"
-
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/product_record_plus"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
-            android:textColor="@color/cardview_dark_background"
-            android:layout_marginLeft="3dp"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/tv_DocSale_Products_Charact"
-            android:text="+"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            tools:text="+" />
-
-
-        <TextView
-            android:id="@+id/tv_DocSale_Products_Total"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/product_record_rub_caption"
-            android:layout_alignBaseline="@+id/product_record_rub_caption"
-            android:layout_below="@id/tv_DocSale_Products_Store"
-            android:text="Сумма"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/product_record_rub_caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_DocSale_Products_Store"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="3dp"
-            android:layout_alignParentRight="true"
-            android:text="р." />
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_DocSale_Products_DiscountPercentAuto"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/tv_DocSale_Products_Store"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/tv_DocSale_Products_Charact"
+                android:text="Склад"
+                android:textColor="@color/accent" />
+
+
+            <TextView
+                android:id="@+id/product_record_price_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/product_record_price"
+                android:layout_marginLeft="3dp"
+                android:layout_toRightOf="@+id/tv_DocSale_Products_Store"
+                android:text="Цена "
+                android:textColor="@color/gray"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/product_record_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_DocSale_Products_Charact"
+                android:layout_marginLeft="3dp"
+                android:layout_toRightOf="@+id/product_record_price_caption"
+
+                android:text="123 456.45"
+                android:textColor="@color/accent" />
+
+            <TextView
+                android:id="@+id/product_record_unit_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_DocSale_Products_Charact"
+                android:layout_toRightOf="@+id/product_record_price"
+                android:text=" за "
+                android:textColor="@color/gray" />
+
+            <TextView
+                android:id="@+id/tv_DocSale_Products_Unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_DocSale_Products_Charact"
+                android:layout_marginLeft="3dp"
+
+                android:layout_toRightOf="@+id/product_record_unit_caption"
+                android:text="Ед.изм."
+                android:textColor="@color/gray"
+                android:visibility="visible" />
+
+
+        </LinearLayout>
+
+        <!--третья строка-->
+        <!--количество-->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_DocSale_Products_Store"
             android:layout_marginTop="10dp"
-            android:text="Скидка по карте" />
+            android:gravity="right"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_DocSale_Products_DiscountPercentManual"
-            android:layout_width="wrap_content"
+            <!--style="@android:style/Widget.DeviceDefault.Button.Borderless"-->
+
+            <TextView
+                android:id="@+id/product_record_minus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:text="-"
+                android:textColor="@color/gray"
+                android:textStyle="bold"
+                tools:text="+" />
+
+            <TextView
+                android:id="@+id/tv_DocSale_Products_Qty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:text="1234.567"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/product_record_plus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:text="+"
+                android:textColor="@color/gray"
+                android:textStyle="bold"
+                tools:text="+"
+
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_DocSale_Products_Store"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/tv_DocSale_Products_DiscountPercentAuto"
             android:layout_marginTop="10dp"
-            android:text="Скидка ручная" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_DocSale_Products_DiscountPercentAuto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Скидка1"
+                android:textColor="@color/gray" />
+
+            <TextView
+                android:id="@+id/tv_DocSale_Products_DiscountPercentManual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Скидка 2"
+                android:textColor="@color/gray" />
+
+            <TextView
+                android:id="@+id/tv_DocSale_Products_Total_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:text="Сумма"
+                android:textColor="@color/gray"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_DocSale_Products_Total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Сумма"
+                android:textColor="@color/gray"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
 
-    </RelativeLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
 </android.support.v7.widget.CardView>

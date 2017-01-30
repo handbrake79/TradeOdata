@@ -65,6 +65,11 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
 
         holder.tvDocSaleProductsProduct.setText(holder.mItem.getProduct().getDescription());
         holder.tvDocSaleProductsCharact.setText(holder.mItem.getCharact().getDescription());
+        if(holder.mItem.getCharact().isEmpty())
+        {
+            holder.tvDocSaleProductsCharact.setVisibility(View.GONE);
+        }
+
 
         holder.tvDocSaleProductsQty.setText(Uttils.formatDoubleToQty(holder.mItem.getQty()));
         holder.tvDocSaleProductsPrice.setText(Uttils.formatDoubleToMoney(holder.mItem.getPrice()));
@@ -105,20 +110,12 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
         @Bind(R.id.tv_DocSale_Products_Total)
         TextView tvDocSaleProductsTotal;
 
-        @Bind(R.id.product_record_rub_caption)
-        TextView tvDocSaleProductsRubChar;
 
         @Bind(R.id.tv_DocSale_Products_DiscountPercentAuto)
         TextView tvDocSaleProductsDiscountPercentAuto;
 
         @Bind(R.id.tv_DocSale_Products_DiscountPercentManual)
         TextView tvDocSaleProductsDiscountPercentManual;
-
-        @Bind(R.id.rl_order_product_row)
-        RelativeLayout rlOrderProductRow;
-
-        @Bind(R.id.cv_order_product_row)
-        CardView cvOrderProductRow;
 
         @Bind(R.id.product_record_plus)
         TextView tvPlus;

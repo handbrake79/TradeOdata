@@ -6,12 +6,17 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 import java.io.File;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
 
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Catalogs.Contract;
@@ -34,7 +39,7 @@ import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
 import ru.sk42.tradeodata.Model.Document.SaleRecordService;
 import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
 import ru.sk42.tradeodata.Model.ProductInfo;
-import ru.sk42.tradeodata.Model.Settings;
+import ru.sk42.tradeodata.Activities.Settings.Settings;
 import ru.sk42.tradeodata.Model.Stock;
 
 
@@ -355,6 +360,24 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
         }
 
     }
+
+    public static long getDocumentCountOnDate(Date dateBegin) {
+        Date dateEnd = Uttils.getEndOfDay(dateBegin);
+
+        try {
+            Dao<DocSale, Object> dao = MyHelper.getDocSaleDao();
+            QueryBuilder<DocSale, Object> queryBuilder = dao.queryBuilder();
+            Where<DocSale, Object> where = queryBuilder.where();
+            where.between("date", dateBegin, dateEnd);
+            PreparedQuery<DocSale> preparedQuery = queryBuilder.prepare();
+            List<DocSale> list = dao.query(preparedQuery);
+            return list.size();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
 }
 
 

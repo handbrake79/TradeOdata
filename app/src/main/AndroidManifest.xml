@@ -1,44 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="ru.sk42.tradeodata">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-feature android:name="android.hardware.usb.accessory" />
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@mipmap/barcode_scan"
+        android:label="ТТ Стройбаза"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".Activities.MainActivity">
+        android:theme="@style/Theme.AppCompat.Light"
+        tools:replace="android:label">
+        <activity android:name=".Activities.MainActivity"
+            >
+            activity: android:windowSoftInputMode="stateHidden"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.SettingsActivity">
+        <activity android:name=".Activities.Settings.SettingsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            >
+
+            activity: android:windowSoftInputMode="stateHidden"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.Document.DocumentActivity">
-        </activity>
         <activity
-            android:name=".Activities.Documents_List.DocList_Activity"
-            android:label="@string/title_activity_documents__list_"
+            android:name=".Activities.Document.DocumentActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            >
+            activity: android:windowSoftInputMode="stateHidden"
+        </activity>
+
+        <activity android:name=".Activities.Documents_List.DocList_Activity"
+            android:theme="@style/Theme.AppCompat.Light"
             />
+        activity: android:windowSoftInputMode="stateHidden"
+        <activity android:name=".Activities.ProductsList.ProductsListActivity">
+            android:theme="@style/Theme.AppCompat.Light"
+            activity: android:windowSoftInputMode="stateHidden"
+        </activity>
+        <activity android:name=".Activities.Document.QtyInputActivity">
+            activity:
+            android:windowSoftInputMode="stateHidden"</activity>
 
         <service
             android:name=".Services.CommunicationWithServer"
             android:exported="false" />
+        <service
+            android:name="com.generalscan.bluetooth.connect.ATService"
+            android:enabled="true" />
 
-        <activity android:name=".Activities.ProductsListBrowser.ProductsListActivity" />
-        <activity android:name=".Activities.Document.QtyInputActivity"></activity>
+        <activity android:name=".Activities.ProductInfo.ProductInfoActivity"></activity>
     </application>
 
 </manifest>

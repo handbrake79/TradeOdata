@@ -15,8 +15,7 @@ import android.view.ViewGroup;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.ProductRecordsAdapter;
-import ru.sk42.tradeodata.Activities.InteractionInterface;
-import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
+import ru.sk42.tradeodata.Activities.ProductsList.DividerDecoration;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
 

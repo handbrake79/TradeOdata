@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".DocumentActivity">
+    <item
+        android:id="@+id/action_view_product_list"
+        android:icon="@drawable/ic_view_list_black_24dp"
+        android:title="@string/ACTION_VIEW_PRODUCT_LIST"
+        app:showAsAction="always"
+        />
+
+    <item android:id="@+id/action_scanner_pair"
+        android:title="@string/action_scanner_pair"
+        android:icon="@drawable/barcode_scan"
+        app:showAsAction="never"
+        />
+
+    <item android:id="@+id/action_scanner_set"
+        android:title="@string/action_scanner_set"
+        android:icon="@drawable/barcode_scan"
+        app:showAsAction="never"
+        />
+
+    <item android:id="@+id/action_scanner_connect"
+        android:title="@string/action_scanner_connect"
+        android:icon="@drawable/barcode_scan"
+        app:showAsAction="never"
+        />
+
+
+</menu>

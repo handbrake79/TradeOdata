@@ -1,12 +1,10 @@
 package ru.sk42.tradeodata.Activities.ProductInfo;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
-import ru.sk42.tradeodata.Activities.ProductsListBrowser.DividerDecoration;
+import ru.sk42.tradeodata.Activities.ProductsList.DividerDecoration;
 import ru.sk42.tradeodata.Helpers.MyHelper;
+import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
@@ -49,7 +48,7 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
     public static ProductInfoFragment newInstance(String refkey) {
         ProductInfoFragment fragment = new ProductInfoFragment();
         Bundle args = new Bundle();
-        args.putString("ref_Key", refkey);
+        args.putString(Constants.REF_KEY_LABEL, refkey);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,12 +64,14 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
 
         if (getArguments() != null) {
-            String ref_Key = getArguments().getString("ref_Key");
+            String ref_Key = getArguments().getString(Constants.REF_KEY_LABEL);
             try {
-                productInfo = MyHelper.getInstance().getDao(ProductInfo.class).queryForEq("ref_Key", ref_Key).get(0);
+                productInfo = MyHelper.getInstance().getDao(ProductInfo.class).queryForEq(Constants.REF_KEY_LABEL, ref_Key).get(0);
             } catch (Exception e) {
                 Toast.makeText(this.getContext(), "не найден продакт_инфо в базе по ссылке " + ref_Key, Toast.LENGTH_LONG).show();
             }
+        }else {
+            throw new RuntimeException("Жопа какая-то!");
         }
 
         View view = inflater.inflate(R.layout.product_info_fragment, container, false);

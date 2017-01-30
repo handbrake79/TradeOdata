@@ -77,7 +77,6 @@ public class ProductInfo extends CDO {
     @Override
     public void save() {
         Dao<ProductInfo, Object> daoInfo = MyHelper.getProductInfoDao();
-        Dao<Stock, Object> daoStock = MyHelper.getStockDao();
 
         try {
             for (Stock stock :

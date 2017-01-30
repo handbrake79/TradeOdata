@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -29,16 +28,17 @@ import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.DocSaleList;
-import ru.sk42.tradeodata.Model.SettingsOld;
+import ru.sk42.tradeodata.Activities.Settings.Settings;
+import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
-import ru.sk42.tradeodata.Services.ServiceResultReciever;
+import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
-public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReciever.Receiver {
+public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.Receiver {
 
     private static final String TAG = "***Doclist activity";
 
-    public ServiceResultReciever mReceiver;
+    public ServiceResultReceiver mReceiver;
 
     Calendar startDate;
 
@@ -55,24 +55,25 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.doclist_activity);
 
-        if (SettingsOld.getCurrentUser() == null) {
-            showToast("Dыберите пользователя в настройках");
+        if (Settings.getCurrentUserStatic() == null) {
+            showToast("Выберите пользователя в настройках");
+            this.finish();
+        }
+        if(Settings.getCurrentUserStatic().getRef_Key().equals(Constants.ZERO_GUID)){
+            showToast("Выберите пользователя в настройках");
             this.finish();
         }
 
         progress = new ProgressDialog(this);
         progress.setIndeterminate(true);
 
-        mReceiver = new ServiceResultReciever(new Handler());
+        mReceiver = new ServiceResultReceiver(new Handler());
         mReceiver.setReceiver(this);
 
         startDate = GregorianCalendar.getInstance();
+        startDate.setTime(Uttils.getStartOfDay(startDate.getTime()));
         long count = 0;
-        try {
-            count = MyHelper.getDocSaleDao().countOf();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        count = MyHelper.getDocumentCountOnDate(startDate.getTime());
         if(count == 0){
             requestDocList();
         }
@@ -86,7 +87,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
                 startActivityForResult(intent, 0);
                 mAdapter.notifyDataSetChanged();
 
-//                Toast.makeText(DocList_Activity.this, "Создать новый документ!", Toast.LENGTH_SHORT).show();
 //                Snackbar.make(view, "", Snackbar.LENGTH_LONG)
 //                        .setAction("", new View.OnClickListener() {
 //                            @Override
@@ -114,11 +114,12 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     }
 
     private void setActionBarTitle() {
+        getWindow().setTitle("");
         String title = Uttils.DATE_FORMATTER.format(startDate.getTime());
-        if (doc_list != null)
-            title += " документов " + doc_list.size().toString() + "";
-        else
-            title += " документов еще нет";
+//        if (doc_list != null)
+//            title += " документов " + doc_list.size().toString() + "";
+//        else
+//            title += " документов еще нет";
 
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewActionBar = inflater.inflate(R.layout.custom_actionbar, null);
@@ -133,6 +134,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         });
         getSupportActionBar().setCustomView(viewActionBar);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setTitle("");
     }
 
     private void setAdapter() {
@@ -150,7 +152,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
             @Override
             public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
                 startDate.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
-                SettingsOld.setStartDate(startDate.getTime());
+                St.setStartDate(startDate.getTime());
                 requestDocList();
             }
         }
@@ -176,7 +178,8 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         if (selectedObject instanceof DocSale) {
             Intent intent = new Intent(this, DocumentActivity.class);
             intent.putExtra("mode", Constants.ModeExistingOrder);
-            intent.putExtra("ref_Key", ((DocSale) selectedObject).getRef_Key());
+            intent.putExtra(Constants.REF_KEY_LABEL, ((DocSale) selectedObject).getRef_Key());
+            intent.putExtra(Constants.ID, ((DocSale) selectedObject).getId());
             startActivityForResult(intent, 0);
             mAdapter.notifyDataSetChanged();
         }

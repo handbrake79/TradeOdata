@@ -23,11 +23,6 @@ public class SaleRecord {
     public SaleRecord() {
     }
 
-
-    @Attribute(name = "type")
-    @Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
-    public static final String saleRecordAttribute = "StandardODATA.Document_РеализацияТоваровУслуг_Товары_RowType";
-
     @DatabaseField(foreign = true)
     DocSale docSale;
 

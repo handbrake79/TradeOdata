@@ -8,19 +8,18 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tv_ProductInfo_Product"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:text="tvCardProduct" />
+        <!--<TextView-->
+            <!--android:id="@+id/tv_ProductInfo_Product"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentStart="true"-->
+            <!--android:layout_alignParentTop="true"-->
+            <!--android:text="tvCardProduct" />-->
 
         <TextView
             android:id="@+id/tv_ProductInfo_Charact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_ProductInfo_Product"
             android:text="tvCardCharact" />
 
         <TextView

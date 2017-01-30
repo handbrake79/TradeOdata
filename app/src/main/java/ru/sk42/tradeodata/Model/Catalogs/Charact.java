@@ -55,7 +55,7 @@ public class Charact extends CDO{
     public static void createStub(){
         Charact charact = new Charact(Constants.ZERO_GUID);
         charact.setOwner_Key(Constants.ZERO_GUID);
-        charact.setDescription("-");
+        charact.setDescription("без характеристики");
         try {
             charact.save();
         } catch (SQLException e) {

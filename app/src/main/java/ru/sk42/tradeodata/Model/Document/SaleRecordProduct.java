@@ -26,6 +26,10 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 @Element
 public class SaleRecordProduct extends SaleRecord {
 
+    @Attribute(name = "type")
+    @Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
+    public static final String saleRecordAttribute = "StandardODATA.Document_РеализацияТоваровУслуг_Товары_RowType";
+
     @Element(name = "СпособСписанияОстаткаТоваров")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     static final String xmlsposob = "СоСклада";

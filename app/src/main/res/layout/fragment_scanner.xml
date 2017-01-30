@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ru.sk42.tradeodata.Activities.Settings.ScannerFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <Button
+        android:text="1. Подключить сканер как устройство Bluetooth (pair device)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnPair" />
+
+    <Button
+        android:text="2. Выбрать сканер из списка устройств Bluetooth (set scaner)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnSelect"
+        android:layout_below="@+id/btnPair"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="3. Включить сканер (connect)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnSelect"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="18dp"
+        android:id="@+id/btnConnect"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/btnConnect"
+        android:hint="Задержка включения сканера (мс)"
+        >
+
+        <EditText
+            android:id="@+id/scannerStartDelayMillis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="500"
+            />
+    </android.support.design.widget.TextInputLayout>
+</RelativeLayout>

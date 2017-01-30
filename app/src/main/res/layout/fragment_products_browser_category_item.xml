@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/colorAccent"
+    android:layout_marginBottom="10dp"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -8,23 +8,24 @@
     >
 
     <TextView
-        android:id="@+id/tvCode"
+        android:id="@+id/products_list_browser_product_code"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
+        android:layout_margin="5dp"
         android:textAppearance="?attr/textAppearanceListItem"
         android:layout_weight="30"
         android:text="Code"
-        android:textSize="@dimen/producstList_Item_TextSize"
+        android:textSize="18sp"
         android:textIsSelectable="false" />
 
     <TextView
         android:id="@+id/tvProduct"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
+        android:layout_margin="5dp"
         android:textAppearance="?attr/textAppearanceListItem"
         android:layout_weight="70"
         android:text="Description"
-        android:textSize= "@dimen/producstList_Item_TextSize" />
+        android:textSize= "20sp"
+        />
 </LinearLayout>

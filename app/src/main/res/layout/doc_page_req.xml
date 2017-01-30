@@ -53,60 +53,6 @@
             android:text="Дата" />
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/dotted_underline" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
-
-        <TextView
-            android:id="@+id/doc_page_req_customer_caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="Контрагент" />
-
-        <TextView
-            android:id="@+id/doc_page_req_customer_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="Контрагент" />
-    </RelativeLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/dotted_underline" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
-
-        <TextView
-            android:id="@+id/doc_page_req_contract_caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="Договор" />
-
-        <TextView
-            android:gravity="right"
-            android:id="@+id/doc_page_req_contract_text"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="Договор" />
-    </RelativeLayout>
 
     <ImageView
         android:layout_width="match_parent"
@@ -137,8 +83,17 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:hint="введите номер"
-            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@+id/doc_page_req_discount_card_capt"
             />
+        <Button
+            android:id="@+id/doc_page_req_find_card"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/doc_page_req_discount_card_capt"
+            android:layout_height="40dp"
+            android:background="@drawable/ic_action_search"
+            android:layout_width="40dp"
+            style="@android:style/Widget.Button.Inset" />
+
     </RelativeLayout>
 
     <ImageView
@@ -146,7 +101,8 @@
         android:layout_height="5dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/dotted_underline" />
+        android:src="@drawable/dotted_underline"
+        android:layout_alignParentLeft="true" />
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -59,16 +59,6 @@
             android:textSize="10sp" />
 
 
-        <TextView
-            android:id="@+id/docList_ProductCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="5sp"
-            android:layout_toEndOf="@id/docList_Author"
-            android:text="ProdCount"
-
-            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/docList_Total"
