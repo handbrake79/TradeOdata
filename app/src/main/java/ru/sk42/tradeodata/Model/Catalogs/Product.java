@@ -37,9 +37,22 @@ public class Product extends CDO {
     @DatabaseField(columnName = "IsService")
     @com.fasterxml.jackson.annotation.JsonProperty("Услуга")
     private Boolean isService;
+
     public Product(String ref_Key) {
         this.ref_Key = ref_Key;
-        updateFromDB();
+        if (ref_Key != null) {
+            try {
+                Product source = MyHelper.getInstance().getDao(Product.class).queryForEq("Ref_Key", ref_Key).get(0);
+                this.setDescription(source.getDescription());
+                this.setRef_Key(source.getRef_Key());
+                this.setCode(source.getCode());
+                this.setFolder(source.getFolder());
+                this.setParent_key(source.getParent_key());
+                this.setService(source.getService());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -86,27 +99,6 @@ public class Product extends CDO {
     public boolean isFolder() {
         return isFolder;
     }
-
-    public void copyProperties(Product source) {
-        this.setDescription(source.getDescription());
-        this.setRef_Key(source.getRef_Key());
-        this.setCode(source.getCode());
-        this.setFolder(source.getFolder());
-        this.setParent_key(source.getParent_key());
-        this.setService(source.getService());
-    }
-
-    private void updateFromDB() {
-        if (ref_Key != null) {
-            try {
-                Product source = MyHelper.getInstance().getDao(Product.class).queryForEq("Ref_Key", ref_Key).get(0);
-                copyProperties(source);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
     public Boolean getFolder() {
         return isFolder;

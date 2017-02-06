@@ -42,7 +42,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
 
         holder.itemView.setSelected(selectedItem == position);
         if (selectedItem == position)
-            holder.itemView.setBackgroundColor(Color.RED);
+            holder.itemView.setBackgroundColor(Color.CYAN);
         else
             holder.itemView.setBackgroundColor(Color.WHITE);
 
