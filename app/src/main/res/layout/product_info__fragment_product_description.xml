@@ -1,0 +1,115 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ru.sk42.tradeodata.Activities.Product.DescriptionFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvProduct_Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="Название товара, длинное-предлинное"
+            android:textColor="@color/accent"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="5dp"
+                app:srcCompat="@drawable/noimg" />
+            <RelativeLayout
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/tvProduct_Code_Cap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Код"/>
+                <TextView
+                    android:layout_marginLeft="5dp"
+                    android:gravity="center"
+                    android:layout_toRightOf="@+id/tvProduct_Code_Cap"
+                    android:id="@+id/tvProduct_Code"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="УТН000000"/>
+                <TextView
+                    android:layout_marginLeft="5dp"
+                    android:layout_below="@+id/tvProduct_Code"
+                    android:id="@+id/tvProduct_SKU_Cap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Арт."/>
+                <TextView
+                    android:layout_marginLeft="5dp"
+                    android:layout_below="@+id/tvProduct_Code"
+                    android:layout_toRightOf="@+id/tvProduct_SKU_Cap"
+                    android:id="@+id/tvProduct_SKU"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:text="АРТ000000000"/>
+                <TextView
+                    android:layout_marginLeft="5dp"
+                    android:layout_below="@+id/tvProduct_SKU"
+                    android:id="@+id/tvProduct_Price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:text="Цена"
+                    android:textColor="@color/bpRed_focused"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/tvProduct_Show_Hide_Description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:paddingTop="5dp"
+            android:text="Показать описание"
+
+            android:textColor="@color/bpLine_dark"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvProduct_Description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:paddingTop="5dp"
+            android:text="Длинное многострочное описание товара. Это очень хороший товар, его обязательно купят."
+
+            android:textColor="@color/bpLine_dark"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</FrameLayout>

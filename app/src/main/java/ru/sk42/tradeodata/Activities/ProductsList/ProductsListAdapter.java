@@ -1,6 +1,5 @@
 package ru.sk42.tradeodata.Activities.ProductsList;
 
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +10,6 @@ import java.util.List;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
-import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.R;
 
 
@@ -41,7 +39,7 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_products_browser_category_item, parent, false);
+                .inflate(R.layout.products_list__fragment_products_browser_category_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -54,9 +52,11 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
         if (holder.mItem.isFolder()) {
             holder.tvCode.setVisibility(View.GONE);
 //            holder.mView.setBackgroundColor(Color.GRAY);
+            holder.tvDescription.setTextSize(26);
         } else {
             holder.tvCode.setVisibility(View.VISIBLE);
 //            holder.mView.setBackgroundColor(Color.WHITE);
+            holder.tvDescription.setTextSize(20);
         }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

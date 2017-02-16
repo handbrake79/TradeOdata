@@ -1,11 +1,8 @@
 package ru.sk42.tradeodata.Activities.Document;
 
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
@@ -25,15 +22,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -43,11 +39,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
+import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
 
-import static android.app.Activity.RESULT_OK;
 import static ru.sk42.tradeodata.Helpers.Uttils.TIME_FORMATTER;
 
 
@@ -82,8 +78,8 @@ public class ShippingFragment extends Fragment {
     @Bind(R.id.input_vehicle_type)
     Spinner mVehicleTypeSpinner;
 
-    @Bind(R.id.input_starting_point)
-    Spinner mStartingPointSpinner;
+//    @Bind(R.id.input_starting_point)
+//    Spinner mStartingPointSpinner;
 
     @Bind(R.id.input_time_from)
     TextView mTimeFromText;
@@ -145,7 +141,7 @@ public class ShippingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.doc_page_shipping, container, false);
+        View view = inflater.inflate(R.layout.doc__page_shipping, container, false);
         ButterKnife.bind(this, view);
 
         initView();
@@ -204,6 +200,13 @@ public class ShippingFragment extends Fragment {
 
         try {
             mRouteArrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line, MyHelper.getRouteDao().queryForAll().toArray());
+            class RoutesComporator implements Comparator<Route> {
+                public int compare(Route p1, Route p2) {
+                    return p1.getDescription().compareTo(p2.getDescription());
+                }
+            }
+
+            mRouteArrayAdapter.sort(new RoutesComporator());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -226,21 +229,21 @@ public class ShippingFragment extends Fragment {
             }
         });
 
-        mStartingPointSpinner.setAdapter(mStartingPointArrayAdapter);
-        mStartingPointSpinner.setSelection(getIndexOfSpinnerValue(mStartingPointSpinner, docSale.getStartingPoint().toString()));
-        mStartingPointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                                            @Override
-                                                            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                                                                mListenerShipping.onStartingPointChanged(adapterView.getItemAtPosition(position).toString(), (TextView) mStartingPointSpinner.getSelectedView());
-                                                                setShippingCostText();
-                                                            }
-
-                                                            @Override
-                                                            public void onNothingSelected(AdapterView<?> adapterView) {
-
-                                                            }
-                                                        }
-        );
+//        mStartingPointSpinner.setAdapter(mStartingPointArrayAdapter);
+//        mStartingPointSpinner.setSelection(getIndexOfSpinnerValue(mStartingPointSpinner, docSale.getStartingPoint().toString()));
+//        mStartingPointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                                                            @Override
+//                                                            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+//                                                                mListenerShipping.onStartingPointChanged(adapterView.getItemAtPosition(position).toString(), (TextView) mStartingPointSpinner.getSelectedView());
+//                                                                setShippingCostText();
+//                                                            }
+//
+//                                                            @Override
+//                                                            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//                                                            }
+//                                                        }
+//        );
 
         mRouteText.setAdapter(mRouteArrayAdapter);
         mRouteText.setText(docSale.getRoute().toString());
@@ -585,6 +588,10 @@ public class ShippingFragment extends Fragment {
         boolean needShipping = mNeedShippingSwitch.isChecked();
         toggleShippingElements(needShipping);
         mListenerShipping.onNeedShippingChanged(needShipping);
+        boolean needUnload = mNeedUnloadSwitch.isChecked();
+        if(needShipping && needUnload){
+            mListenerShipping.onNeedUnloadChanged(needUnload);
+        }
     }
 
     private void toggleShippingElements(boolean state) {
@@ -599,10 +606,9 @@ public class ShippingFragment extends Fragment {
         mTimeFromText.setEnabled(state);
         mTimeToText.setEnabled(state);
         mShippingAddressEditText.setEnabled(state);
-        mStartingPointSpinner.setEnabled(state);
+//        mStartingPointSpinner.setEnabled(state);
         mRouteText.setEnabled(state);
         mVehicleTypeSpinner.setEnabled(state);
-        mStartingPointSpinner.setEnabled(state);
         mShippingCostEditText.setEnabled(state);
 
         mNeedUnloadSwitch.setEnabled(state);

@@ -14,6 +14,6 @@ public interface SaleRecordInterface {
 
     void deleteRecord(SaleRecord record);
 
-    void onRecordSelected(SaleRecord record);
+    void onRecordSelected(SaleRecord record, int action);
 
 }

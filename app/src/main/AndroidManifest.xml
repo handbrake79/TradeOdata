@@ -21,7 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light"
         tools:replace="android:label">
-        <activity android:name=".Activities.MainActivity"
+        <activity
+            android:name=".Activities.MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             >
             activity: android:windowSoftInputMode="stateHidden"
             <intent-filter>
@@ -30,10 +32,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.Settings.SettingsActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            >
-
+        <activity
+            android:name=".Activities.Settings.SettingsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             activity: android:windowSoftInputMode="stateHidden"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,22 +44,27 @@
         </activity>
         <activity
             android:name=".Activities.Document.DocumentActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            >
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             activity: android:windowSoftInputMode="stateHidden"
         </activity>
-
-        <activity android:name=".Activities.Documents_List.DocList_Activity"
-            android:theme="@style/Theme.AppCompat.Light"
-            />
+        <activity
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+            android:name=".Activities.Documents_List.DocList_Activity"
+             />
         activity: android:windowSoftInputMode="stateHidden"
         <activity android:name=".Activities.ProductsList.ProductsListActivity">
-            android:theme="@style/Theme.AppCompat.Light"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             activity: android:windowSoftInputMode="stateHidden"
         </activity>
         <activity android:name=".Activities.Document.QtyInputActivity">
-            activity:
-            android:windowSoftInputMode="stateHidden"</activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+        </activity>
+        <activity android:name=".Activities.Product.ProductActivity">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+        </activity>
+
 
         <service
             android:name=".Services.CommunicationWithServer"
@@ -67,7 +73,6 @@
             android:name="com.generalscan.bluetooth.connect.ATService"
             android:enabled="true" />
 
-        <activity android:name=".Activities.ProductInfo.ProductInfoActivity"></activity>
     </application>
 
 </manifest>

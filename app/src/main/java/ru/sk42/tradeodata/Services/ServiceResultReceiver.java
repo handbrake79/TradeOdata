@@ -10,25 +10,25 @@ import android.support.v4.os.ResultReceiver;
 
 public class ServiceResultReceiver extends ResultReceiver {
 
-    private Receiver mReceiver;
+    private ReceiverInterface mReceiverInterface;
 
     public ServiceResultReceiver(Handler handler) {
         super(handler);
     }
 
-    public interface Receiver {
+    public interface ReceiverInterface {
         void onReceiveResult(int resultCode, Bundle resultData);
     }
 
-    public void setReceiver(Receiver receiver) {
-        mReceiver = receiver;
+    public void setReceiver(ReceiverInterface receiverInterface) {
+        mReceiverInterface = receiverInterface;
     }
 
     @Override
     protected void onReceiveResult(int resultCode, Bundle resultData) {
 
-        if (mReceiver != null) {
-            mReceiver.onReceiveResult(resultCode, resultData);
+        if (mReceiverInterface != null) {
+            mReceiverInterface.onReceiveResult(resultCode, resultData);
         }
     }
 

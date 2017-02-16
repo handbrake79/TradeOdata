@@ -7,17 +7,14 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -85,7 +82,7 @@ public class RequisitesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.doc_page_req, container, false);
+        View view = inflater.inflate(R.layout.doc__page_req, container, false);
         ButterKnife.bind(this, view);
 
         mActivityListener = (DocumentListenerInterface) getActivity();

@@ -26,6 +26,7 @@ import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
 import ru.sk42.tradeodata.Model.Catalogs.Organisation;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
+import ru.sk42.tradeodata.Model.Catalogs.ImageProduct;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
@@ -107,6 +108,7 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Unit.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, User.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, VehicleType.class);
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, ImageProduct.class);
 
 
             TableUtils.createTableIfNotExists(getInstance().connectionSource, DocSale.class);
@@ -390,6 +392,16 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
         }
 
     }
+
+    public static Dao<ImageProduct, Object> getProductImageDao() {
+        try {
+            return getInstance().getDao(ImageProduct.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }
 
 

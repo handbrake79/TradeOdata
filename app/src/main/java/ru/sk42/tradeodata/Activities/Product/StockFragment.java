@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.Activities.ProductInfo;
+package ru.sk42.tradeodata.Activities.Product;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -26,14 +26,14 @@ import ru.sk42.tradeodata.R;
  * Activities containing this fragment MUST implement the {@link InteractionInterface}
  * interface.
  */
-public class ProductInfoFragment extends android.support.v4.app.Fragment {
+public class StockFragment extends android.support.v4.app.Fragment {
 
     private static final String TAG = "ProductInfo***";
     public ProductInfo productInfo;
     RecyclerView mRecyclerView;
     private int mColumnCount = 1;
     private InteractionInterface mListener;
-    private ProductInfo_Adapter mAdapter;
+    private Stock_Adapter mAdapter;
 
 
     /**
@@ -41,12 +41,12 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
 
-    public ProductInfoFragment() {
+    public StockFragment() {
     }
 
 
-    public static ProductInfoFragment newInstance(String refkey) {
-        ProductInfoFragment fragment = new ProductInfoFragment();
+    public static StockFragment newInstance(String refkey) {
+        StockFragment fragment = new StockFragment();
         Bundle args = new Bundle();
         args.putString(Constants.REF_KEY_LABEL, refkey);
         fragment.setArguments(args);
@@ -69,21 +69,20 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
                 productInfo = MyHelper.getInstance().getDao(ProductInfo.class).queryForEq(Constants.REF_KEY_LABEL, ref_Key).get(0);
             } catch (Exception e) {
                 Toast.makeText(this.getContext(), "не найден продакт_инфо в базе по ссылке " + ref_Key, Toast.LENGTH_LONG).show();
+                throw new RuntimeException("не найден продакт_инфо в базе по ссылке " + ref_Key);
             }
         }else {
             throw new RuntimeException("Жопа какая-то!");
         }
 
-        View view = inflater.inflate(R.layout.product_info_fragment, container, false);
+        View view = inflater.inflate(R.layout.product_info__stock_fragment, container, false);
 
-        TextView tvProductDescription = (TextView) view.findViewById(R.id.tvProductInfo_ProductDescription);
         TextView tvOutOfStock = (TextView) view.findViewById(R.id.tvProductInfo_outofstock);
         Button btnSelect = (Button) view.findViewById(R.id.btnSelectStock);
         if(productInfo.getArrayList().size() == 0){
             tvOutOfStock.setVisibility(View.VISIBLE);
             btnSelect.setVisibility(View.GONE);
         }
-        tvProductDescription.setText(productInfo.getDescription());
 
         View rvView = view.findViewById(R.id.rvStock);
         btnSelect.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +102,7 @@ public class ProductInfoFragment extends android.support.v4.app.Fragment {
                 mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             productInfo = ProductInfo.getObject(ProductInfo.class, productInfo.getRef_Key());
-            mAdapter = new ProductInfo_Adapter(productInfo.getArrayList(), mListener);
+            mAdapter = new Stock_Adapter(productInfo.getArrayList(), mListener);
             mRecyclerView.setAdapter(mAdapter);
             mRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
 

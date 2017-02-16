@@ -27,5 +27,10 @@
         app:showAsAction="never"
         />
 
+    <item android:id="@+id/action_input_barcode"
+        android:title="Поиск по штрихкоду"
+        android:icon="@drawable/barcode_scan"
+        app:showAsAction="never"
+        />
 
 </menu>

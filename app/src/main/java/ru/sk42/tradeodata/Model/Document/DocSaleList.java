@@ -51,12 +51,12 @@ public class DocSaleList {
 
     public void save() throws SQLException {
 
-            for (DocSale docSale : this.getValues()
-                    ) {
-                List<DocSale> list = MyHelper.getDocSaleDao().queryForAll();
-                docSale.save();
+        for (DocSale docSale : this.getValues()
+                ) {
+            List<DocSale> list = MyHelper.getDocSaleDao().queryForAll();
+            docSale.save();
 
-            }
+        }
 
     }
 

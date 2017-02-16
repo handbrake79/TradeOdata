@@ -3,7 +3,6 @@ package ru.sk42.tradeodata.Activities.Settings;
 import android.content.res.Configuration;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -58,14 +57,14 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
+        setContentView(R.layout.settings__activity);
         ButterKnife.bind(this, this);
         int[] colors = {0, 0xFFFF0000, 0}; // red for the example
         mDrawerList.setDivider(new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors));
         mDrawerList.setDividerHeight(2);
 
         mDrawerList.setAdapter(new DrawerAdapter<String>(this,
-                R.layout.list_item_layout, Constants.SETTINGS_ACTIONS));
+                R.layout.drawer_list_item_layout, Constants.SETTINGS_ACTIONS));
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

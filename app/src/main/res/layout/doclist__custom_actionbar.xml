@@ -2,9 +2,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <TextView
         android:textSize="22sp"
+        tools:text="ДАТА!"
         android:textColor="@color/accent"
         android:id="@+id/customt_actionbar_caption"
         android:layout_width="match_parent"

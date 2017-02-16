@@ -38,23 +38,30 @@ public class Product extends CDO {
     @com.fasterxml.jackson.annotation.JsonProperty("Услуга")
     private Boolean isService;
 
-    public Product(String ref_Key) {
-        this.ref_Key = ref_Key;
-        if (ref_Key != null) {
-            try {
-                Product source = MyHelper.getInstance().getDao(Product.class).queryForEq("Ref_Key", ref_Key).get(0);
-                this.setDescription(source.getDescription());
-                this.setRef_Key(source.getRef_Key());
-                this.setCode(source.getCode());
-                this.setFolder(source.getFolder());
-                this.setParent_key(source.getParent_key());
-                this.setService(source.getService());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+    @DatabaseField(columnName = "SKU")
+    @com.fasterxml.jackson.annotation.JsonProperty("Артикул")
+    private String SKU;
+
+    public String getSKU() {
+        return SKU;
     }
 
+    public void setSKU(String SKU) {
+        this.SKU = SKU;
+    }
+
+    //d:ДополнительноеОписаниеНоменклатуры
+    @DatabaseField(columnName = "Additional_Description")
+    @com.fasterxml.jackson.annotation.JsonProperty("ДополнительноеОписаниеНоменклатуры")
+    private String additional_Description;
+
+    public String getAdditional_Description() {
+        return additional_Description;
+    }
+
+    public void setAdditional_Description(String additional_Description) {
+        this.additional_Description = additional_Description;
+    }
 
     public Product() {
     }

@@ -24,6 +24,7 @@ public class RetroConstants {
         public static final String DISCOUNT_CARDS = "Parent_Key eq guid'23298a25-3cfd-11e2-bbce-984be1645107' or Parent_Key eq guid'f77ab099-0749-11e4-9f4b-000c29984fcd'";
         public static final String CONTRACT = "Owner_Key eq guid'" + Constants.CUSTOMER_GUID + "'";
         public static final String CUSTOMER = "Ref_Key eq guid'" + Constants.CUSTOMER_GUID + "'";
+
     }
 
 }

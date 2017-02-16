@@ -1,8 +1,8 @@
 package ru.sk42.tradeodata.Activities.ProductsList;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,19 +29,16 @@ import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Activities.Settings.Settings;
 import ru.sk42.tradeodata.R;
-import ru.sk42.tradeodata.NetworkRequests.ProductInfoRequest;
 import ru.sk42.tradeodata.NetworkRequests.ProductsRequest;
 import ru.sk42.tradeodata.NetworkRequests.RetroConstants;
-import ru.sk42.tradeodata.Services.CommunicationWithServer;
-import ru.sk42.tradeodata.Services.DataLoader;
 import ru.sk42.tradeodata.Services.ServiceGenerator;
 
 
 public class ProductsListFragment extends Fragment {
 
+    View view;
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     static String TAG = "***ProdList_Fragment";
@@ -81,7 +78,7 @@ public class ProductsListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_products_browser_recyclerview, container, false);
+        view = inflater.inflate(R.layout.products_list__fragment_products_browser_recyclerview, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -101,7 +98,7 @@ public class ProductsListFragment extends Fragment {
             if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.ZERO_GUID)) {
                 Product lastViewedGroup = Product.getObject(Product.class, lastViewedGroupKey);
                 if (lastViewedGroup != null) {
-                    showChildrenProducts(lastViewedGroup);
+                    showChildProducts(lastViewedGroup);
                 }
             } else {
                 showTopLevelProducts();
@@ -117,7 +114,7 @@ public class ProductsListFragment extends Fragment {
     public void onItemSelected(final Product product) {
         if (product.isFolder()) {
             Settings.setLastViewedProductGroupStatic(product.getRef_Key());
-            showChildrenProducts(product);
+            showChildProducts(product);
         } else {
 
             Settings.setLastViewedProductGroupStatic(product.getParent_key());
@@ -156,7 +153,7 @@ public class ProductsListFragment extends Fragment {
 
             testProduct = MyHelper.getInstance().getDao(Product.class).queryForEq("ref_key", guid).get(0);
             currentCategory = testProduct;
-            showChildrenProducts(currentCategory);
+            showChildProducts(currentCategory);
 
         } catch (Exception e) {
             Log.e(getClass().getName(), e.getMessage());
@@ -182,7 +179,7 @@ public class ProductsListFragment extends Fragment {
         parentACtivity.setActionBarTitle(title);
     }
 
-    public void showChildrenProducts(Product product) {
+    public void showChildProducts(Product product) {
 
         if (!product.isFolder()) {
             return; //это не группа, оставляем всё как есть
@@ -193,18 +190,18 @@ public class ProductsListFragment extends Fragment {
         String guid = product.getRef_Key();
         currentCategory = product;
         mAdapter.setParentProduct(currentCategory);
-        Dao<Product, Object> dao = MyHelper.getProductDao();
         List<Product> list = getProductsByParent(guid);
 
         if (list == null || list.size() == 0) {
-            Toast.makeText(this.getContext(), "DB Request", Toast.LENGTH_SHORT).show();
             final ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
             Call<ProductsList> call = request.call(RetroConstants.getMap("Parent_Key eq guid'" + guid + "'"));
             call.enqueue(new MyCallBack());
         } else
             updateView(list);
+    }
 
-
+    public void showMessage(String msg) {
+        Snackbar.make(view, msg, Snackbar.LENGTH_SHORT).show();
     }
 
     public void showTopLevelProducts() {
@@ -213,7 +210,7 @@ public class ProductsListFragment extends Fragment {
         String guid = Constants.ZERO_GUID;
         List<Product> list = getProductsByParent(guid);
         if (list == null || list.size() == 0) {
-            Toast.makeText(this.getContext(), "DB Request", Toast.LENGTH_SHORT).show();
+            showMessage("Запрос к 1С");
             final ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
             Call<ProductsList> call = request.call(RetroConstants.getMap("Parent_Key eq guid'" + guid + "'"));
             call.enqueue(new MyCallBack());

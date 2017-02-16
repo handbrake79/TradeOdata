@@ -19,6 +19,7 @@ import org.simpleframework.xml.convert.Convert;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -67,8 +68,14 @@ public class DocSale extends CDO {
 
         docSale.setDate(new GregorianCalendar().getTime());
         docSale.setShippingDate(new Date());
-        docSale.setShippingTimeFrom(new Date());
-        docSale.setShippingTimeTo(new Date());
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.set(Calendar.HOUR, 9);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        docSale.setShippingTimeFrom(calendar.getTime());
+        calendar.set(Calendar.HOUR, 18);
+        docSale.setShippingTimeTo(calendar.getTime());
 
         docSale.setAuthor(Settings.getCurrentUserStatic());
         docSale.setCustomer(Customer.newInstance());
@@ -1021,8 +1028,8 @@ public class DocSale extends CDO {
 
             removeShippingFromServicesCollection();
 
-            setShippingCost(0);
-            setUnloadCost(0);
+            //setShippingCost(0);
+            //setUnloadCost(0);
             setNeedUnload(false);
         }
         if (needUnload) {
@@ -1030,7 +1037,7 @@ public class DocSale extends CDO {
             addUnloadToServicesCollection();
 
         } else {
-            setUnloadCost(0);
+            //setUnloadCost(0);
 
             removeUnloadFromServicesCollection();
         }

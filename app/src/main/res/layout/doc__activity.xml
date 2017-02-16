@@ -75,7 +75,7 @@
 
             </LinearLayout>
 
-            <include layout="@layout/bottom_sheet_total" />
+            <include layout="@layout/doc__bottom_sheet_total" />
 
         </android.support.design.widget.CoordinatorLayout>
 

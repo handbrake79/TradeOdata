@@ -9,6 +9,9 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 
@@ -22,6 +25,29 @@ public class ProductInfo extends CDO {
     @DatabaseField
     @JsonProperty("Description")
     private String description;
+
+    @DatabaseField
+    @JsonProperty("Price")
+    private double price;
+
+    public Date getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(Date requestDate) {
+        this.requestDate = requestDate;
+    }
+
+    @DatabaseField
+    private Date requestDate;
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
 
     @JsonProperty("Stock")
     @ForeignCollectionField(eager = true, maxEagerLevel = 9)
@@ -76,15 +102,20 @@ public class ProductInfo extends CDO {
 
     @Override
     public void save() {
-        Dao<ProductInfo, Object> daoInfo = MyHelper.getProductInfoDao();
+        this.setRequestDate(GregorianCalendar.getInstance().getTime());
+        Dao<ProductInfo, Object> daoProductInfo = MyHelper.getProductInfoDao();
 
         try {
+            daoProductInfo.createOrUpdate(this);
+            List<Stock> stocks = MyHelper.getStockDao().queryForEq("productInfo_id", this.getRef_Key());
+            MyHelper.getStockDao().delete(stocks);
+
             for (Stock stock :
                     this.getStocks()) {
                 stock.setProductInfo(this);
                 stock.save();
             }
-            daoInfo.createOrUpdate(this);
+//            daoProductInfo.createOrUpdate(this);
         } catch (SQLException e) {
             e.printStackTrace();
         }

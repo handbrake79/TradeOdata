@@ -39,6 +39,8 @@ android {
 
 
 
+
+
 dependencies {
 
     compile files('libs/generalscan_sdk.jar')
@@ -66,4 +68,5 @@ dependencies {
     compile 'com.shawnlin:number-picker:2.0.1'
     compile 'com.rengwuxian.materialedittext:library:2.1.3'
     compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
 }

@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -30,7 +31,7 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
-public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.Receiver {
+public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.ReceiverInterface {
 
     ServiceResultReceiver mReceiver;
     long prevtime, curtime;
@@ -43,8 +44,9 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout._main__activity);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         initApplication();
 
@@ -65,11 +67,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
                     HttpURLConnection urlConn = (HttpURLConnection) urlServer.openConnection();
                     urlConn.setConnectTimeout(3000); //<- 3Seconds Timeout
                     urlConn.connect();
-                    if (urlConn.getResponseCode() == 200) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return urlConn.getResponseCode() == 200;
                 } catch (MalformedURLException e1) {
                     return false;
                 } catch (IOException e) {
@@ -95,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         Charact.createStub();
         Intent i = new Intent(MainActivity.this, CommunicationWithServer.class);
         i.putExtra("from", "MainAct");
-        i.putExtra("mode", Constants.SERVICE_REQUEST.PRELOAD.name());
+        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.PRELOAD.ordinal());
         i.putExtra("receiverTag", mReceiver);
         startService(i);
     }
@@ -151,11 +149,24 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
 
-        if (resultCode == 1) {
+        if (resultCode == Constants.FEEDBACK) {
+            String message = resultData.getString("Message");
+
+            if (message != null) {
+                progressDialog.setIndeterminate(true);
+                progressDialog.setTitle("Предзагрузка");
+                progressDialog.setMessage(message);
+                if (!progressDialog.isShowing())
+                    progressDialog.show();
+            }
+            return;
+        }
+
+        Constants.REQUESTS requestedOperation = Constants.REQUESTS.values()[resultCode];
+        if (requestedOperation == Constants.REQUESTS.PRELOAD) {
             progressDialog.dismiss();
 
-
-            showToast("Предварительная загрузка завершена");
+            showSnack("Предварительная загрузка завершена");
 
             //TODO         // переписать нормально
             try {
@@ -172,21 +183,15 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             return;
         }
 
-        String message = resultData.getString("Message");
-
-        if (message != null) {
-            progressDialog.setIndeterminate(true);
-            progressDialog.setTitle("Предзагрузка");
-            progressDialog.setMessage(message);
-            if (!progressDialog.isShowing())
-                progressDialog.show();
-        }
-
 
     }
 
     void showToast(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+    }
+
+    void showSnack(String s) {
+        Snackbar.make(getWindow().getDecorView(), s, Snackbar.LENGTH_SHORT).show();
     }
 
 }

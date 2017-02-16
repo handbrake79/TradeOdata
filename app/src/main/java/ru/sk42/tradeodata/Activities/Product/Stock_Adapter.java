@@ -1,4 +1,4 @@
-package ru.sk42.tradeodata.Activities.ProductInfo;
+package ru.sk42.tradeodata.Activities.Product;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -10,17 +10,16 @@ import android.widget.TextView;
 import java.util.List;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
-import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
 
 //implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder>
-public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapter.ViewHolder> {
+public class Stock_Adapter extends RecyclerView.Adapter<Stock_Adapter.ViewHolder> {
 
     private final List<Stock> mValues;
     private Integer selectedItem;
 
-    public ProductInfo_Adapter(List<Stock> items, InteractionInterface listener) {
+    public Stock_Adapter(List<Stock> items, InteractionInterface listener) {
         selectedItem = -1;
 
         mValues = items;
@@ -32,7 +31,7 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_info_card, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_info__stock_card, parent, false);
         return new ViewHolder(view);
     }
 
@@ -51,7 +50,14 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
         //holder.mProduct.setText(product.getDescription());
         //holder.mProduct.setText(mValues.get(position).getProductInfo().getDescription());
         holder.mStore.setText(mValues.get(position).getStoreDescription());
-        holder.mCharact.setText(mValues.get(position).getCharact_Description());
+        if(mValues.get(position).getCharact().isEmpty()){
+            holder.mCharact.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.mCharact.setVisibility(View.VISIBLE);
+            holder.mCharact.setText(mValues.get(position).getCharact_Description());
+        }
         holder.mPrice.setText(mValues.get(position).getPrice().toString());
         holder.mQty.setText(mValues.get(position).getQty().toString());
         holder.mUnit.setText(mValues.get(position).getUnit().getDescription());
@@ -98,10 +104,6 @@ public class ProductInfo_Adapter extends RecyclerView.Adapter<ProductInfo_Adapte
             });
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mCharact.getText() + "'";
-        }
     }
 
 }

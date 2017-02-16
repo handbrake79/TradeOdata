@@ -35,21 +35,7 @@ public class DataLoader {
 
     static private CDO objectToCheck;
     static private HashMap<Class<?>, ArrayList<String>> unresolvedLinks;
-    static Runnable myrunnable = new Runnable() {
-        @Override
-        public void run() {
 
-            try {
-                makeRequests();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.d(TAG, "run: " + e.toString());
-            }
-        }
-    };
-    boolean needReload;
-    Integer requestsPending;
 
     public static void LoadMissingDataForObject(Object mcdo, Class clazz) {
 
@@ -64,11 +50,22 @@ public class DataLoader {
             unresolvedLinks = CheckRelatedDataToLoad.checkObject(objectToCheck);
         }
         sendRequestsInNewThread();
-
-
     }
 
     static private void sendRequestsInNewThread(){
+        Runnable myrunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    makeRequests();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "run: " + e.toString());
+                }
+            }
+        };
         Thread thread1 = new Thread(myrunnable);
         thread1.start();
         try {

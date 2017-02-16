@@ -30,7 +30,7 @@ public class PrintersRecyclerViewAdapter extends RecyclerView.Adapter<PrintersRe
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.printers_list_item, parent, false);
+                .inflate(R.layout.settings__printers_list_item, parent, false);
         return new ViewHolder(view);
     }
 

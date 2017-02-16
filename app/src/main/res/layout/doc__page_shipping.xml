@@ -35,8 +35,8 @@
 
 
             <!--TIME-->
-            <LinearLayout
-                android:layout_marginTop="5dp"
+            <RelativeLayout
+                android:layout_marginTop="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -76,6 +76,8 @@
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout
+                    android:id="@+id/til_time_from"
+                    android:layout_toRightOf="@+id/tilDate"
                     android:layout_gravity="center"
                     style="@style/Widget.Design.TextInputLayout"
                     android:layout_width="wrap_content"
@@ -101,6 +103,8 @@
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout
+                    android:layout_toRightOf="@+id/til_time_from"
+                    android:id="@+id/til_time_to"
                     android:layout_marginLeft="20dp"
                     android:layout_gravity="center"
                     style="@style/Widget.Design.TextInputLayout"
@@ -126,10 +130,38 @@
                         android:textIsSelectable="false" />
                 </android.support.design.widget.TextInputLayout>
 
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/tilDate"
+                    android:text="Дата доставки"
+                    android:textColor="@color/accent"
+                    />
 
-            </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/til_time_from"
+                    android:layout_alignEnd="@id/til_time_from"
+                    android:layout_alignRight="@id/til_time_from"
+                    android:text="С"
+                    android:textColor="@color/accent"
+                    android:textAppearance="@style/TextAppearance.AppCompat" />
+                <TextView
+                    android:layout_alignStart="@id/til_time_to"
+                    android:textColor="@color/accent"
+                    android:layout_above="@id/til_time_to"
+                    android:text="ПО"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/til_time_to" />
+
+
+            </RelativeLayout>
 
             <LinearLayout
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -228,36 +260,36 @@
 
             </RelativeLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical">
+            <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:gravity="center_vertical">-->
 
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_alignBaseline="@+id/input_starting_point"
-                    android:layout_alignParentLeft="true"
-                    android:gravity="center_vertical"
-                    android:text="Начальная точка" />
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:layout_alignBaseline="@+id/input_starting_point"-->
+                    <!--android:layout_alignParentLeft="true"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:text="Начальная точка" />-->
 
-                <Spinner
-                    android:id="@+id/input_starting_point"
-                    style="@style/Base.Widget.AppCompat.Spinner.Underlined"
-                    android:layout_width="200dp"
+                <!--<Spinner-->
+                    <!--android:id="@+id/input_starting_point"-->
+                    <!--style="@style/Base.Widget.AppCompat.Spinner.Underlined"-->
+                    <!--android:layout_width="200dp"-->
 
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginLeft="5sp"
-                    android:gravity="center_vertical"
-                    android:inputType="textPersonName"
-                    android:minWidth="200dp"
-                    android:text="ТипТС"
-                    tools:text="Тип ТС" />
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentRight="true"-->
+                    <!--android:layout_marginLeft="5sp"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:inputType="textPersonName"-->
+                    <!--android:minWidth="200dp"-->
+                    <!--android:text="ТипТС"-->
+                    <!--tools:text="Тип ТС" />-->
 
-            </RelativeLayout>
+            <!--</RelativeLayout>-->
 
             <RelativeLayout
                 android:id="@+id/rlroute"

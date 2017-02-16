@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -18,6 +19,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,12 +43,14 @@ import com.generalscan.bluetooth.BluetoothSettings;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.StringTokenizer;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DrawerAdapter;
-import ru.sk42.tradeodata.Activities.ProductInfo.ProductInfoActivity;
+import ru.sk42.tradeodata.Activities.Product.ProductActivity;
 import ru.sk42.tradeodata.Activities.ProductsList.ProductsListActivity;
 import ru.sk42.tradeodata.Activities.Scanner.ReadBroadcast;
 import ru.sk42.tradeodata.Activities.Settings.Settings;
@@ -60,20 +65,22 @@ import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
+import ru.sk42.tradeodata.Model.Document.SaleRecordService;
 import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
+
 public class DocumentActivity extends AppCompatActivity implements SaleRecordInterface,
-        ServiceResultReceiver.Receiver,
+        ServiceResultReceiver.ReceiverInterface,
         DocumentListenerInterface {
 
     private static final String TAG = "Document ACTIVITY***";
-    private static final int REQ_CODE_SPEECH_INPUT = 75334; //speech
-    public static final int SHOW_PRODUCTS_LIST = 100;
-    public static final int ON_RECORD_SELECTED = 300;
+    View view;
+
+    private int productsCount;
 
     Toolbar myToolbar;
     Activity mActivity;
@@ -154,7 +161,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.document__activity);
+        setContentView(R.layout.doc__activity);
         ButterKnife.bind(this, this);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -176,7 +183,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         mReceiver.setReceiver(this);
 
         Intent intent = getIntent();
-        int mode = intent.getIntExtra("mode", Constants.ModeNewOrder);
+        int mode = intent.getIntExtra(Constants.MODE_LABEL, Constants.ModeNewOrder);
 
         if (mode == Constants.ModeExistingOrder) {
             docRef_Key = intent.getStringExtra(Constants.REF_KEY_LABEL);
@@ -213,7 +220,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         mDrawerList.setDividerHeight(1);
         // Set the adapter for the list view
         mDrawerList.setAdapter(new DrawerAdapter<String>(this,
-                R.layout.list_item_layout, Constants.DOCUMENT_ACTIONS));
+                R.layout.drawer_list_item_layout, Constants.DOCUMENT_ACTIONS));
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -258,7 +265,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
         //**
         if (mode == Constants.ModeExistingOrder) {
-            networkLoadMissingObjectFrom1C();
+            LoadMissingObjectsFrom1C();
         }
 
         //Scanner
@@ -373,18 +380,74 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             case R.id.action_scanner_connect:
                 connectScaner();
                 break;
+            case R.id.action_input_barcode:
+                inputBarcode();
+                break;
 
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void inputBarcode() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Введите штрихкод");
 
-    private void addNewProductRow(Stock stock) {
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String barcode = input.getText().toString();
+                onBarcodeAquired(barcode);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+
+    private void addProduct(Stock stock) {
+        Product product = Product.getObject(Product.class, stock.getProductInfo().getRef_Key());
+        if (product.getService()) {
+            addServiceToDocument(stock, product);
+
+            recalc();
+            fragmentPagerAdapter.notifyFragmentDataSetChanged(2);
+            viewPager.post(new Runnable() {
+                @Override
+                public void run() {
+                    viewPager.setCurrentItem(2);
+                }
+            });
+
+        } else {
+            addProductToDocument(stock, product);
+            recalc();
+            fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
+            viewPager.post(new Runnable() {
+                @Override
+                public void run() {
+                    viewPager.setCurrentItem(1);
+                }
+            });
+        }
+
+    }
+
+    private void addProductToDocument(Stock stock, Product product) {
         SaleRecordProduct row = new SaleRecordProduct();
         row.setDocSale(docSale);
         row.setRef_Key(docSale.getRef_Key());
         row.setLineNumber(docSale.getProducts().size() + 1);
-        row.setProduct(Product.getObject(Product.class, stock.getProductInfo().getRef_Key()));
+        row.setProduct(product);
         row.setProduct_Key(row.getProduct().getRef_Key());
         row.setCharact(stock.getCharact());
         row.setStore(stock.getStore());
@@ -397,6 +460,19 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
         docSale.getProducts().add(row);
 
+    }
+
+    private void addServiceToDocument(Stock stock, Product product) {
+        SaleRecordService row = new SaleRecordService();
+        row.setDocSale(docSale);
+        row.setRef_Key(docSale.getRef_Key());
+        row.setLineNumber(docSale.getProducts().size() + 1);
+        row.setProduct(product);
+        row.setProduct_Key(row.getProduct().getRef_Key());
+        row.setPrice(stock.getPrice());
+        row.setTotal(row.getPrice());
+        row.setQty(1f);
+        docSale.getServices().add(row);
     }
 
 
@@ -648,7 +724,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
     }
 
-    class QtyMinusDialogListener implements DialogInterface.OnClickListener {
+    class DeleteRecordDialogListener implements DialogInterface.OnClickListener {
         @Override
         public void onClick(DialogInterface dialogInterface, int which) {
             switch (which) {
@@ -664,7 +740,8 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
     private void deleteCurrentProductRecord() {
-        deleteRecord(currentRecord);
+        docSale.getProducts().remove(currentRecord);
+        recalc();
     }
 
 
@@ -674,7 +751,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             return;
         }
         Intent intent = new Intent(this, ProductsListActivity.class);
-        startActivityForResult(intent, SHOW_PRODUCTS_LIST);
+        startActivityForResult(intent, Constants.SHOW_PRODUCTS_LIST);
     }
 
     @Override
@@ -683,7 +760,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             return;
         }
 
-        if (requestCode == SHOW_PRODUCTS_LIST && resultCode == 0) {
+        if (requestCode == Constants.SHOW_PRODUCTS_LIST && resultCode == 0) {
 
             Stock stock = null;
             int id = data.getIntExtra("id", -1);
@@ -694,12 +771,12 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
                     e.printStackTrace();
                 }
                 if (stock != null) {
-                    addNewProductRow(stock);
+                    addProduct(stock);
                 }
             }
         }
 
-        if (requestCode == ON_RECORD_SELECTED && resultCode == 0) {
+        if (requestCode == Constants.ON_RECORD_SELECTED_IN_DOCUMENT && resultCode == 0) {
 
             SaleRecordProduct record = null;
             long id = data.getLongExtra("id", -1);
@@ -719,19 +796,20 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
                     }
                 }
             }
+
+            recalc();
+
+            viewPager.post(new Runnable() {
+                @Override
+                public void run() {
+                    viewPager.setCurrentItem(1);
+                }
+            });
+
+            fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
+
         }
 
-        recalc();
-
-
-        viewPager.post(new Runnable() {
-            @Override
-            public void run() {
-                viewPager.setCurrentItem(1);
-            }
-        });
-
-        fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
     }
 
 
@@ -755,14 +833,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         double q = record.getQty();
         if (q <= 1) {
             currentRecord = record;
-            QtyMinusDialogListener listener = new QtyMinusDialogListener();
-
-            AlertDialog.Builder adb = new AlertDialog.Builder(this)
-                    .setTitle(currentRecord.getProduct().getDescription())
-                    .setPositiveButton("Да", listener)
-                    .setNegativeButton("Нет", listener)
-                    .setMessage("Удалить?");
-            adb.create().show();
+            handleRecordDeletion();
         }
         if (q > 1) {
             q--;
@@ -771,33 +842,49 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
     }
 
-    @Override
-    public void deleteRecord(SaleRecord record) {
-        if(docSale.getPosted())
-        {
-            showMessage("Документ проведен, изменения запрещены.");
-            return;
-        }
-        docSale.getProducts().remove(record);
-        recalc();
+    private void handleRecordDeletion() {
+        DeleteRecordDialogListener listener = new DeleteRecordDialogListener();
+
+        AlertDialog.Builder adb = new AlertDialog.Builder(this)
+                .setTitle(currentRecord.getProduct().getDescription())
+                .setPositiveButton("Да", listener)
+                .setNegativeButton("Нет", listener)
+                .setMessage("Удалить?");
+        adb.create().show();
+
     }
 
     @Override
-    public void onRecordSelected(SaleRecord record) {
-        try {
-            docSale.save();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void deleteRecord(SaleRecord record) {
+        if (docSale.getPosted()) {
+            showMessage("Документ проведен, изменения запрещены.");
+            return;
         }
-        if (record.getProduct_Key().equals(Constants.SHIPPING_GUID) ||
-                record.getProduct_Key().equals(Constants.UNLOAD_GUID)) {
-            return; //для услуг по доставке и разгрузке не редактируем кол-во
-        }
+        currentRecord = record;
+        handleRecordDeletion();
+    }
 
-        Intent intent = new Intent(this, QtyInputActivity.class);
-        intent.putExtra("id", record.getId());
-        intent.putExtra("qty", record.getQty());
-        startActivityForResult(intent, 300);
+    @Override
+    public void onRecordSelected(SaleRecord record, int action) {
+        if (action == Constants.SELECT_RECORD_FOR_CHANGE) {
+            try {
+                docSale.save();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if (record.getProduct_Key().equals(Constants.SHIPPING_GUID) ||
+                    record.getProduct_Key().equals(Constants.UNLOAD_GUID)) {
+                return; //для услуг по доставке и разгрузке не редактируем кол-во
+            }
+
+            Intent intent = new Intent(this, QtyInputActivity.class);
+            intent.putExtra("id", record.getId());
+            intent.putExtra("qty", record.getQty());
+            startActivityForResult(intent, Constants.ON_RECORD_SELECTED_IN_DOCUMENT);
+        }
+        if (action == Constants.SELECT_RECORD_FOR_VIEW_PRODUCT) {
+            ShowProductActivity(record.getProduct_Key());
+        }
     }
 
 
@@ -822,7 +909,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
     private void showMessage(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        Snackbar.make(getWindow().getDecorView(), text, Toast.LENGTH_SHORT).show();
     }
 
     public void saveLocal() {
@@ -905,7 +992,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     private void print() {
         Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.SERVICE_REQUEST.PRINT_DOCUMENT.name());
+        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.PRINT_DOCUMENT.ordinal());
         i.putExtra(Constants.DOC_NUMBER, docSale.getNumber());
         i.putExtra(Constants.PRINTER_NAME, Settings.getPrinterStatic());
         i.putExtra("receiverTag", mReceiver);
@@ -915,8 +1002,20 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
     private void saveTo1C(boolean post) {
-        if(post && docSale.getNeedShipping() && docSale.getWeight() == 0){
+        productsCount = docSale.getProducts().size();
+        Calendar shippingDate = GregorianCalendar.getInstance();
+        shippingDate.setTime(docSale.getShippingDate());
+        if(docSale.getNeedShipping() && !Uttils.isShippingDateValid(shippingDate)){
+            showMessage("Дата доставки указана неверно!");
+            return;
+        }
+        if (post && docSale.getNeedShipping() && docSale.getWeight() == 0) {
             showMessage("Не указан вес товаров, оформление доставки невозможно!");
+            return;
+        }
+
+        if (post && docSale.getNeedUnload() && docSale.getWorkersCount() == 0) {
+            showMessage("Указана разгрузка, но нет грузчиков!");
             return;
         }
 
@@ -936,18 +1035,18 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             return;
         }
 
-
         if (post) {
             Intent i = new Intent(this, CommunicationWithServer.class);
-            i.putExtra("mode", Constants.SERVICE_REQUEST.POST_IN_1C.name());
-            i.putExtra("id", docSale.getId());
+            i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.POST_DOCUMENT.ordinal());
+            i.putExtra(Constants.ID, docSale.getId());
+            i.putExtra(Constants.REF_KEY_LABEL, docRef_Key);
             i.putExtra("receiverTag", mReceiver);
             i.putExtra("from", "DocList");
             startService(i);
 
         } else {
             Intent i = new Intent(this, CommunicationWithServer.class);
-            i.putExtra("mode", Constants.SERVICE_REQUEST.SAVE_TO_1C.name());
+            i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.SAVE_DOCUMENT.ordinal());
             i.putExtra("id", docSale.getId());
             i.putExtra("receiverTag", mReceiver);
             i.putExtra("from", "DocList");
@@ -955,78 +1054,27 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
     }
 
-    private void networkLoadMissingObjectFrom1C() {
+    private void LoadMissingObjectsFrom1C() {
         Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.SERVICE_REQUEST.LOAD_MISSING_FOR_DOCUMENT.name());
+        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.LOAD_MISSING_FOR_DOCUMENT.ordinal());
         i.putExtra("from", "Document");
         i.putExtra(Constants.REF_KEY_LABEL, getDocRef_Key());
         i.putExtra("receiverTag", mReceiver);
         startService(i);
     }
 
-    @Override
-    public void onReceiveResult(int code, Bundle mResult) {
-        if (code == Constants.PRODUCT_INFO_REQUEST_FINISHED) {
-            if (mResult.getBoolean("ok")) {
-                Intent intent = new Intent(this, ProductInfoActivity.class);
-                intent.putExtra(Constants.REF_KEY_LABEL, mResult.getString(Constants.REF_KEY_LABEL));
-                startActivityForResult(intent, SHOW_PRODUCTS_LIST);
-            } else {
-                showMessage(mResult.getString("error"));
+    private void ShowProductActivity(String ref_Key) {
+        Intent intent = new Intent(this, ProductActivity.class);
+        intent.putExtra(Constants.REF_KEY_LABEL, ref_Key);
+        startActivityForResult(intent, Constants.SHOW_PRODUCTS_LIST);
 
-            }
-        }
-        if (code == Constants.SCANNER_EVENT) {
-            String barchar = mResult.getString(Constants.SCANNER_DATA_LABEL, "");
-            if ((barchar.equals("\n") || barchar.equals("\r")) && barcode.length() > 0) {
-
-                onBarcodeAquired(barcode);
-                barcode = "";
-            }
-            if (!barchar.equals("\n") && !barchar.equals("\r")) {
-                barcode += barchar;
-            }
-        }
-        if (code == Constants.LOAD_FINISHED) {
-            try {
-                Log.d(TAG, "onReceiveResult: колво документов в базе = " + String.valueOf(MyHelper.getDocSaleDao().countOf()));
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            Log.d(TAG, "onReceiveResult: SFO COMPLETED");
-            boolean ok = mResult.getBoolean("ok");
-            if (!ok) {
-                if (mResult.containsKey("error")) {
-                    String error = mResult.getString("error", "Ошибка не передана сервисом!");
-                    showMessage(error);
-                }
-            } else {
-                docRef_Key = mResult.getString(Constants.REF_KEY_LABEL, "");
-                //Видимо здесь нужно показывать фрагмент
-                loadDocumentFromDB();
-                setActionBarTitle();
-                fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
-                refreshTotal();
-            }
-        }
-
-        if(code == Constants.PRINT_REQUEST_FINISHED){
-            boolean ok = mResult.getBoolean("ok");
-            if(ok){
-                showMessage("Документ отправлен на печать");
-            }
-            else{
-                showMessage("Ошибка печати на сервере");
-
-            }
-        }
     }
 
     private void onBarcodeAquired(String barcode) {
         barcode = barcode.replaceAll("[^0-9.]", "");
         showMessage(barcode);
         Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.SERVICE_REQUEST.REQUEST_BARCODE.name());
+        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.BARCODE.ordinal());
         i.putExtra(Constants.BARCODE_LABEL, barcode);
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");
@@ -1048,4 +1096,59 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
 
+    @Override
+    public void onReceiveResult(int code, Bundle mResult) {
+        if (code == Constants.FEEDBACK) {
+            showMessage(mResult.getString(Constants.MESSAGE_LABEL));
+            return;
+        }
+
+        if (code == Constants.SCANNER_EVENT) {
+            String barchar = mResult.getString(Constants.SCANNER_DATA_LABEL, "");
+            if ((barchar.equals("\n") || barchar.equals("\r")) && barcode.length() > 0) {
+
+                onBarcodeAquired(barcode);
+                barcode = "";
+            }
+            if (!barchar.equals("\n") && !barchar.equals("\r")) {
+                barcode += barchar;
+            }
+            return;
+        }
+
+        Constants.REQUESTS ro = Constants.REQUESTS.values()[code];
+        boolean success = mResult.getBoolean(Constants.OPERATION_SUCCESS_LABEL);
+        String message = mResult.getString(Constants.MESSAGE_LABEL, "Ошибка не передана сервисом!");
+        int resultCode = mResult.getInt(Constants.RESULT_CODE_LABEL);
+        if (ro == Constants.REQUESTS.PRODUCT_INFO) {
+            if (mResult.getBoolean(Constants.OPERATION_SUCCESS_LABEL)) {
+                ShowProductActivity(mResult.getString(Constants.REF_KEY_LABEL));
+            } else {
+                showMessage(mResult.getString("error"));
+            }
+        }
+        if (ro == Constants.REQUESTS.SAVE_DOCUMENT || ro == Constants.REQUESTS.POST_DOCUMENT || ro == Constants.REQUESTS.LOAD_MISSING_FOR_DOCUMENT) {
+            if(ro != Constants.REQUESTS.LOAD_MISSING_FOR_DOCUMENT){
+                showMessage(message + "(" + String.valueOf(resultCode) + ")");
+            }
+            if(success) {
+                //Видимо здесь нужно показывать фрагмент
+                docRef_Key = mResult.getString(Constants.REF_KEY_LABEL);
+                loadDocumentFromDB();
+                setActionBarTitle();
+                fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
+                refreshTotal();
+                if (code == Constants.SAVE_COMPLETE) {
+                    //покажем подарки
+                    int gifts = docSale.getProducts().size() - productsCount;
+                    if (gifts > 0) {
+                        showMessage("Были добавлены подарки (" + String.valueOf(gifts) + ")!");
+                    }
+                }
+            }
+        }
+    }
+
+
 }
+

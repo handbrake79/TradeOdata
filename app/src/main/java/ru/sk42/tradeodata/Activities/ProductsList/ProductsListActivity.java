@@ -7,11 +7,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
-import ru.sk42.tradeodata.Activities.ProductInfo.ProductInfoFragment;
+import ru.sk42.tradeodata.Activities.Product.ProductActivity;
+import ru.sk42.tradeodata.Activities.Product.StockFragment;
+import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.ProductInfo;
 import ru.sk42.tradeodata.Model.Stock;
@@ -19,9 +25,12 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
+import static ru.sk42.tradeodata.Model.Constants.MODE_LABEL;
+import static ru.sk42.tradeodata.Model.Constants.SHOW_PRODUCTS_LIST;
+import static ru.sk42.tradeodata.Model.Constants.OPERATION_SUCCESS_LABEL;
 import static ru.sk42.tradeodata.R.id.frame_view_products_list;
 
-public class ProductsListActivity extends AppCompatActivity implements ServiceResultReceiver.Receiver, InteractionInterface {
+public class ProductsListActivity extends AppCompatActivity implements ServiceResultReceiver.ReceiverInterface, InteractionInterface {
 
     private static final String TAG = "ProdListAct***";
 
@@ -32,7 +41,8 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        setContentView(R.layout.view_products_list);
+        setContentView(R.layout.products_list__view_products_list);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //setTitle("");
         mReceiver.setReceiver(this);
 
@@ -45,22 +55,18 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
 
     }
 
-    private void onButtonBackPressed(){
+    private void onButtonBackPressed() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(frame_view_products_list);
-        if (fragment instanceof ProductInfoFragment){
+        if (fragment instanceof StockFragment) {
             getSupportFragmentManager().popBackStack();
-        }
-        else {
+        } else {
             productsListFragment.showParentProducts();
         }
 
     }
 
     public void setActionBarTitle(String title) {
-//        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService
-//                (Context.LAYOUT_INFLATER_SERVICE);
-//
-//        View actionBarView = inflater.inflate(R.layout.custom_actionbar, null);
+
         TextView tv = (TextView) findViewById(R.id.products_list_group_caption);
         tv.setText(title);
         tv.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +99,6 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
     }
 
 
-
     @Override
     public void onItemSelected(Object selectedObject) {
         Intent intent = new Intent();
@@ -103,12 +108,13 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
         finish();
     }
 
+
     @Override
     public void onRequestSuccess(Object selectedObject) {
         setTitle("");
 
         ProductInfo productInfo = (ProductInfo) selectedObject;
-        ProductInfoFragment fragment = ProductInfoFragment.newInstance(productInfo.getRef_Key());
+        StockFragment fragment = StockFragment.newInstance(productInfo.getRef_Key());
 
         getSupportFragmentManager().beginTransaction()
                 .replace(frame_view_products_list, fragment)
@@ -117,32 +123,52 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
 
     }
 
-    public void requestProductInfo(String product_key){
+    public void requestProductInfo(String product_key) {
         Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra("mode", Constants.SERVICE_REQUEST.REQUEST_PRODUCT_INFO.name());
+        i.putExtra(MODE_LABEL, Constants.REQUESTS.PRODUCT_INFO.ordinal());
         i.putExtra("ref_Key", product_key);
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");
         startService(i);
+    }
 
-
+    private void showMessage(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
+            return;
+        }
+
+        if (requestCode == Constants.SHOW_PRODUCTS_LIST && resultCode == 0) {
+
+            Stock stock = null;
+            int id = data.getIntExtra("id", -1);
+            if (id != -1) {
+                try {
+                    stock = MyHelper.getStockDao().queryForId(id);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (stock != null) {
+                    onItemSelected(stock);
+                }
+            }
+        }
+    }
+
+    @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
-        if(resultCode == Constants.PRODUCT_INFO_REQUEST_FINISHED){
-            boolean ok = resultData.getBoolean("ok", false);
-            if(ok){
+        if (resultCode == Constants.REQUESTS.PRODUCT_INFO.ordinal()) {
+            boolean success = resultData.getBoolean(OPERATION_SUCCESS_LABEL, false);
+            if (success) {
+                Intent intent = new Intent(this, ProductActivity.class);
                 String ref_Key = resultData.getString(Constants.REF_KEY_LABEL);
-                ProductInfoFragment fragment = ProductInfoFragment.newInstance(ref_Key);
-
-                getSupportFragmentManager().beginTransaction()
-                        .replace(frame_view_products_list, fragment)
-                        .addToBackStack(fragment.getClass().getName())
-                        .commit();
-
-
+                intent.putExtra(Constants.REF_KEY_LABEL, ref_Key);
+                startActivityForResult(intent, SHOW_PRODUCTS_LIST);
             }
         }
     }

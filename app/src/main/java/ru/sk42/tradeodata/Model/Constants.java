@@ -12,15 +12,27 @@ import ru.sk42.tradeodata.R;
  */
 public class Constants {
 
-    public static final int SCANNER_EVENT = 654;
+    public static final int SCANNER_EVENT = 11;
     public static final String SCANNER_DATA_LABEL = "scanner_data";
     public static final String BARCODE_LABEL = "barcode";
     public static final String REF_KEY_LABEL = "ref_Key";
     public static final String ID = "id";
     public static final String DOC_NUMBER = "docNumber";
     public static final String PRINTER_NAME = "printerName";
-    public static final int PRODUCT_INFO_REQUEST_FINISHED = 656;
-    public static final int PRINT_REQUEST_FINISHED = 17;
+    public static final int PRODUCT_INFO_REQUEST_FINISHED = 12;
+    public static final int PRINT_REQUEST_FINISHED = 13;
+    public static final int PRODUCT_SELECTED = 14;
+    public static final int ON_RECORD_SELECTED_IN_DOCUMENT = 15;
+    public static final int SHOW_PRODUCTS_LIST = 16;
+    public static final int SELECT_RECORD_FOR_CHANGE = 17;
+    public static final int SELECT_RECORD_FOR_VIEW_PRODUCT = 18;
+    public static final int IMAGE_LOADED = 19;
+    public static final String OPERATION_SUCCESS_LABEL = "success";
+    public static final int SAVE_COMPLETE = 20;
+    public static final int POST_COMPLETE = 21;
+    public static final String MESSAGE_LABEL = "message";
+    public static final String RESULT_CODE_LABEL = "result_code";
+    public static final String MODE_LABEL = "mode";
     public static ArrayList<String> DOCUMENT_ACTIONS;
 
     static {
@@ -46,8 +58,7 @@ public class Constants {
     public static final String SHIPPING_GUID = "254bbb25-6395-422b-8f00-fd126ec82289";
     public static final String UNLOAD_GUID = "7ca2e35d-7f03-4869-9e54-eabe1af8eeba";
 
-    public static final int SAVE_DOCUMENT_RESULT = 100;
-    public static final int FEEDBACK = 0;
+    public static final int FEEDBACK = 98765;
     public static final int LOAD_FINISHED = 1;
     public static final String CONTRACT_GUID = "e8a12ae1-26fe-11e1-b72e-984be1645106";
 
@@ -69,17 +80,18 @@ public class Constants {
     }
 
 
-    public enum SERVICE_REQUEST {
+    public enum REQUESTS {
         PRELOAD,
         LOAD_MISSING_FOR_LIST_OF_DOCUMENTS,
-        REQUEST_DOCUMENTS,
-        SAVE_TO_1C,
-        REQUEST_SINGLE_DOCUMENT,
+        LOAD_DOCUMENTS,
+        SAVE_DOCUMENT,
+        SINGLE_DOCUMENT,
         LOAD_MISSING_FOR_DOCUMENT,
-        POST_IN_1C,
-        REQUEST_BARCODE,
-        REQUEST_PRODUCT_INFO,
-        PRINT_DOCUMENT;
+        POST_DOCUMENT,
+        BARCODE,
+        PRODUCT_INFO,
+        PRINT_DOCUMENT,
+        LOAD_IMAGE
     }
 
     public class COLORS {

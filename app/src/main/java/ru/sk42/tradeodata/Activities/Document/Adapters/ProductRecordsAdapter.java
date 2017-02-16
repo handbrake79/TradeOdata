@@ -2,7 +2,6 @@ package ru.sk42.tradeodata.Activities.Document.Adapters;
 
 
 import android.graphics.Color;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.order_product_row_card, parent, false);
+                .inflate(R.layout.doc__product_row_card, parent, false);
         return new ViewHolder(view);
     }
 
@@ -151,6 +149,18 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
                 }
             });
             // Handle item click and set the selection
+            tvDocSaleProductsQty.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Redraw the old selection and the new
+                    notifyItemChanged(selectedItem);
+                    selectedItem = getLayoutPosition();
+                    notifyItemChanged(selectedItem);
+                    mListener.onRecordSelected(getSelectedObject(), Constants.SELECT_RECORD_FOR_CHANGE);
+                }
+            });
+
+            // Handle item click and set the selection
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -158,7 +168,7 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
                     notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
-                    mListener.onRecordSelected(getSelectedObject());
+                    mListener.onRecordSelected(getSelectedObject(), Constants.SELECT_RECORD_FOR_VIEW_PRODUCT);
                 }
             });
 

@@ -37,12 +37,15 @@ public class ServicesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-
         DocumentActivity activity = (DocumentActivity) getActivity();
         docSale = activity.getDocSale();
 
-        view = inflater.inflate(R.layout.doc_page_services, container, false);
+        view = inflater.inflate(R.layout.doc__page_services, container, false);
         ButterKnife.bind(this, view);
+
+        mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
+        mServicesRecyclerView.setSelected(true);
+        mServicesRecyclerView.setLayoutManager(new LinearLayoutManager(mServicesRecyclerView.getContext()));
 
         setAdapter();
 
@@ -51,9 +54,6 @@ public class ServicesFragment extends Fragment {
     }
 
     private void setAdapter() {
-        mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
-        mServicesRecyclerView.setSelected(true);
-        mServicesRecyclerView.setLayoutManager(new LinearLayoutManager(mServicesRecyclerView.getContext()));
         adapter = new ServicesRecordsAdapter(docSale.getServicesList(), (SaleRecordInterface) getActivity());
         mServicesRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -62,6 +62,7 @@ public class ServicesFragment extends Fragment {
     public void notifyDataChanged(){
         if(adapter != null) {
             setAdapter();
+            mServicesRecyclerView.scrollToPosition(docSale.getServices().size() - 1);
         }
     }
 }

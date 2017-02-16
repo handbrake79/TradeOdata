@@ -72,14 +72,10 @@ public class CheckRelatedDataToLoad {
             //если не нашли - добавляем в мапу для дальнейшей загрузки с сервера
             DocSale docSale = (DocSale) obj;
             if (docSale != null) {
-
-                //callBackInterface.showProgress("Check doc", "Processing " + docSale.getNumber());
-
                 checkDocCustomer(docSale);
                 checkDocContract(docSale);
                 checkDocAuthor(docSale);
                 checkDocProductsAndServices(docSale);
-                //callBackInterface.showProgress(" check doc completed", "ok");
             }
 
         }

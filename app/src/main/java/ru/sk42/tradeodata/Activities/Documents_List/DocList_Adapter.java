@@ -37,7 +37,7 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.doclist_card, parent, false);
+                .inflate(R.layout.doclist__card, parent, false);
         return new ViewHolder(view);
     }
 

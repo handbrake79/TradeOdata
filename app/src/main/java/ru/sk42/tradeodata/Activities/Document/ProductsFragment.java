@@ -39,7 +39,7 @@ public class ProductsFragment extends Fragment {
         DocumentActivity activity = (DocumentActivity) getActivity();
         docSale = activity.getDocSale();
 
-        mProductsRecyclerView = (RecyclerView) inflater.inflate(R.layout.doc_page_products, container, false);
+        mProductsRecyclerView = (RecyclerView) inflater.inflate(R.layout.doc__page_products, container, false);
         ButterKnife.bind(this, mProductsRecyclerView);
 
         mProductsRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
@@ -59,6 +59,7 @@ public class ProductsFragment extends Fragment {
 
     public void notifyDataChanged() {
         setAdapter();
+        mProductsRecyclerView.scrollToPosition(docSale.getProducts().size() - 1);
     }
 
 }

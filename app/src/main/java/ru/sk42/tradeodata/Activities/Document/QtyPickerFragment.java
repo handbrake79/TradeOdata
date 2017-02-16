@@ -88,7 +88,7 @@ public class QtyPickerFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_qty_picker, container, false);
+        View view = inflater.inflate(R.layout.doc__fragment_qty_picker, container, false);
         ButterKnife.bind(this, view);
 
         inputQtyNumberEdittext.setText(String.valueOf(record.getQty()));

@@ -32,7 +32,7 @@ public class DrawerAdapter<T> extends ArrayAdapter<String> {
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.list_item_layout,
+        View rowView = inflater.inflate(R.layout.drawer_list_item_layout,
                 parent, false);
 
         String action =  list.get(position);

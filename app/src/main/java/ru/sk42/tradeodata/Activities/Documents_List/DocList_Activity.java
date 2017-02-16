@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +35,7 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
-public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.Receiver {
+public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.ReceiverInterface {
 
     private static final String TAG = "***Doclist activity";
 
@@ -53,7 +54,9 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ***OnCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.doclist_activity);
+        setContentView(R.layout.doclist__activity);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (Settings.getCurrentUserStatic() == null) {
             showToast("Выберите пользователя в настройках");
@@ -83,7 +86,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(DocList_Activity.this, DocumentActivity.class);
-                intent.putExtra("mode", Constants.ModeNewOrder);
+                intent.putExtra(Constants.MODE_LABEL, Constants.ModeNewOrder);
                 startActivityForResult(intent, 0);
                 mAdapter.notifyDataSetChanged();
 
@@ -122,7 +125,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 //            title += " документов еще нет";
 
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View viewActionBar = inflater.inflate(R.layout.custom_actionbar, null);
+        View viewActionBar = inflater.inflate(R.layout.doclist__custom_actionbar, null);
 
         TextView tv = (TextView) viewActionBar.findViewById(R.id.customt_actionbar_caption);
         tv.setText(title);
@@ -177,7 +180,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         //это может быть выбор документа из списка
         if (selectedObject instanceof DocSale) {
             Intent intent = new Intent(this, DocumentActivity.class);
-            intent.putExtra("mode", Constants.ModeExistingOrder);
+            intent.putExtra(Constants.MODE_LABEL, Constants.ModeExistingOrder);
             intent.putExtra(Constants.REF_KEY_LABEL, ((DocSale) selectedObject).getRef_Key());
             intent.putExtra(Constants.ID, ((DocSale) selectedObject).getId());
             startActivityForResult(intent, 0);
@@ -202,13 +205,14 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
-        if (resultCode == 1) {
+        if (resultCode == Constants.FEEDBACK) {
+            String message = resultData.getString("Message");
+            showMessage(message);
+            return;
+        }
+        if (resultCode == Constants.REQUESTS.LOAD_DOCUMENTS.ordinal()) {
             progress.hide();
             setAdapter();
-        }
-        if (resultCode == 0) {
-            String message = resultData.getString("Message");
-            showProgress(message);
         }
     }
 
@@ -217,7 +221,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("StartDate", startDate.getTimeInMillis());
-        i.putExtra("mode", Constants.SERVICE_REQUEST.REQUEST_DOCUMENTS.name());
+        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.LOAD_DOCUMENTS.ordinal());
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");
         startService(i);
@@ -230,7 +234,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    void showProgress(String message) {
+    void showMessage(String message) {
         Log.d(TAG, "progress: " + Constants.getCurrentTimeStamp() + " - " + message);
         if (progress == null) {
             progress = new ProgressDialog(this);
