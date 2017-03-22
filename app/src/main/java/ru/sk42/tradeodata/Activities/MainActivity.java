@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity;
 import ru.sk42.tradeodata.Activities.Settings.SettingsActivity;
@@ -31,10 +30,12 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
-public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.ReceiverInterface {
+import static ru.sk42.tradeodata.Model.Constants.MESSAGE_LABEL;
+
+public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.ServiceResultReceiverInterface {
 
     ServiceResultReceiver mReceiver;
-    long prevtime, curtime;
+    long mPrevTime, curtime;
     ProgressDialog progressDialog;
 
     private static boolean mNetworkAvailable = false;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             NetworkInfo netInfo = connMan.getActiveNetworkInfo();
             if (netInfo != null && netInfo.isConnected()) {
                 try {
-                    URL urlServer = new URL(Settings.getServerAddressStatic() + St.getInfoBaseName());
+                    URL urlServer = new URL(Settings.getServerAddressStatic() + Settings.getInfoBaseNameStatic());
                     HttpURLConnection urlConn = (HttpURLConnection) urlServer.openConnection();
                     urlConn.setConnectTimeout(3000); //<- 3Seconds Timeout
                     urlConn.connect();
@@ -103,11 +104,9 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         progressDialog = new ProgressDialog(this);
 
         MyHelper.getInstance(getApplication());
-        //MyHelper.dropAndCreateTables();
         MyHelper.createTables();
 
         St.setApplication(getApplication());
-        St.readSettings();
 
         progressDialog.setTitle("Проверка доступности сервера");
         progressDialog.show();
@@ -125,36 +124,40 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
     @Override
     public void onBackPressed() {
-        if (prevtime != 0) {
+        if (mPrevTime != 0) {
             curtime = System.currentTimeMillis();
-            if ((curtime - prevtime) / 1000 <= 3) {
+            if ((curtime - mPrevTime) / 1000 <= 3) {
                 finish();
                 System.exit(0);
-            } else prevtime = 0;
+            } else mPrevTime = 0;
         }
-        if (prevtime == 0) {
-            Toast.makeText(this, "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show();
-            prevtime = System.currentTimeMillis();
+        if (mPrevTime == 0) {
+            showSnack("Нажмите еще раз для выхода");
+            mPrevTime = System.currentTimeMillis();
             return;
         }
     }
 
 
     public void btnDocListClick(View view) {
-        Intent intent = new Intent(this, DocList_Activity.class);
-        startActivity(intent);
+        showDocList();
     }
 
+    private void showDocList() {
+        Intent intent = new Intent(this, DocList_Activity.class);
+        startActivity(intent);
+
+    }
 
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
+    public void onReceiveResultFromService(int resultCode, Bundle resultData) {
 
         if (resultCode == Constants.FEEDBACK) {
-            String message = resultData.getString("Message");
+            String message = resultData.getString(MESSAGE_LABEL);
 
             if (message != null) {
                 progressDialog.setIndeterminate(true);
-                progressDialog.setTitle("Предзагрузка");
+                progressDialog.setTitle("Загрузка данных с сервера");
                 progressDialog.setMessage(message);
                 if (!progressDialog.isShowing())
                     progressDialog.show();
@@ -171,19 +174,16 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             //TODO         // переписать нормально
             try {
                 Settings.setDefaultStartingPointStatic(MyHelper.getStartingPointDao().queryForEq(Constants.REF_KEY_LABEL, "96487975-3968-426e-9dff-50f4da82431e").get(0));
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
                 Settings.setDefaultVehicleTypeStatic(MyHelper.getVehicleTypesDao().queryForEq(Constants.REF_KEY_LABEL, "b56961f4-294a-11e2-a8fe-984be1645107").get(0));
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            return;
+            showDocList();
         }
-
-
     }
 
     void showToast(String s) {

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
 import ru.sk42.tradeodata.Model.Catalogs.ImageProduct;
@@ -19,7 +20,7 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
-public class ProductActivity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.ReceiverInterface {
+public class ProductActivity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.ServiceResultReceiverInterface {
 
     ProductPresenterContract.ProductDescriptionContract mProductDescriptionContract;
     ServiceResultReceiver mReceiver;
@@ -28,7 +29,7 @@ public class ProductActivity extends AppCompatActivity implements InteractionInt
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.product_info__activity);
+        setContentView(R.layout.product_activity);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -51,11 +52,11 @@ public class ProductActivity extends AppCompatActivity implements InteractionInt
         mReceiver = new ServiceResultReceiver(new Handler());
         mReceiver.setReceiver(this);
         setTitle();
-        showImage();
+        loadImage();
 
     }
 
-    private void setTitle(){
+    private void setTitle() {
         String title = "Назад";
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewActionBar = inflater.inflate(R.layout.doclist__custom_actionbar, null);
@@ -74,10 +75,22 @@ public class ProductActivity extends AppCompatActivity implements InteractionInt
 
     }
 
+    private void showMessage(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onItemSelected(Object selectedObject) {
         Intent intent = new Intent();
         Stock stock = (Stock) selectedObject;
+        if (stock.getQty() <= 0) {
+            showMessage("Неверное количество");
+            return;
+        }
+        if (stock.getPrice() <= 0) {
+            showMessage("Неверная цена");
+            return;
+        }
         intent.putExtra("id", stock.getId());
         setResult(0, intent);
         finish();
@@ -94,7 +107,7 @@ public class ProductActivity extends AppCompatActivity implements InteractionInt
         finish();
     }
 
-    void showImage(){
+    void loadImage() {
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.LOAD_IMAGE.ordinal());
         i.putExtra("receiverTag", mReceiver);
@@ -104,11 +117,13 @@ public class ProductActivity extends AppCompatActivity implements InteractionInt
     }
 
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        if(resultCode == Constants.REQUESTS.LOAD_IMAGE.ordinal()){
-            if(resultData.getBoolean(Constants.OPERATION_SUCCESS_LABEL)){
+    public void onReceiveResultFromService(int resultCode, Bundle resultData) {
+        if (resultCode == Constants.REQUESTS.LOAD_IMAGE.ordinal()) {
+            if (resultData.getBoolean(Constants.OPERATION_SUCCESS_LABEL)) {
                 Bitmap bitmap = ImageProduct.getBitMapByRefKey(resultData.getString(Constants.REF_KEY_LABEL));
-                mProductDescriptionContract.showImage(bitmap);
+                if (mProductDescriptionContract != null) {
+                    mProductDescriptionContract.showImage(bitmap);
+                }
             }
         }
     }

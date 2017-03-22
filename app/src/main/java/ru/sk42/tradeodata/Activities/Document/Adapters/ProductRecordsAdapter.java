@@ -4,20 +4,25 @@ package ru.sk42.tradeodata.Activities.Document.Adapters;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.SaleRecordInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
 import ru.sk42.tradeodata.R;
 
@@ -34,6 +39,10 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
     public ProductRecordsAdapter(ArrayList<SaleRecordProduct> mValues, SaleRecordInterface mListener) {
         this.mListener = mListener;
         this.mValues = mValues;
+    }
+
+    public void setValues(ArrayList<SaleRecordProduct> values) {
+        mValues = values;
     }
 
     private SaleRecordProduct getSelectedObject() {
@@ -64,8 +73,7 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
 
         holder.tvDocSaleProductsProduct.setText(holder.mItem.getProduct().getDescription());
         holder.tvDocSaleProductsCharact.setText(holder.mItem.getCharact().getDescription());
-        if(holder.mItem.getCharact().isEmpty())
-        {
+        if (holder.mItem.getCharact().isEmpty()) {
             holder.tvDocSaleProductsCharact.setVisibility(View.GONE);
         }
 
@@ -75,8 +83,11 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
         holder.tvDocSaleProductsTotal.setText(Uttils.formatDoubleToMoney(holder.mItem.getTotal()));
         holder.tvDocSaleProductsUnit.setText(holder.mItem.getUnit().getDescription());
         holder.tvDocSaleProductsStore.setText(holder.mItem.getStore().getDescription());
-        holder.tvDocSaleProductsDiscountPercentAuto.setText("Авт. скидка %" + holder.mItem.getDiscountPercentAuto().toString());
-        holder.tvDocSaleProductsDiscountPercentManual.setText("Руч. скидка %" + holder.mItem.getDiscountPercentManual().toString());
+        if (holder.mItem.getDiscountPercentAuto() > 0) {
+            holder.tvDocSaleProductsDiscountPercentAuto.setText("скидка %" + holder.mItem.getDiscountPercentAuto().toString());
+        } else {
+            holder.tvDocSaleProductsDiscountPercentAuto.setVisibility(View.INVISIBLE);
+        }
 
     }
 
@@ -84,6 +95,23 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public void updateValue(SaleRecord record) {
+        int pos = -1;
+        Iterator<SaleRecordProduct> it = mValues.iterator();
+        while (it.hasNext()) {
+            SaleRecord currentRecord = it.next();
+            pos++;
+            if (currentRecord.getId() == record.getId()) {
+                currentRecord.setQty(record.getQty());
+                currentRecord.setTotal(record.getTotal());
+                currentRecord.setPrice(record.getPrice());
+                this.notifyItemChanged(pos);
+                break;
+            }
+
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
@@ -112,9 +140,6 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
 
         @Bind(R.id.tv_DocSale_Products_DiscountPercentAuto)
         TextView tvDocSaleProductsDiscountPercentAuto;
-
-        @Bind(R.id.tv_DocSale_Products_DiscountPercentManual)
-        TextView tvDocSaleProductsDiscountPercentManual;
 
         @Bind(R.id.product_record_plus)
         TextView tvPlus;
@@ -161,7 +186,7 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
             });
 
             // Handle item click and set the selection
-            itemView.setOnClickListener(new View.OnClickListener() {
+            tvDocSaleProductsProduct.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Redraw the old selection and the new
@@ -176,15 +201,14 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
                 @Override
                 public void onClick(View view) {
                     selectedItem = getLayoutPosition();
-                    mListener.deleteRecord(getSelectedObject());
+                    mListener.removeRecord(getSelectedObject());
                 }
             });
         }
 
-
         @Override
         public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
-            String[] menuItems = {"Удалить товар", "2", "3"};
+            String[] menuItems = {"Удалить товар"};
             for (int i = 0; i < menuItems.length; i++) {
                 contextMenu.add(Menu.NONE, i, i, menuItems[i]);
             }

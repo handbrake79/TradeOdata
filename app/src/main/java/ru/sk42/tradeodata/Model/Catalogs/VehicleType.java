@@ -19,21 +19,37 @@ import ru.sk42.tradeodata.Model.Constants;
 @DatabaseTable
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleType extends CDO {
+
     @DatabaseField(id = true)
     @JsonProperty("Ref_Key")
     private String ref_Key;
+
     @DatabaseField
     @JsonProperty
     private String Code;
+
     @DatabaseField
     @JsonProperty
     private String Description;
+
     @DatabaseField
     @JsonProperty("МаксимальныйОбъем")
     private Integer maxVolume;
+
     @DatabaseField
     @JsonProperty("МаксимальнаяГрузоподъемность")
     private Integer maxTonnage;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @DatabaseField
+    boolean enabled;
 
     public static VehicleType newInstance() {
         VehicleType obj = new VehicleType();

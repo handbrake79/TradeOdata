@@ -337,7 +337,7 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
     public static Dao<Settings, Object> getSettingsDao() {
         try {
             return getInstance().getDao(Settings.class);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

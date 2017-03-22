@@ -99,7 +99,7 @@ public class DataLoader {
                         for (String url : urlList) {
                             showProgress(" Загружаются товары");
                             ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
-                            Call<ProductsList> call = request.call(RetroConstants.getMap(url));
+                            Call<ProductsList> call = request.call(RetroConstants.getMapWithFieldRestriction(url, RetroConstants.productFieldsList));
                             ProductsList list = call.execute().body();
                             list.save();
                             Log.d(TAG, "makeRequests: сохранили товары! ***");

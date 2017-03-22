@@ -9,14 +9,16 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-feature android:name="android.hardware.usb.accessory" />
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/barcode_scan"
+        android:icon="@mipmap/icon"
         android:label="ТТ Стройбаза"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light"
@@ -48,9 +50,8 @@
             activity: android:windowSoftInputMode="stateHidden"
         </activity>
         <activity
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
             android:name=".Activities.Documents_List.DocList_Activity"
-             />
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         activity: android:windowSoftInputMode="stateHidden"
         <activity android:name=".Activities.ProductsList.ProductsListActivity">
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
@@ -62,8 +63,7 @@
         </activity>
         <activity android:name=".Activities.Product.ProductActivity">
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="stateHidden"
-        </activity>
+            android:windowSoftInputMode="stateHidden"</activity>
 
 
         <service

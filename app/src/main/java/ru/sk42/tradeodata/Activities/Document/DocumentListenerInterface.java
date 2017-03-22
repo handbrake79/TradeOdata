@@ -50,5 +50,5 @@ public interface DocumentListenerInterface {
 
     void onContactPersonPhoneChanged(String text, TextInputLayout tilContactPersonPhone);
 
-    void setDiscountCard(DiscountCard card);
+    void onDiscountCardNumberEntered(String cardNumber, TextInputLayout tilCardNumber);
 }

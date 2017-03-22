@@ -17,11 +17,12 @@ import ru.sk42.tradeodata.R;
 public class Stock_Adapter extends RecyclerView.Adapter<Stock_Adapter.ViewHolder> {
 
     private final List<Stock> mValues;
-    private Integer selectedItem;
+    public Integer selectedItem;
+    private InteractionInterface mListener;
 
     public Stock_Adapter(List<Stock> items, InteractionInterface listener) {
         selectedItem = -1;
-
+        this.mListener = listener;
         mValues = items;
     }
 
@@ -40,21 +41,20 @@ public class Stock_Adapter extends RecyclerView.Adapter<Stock_Adapter.ViewHolder
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         holder.itemView.setSelected(selectedItem == position);
-        if (selectedItem == position)
+        if (selectedItem == position) {
             holder.itemView.setBackgroundColor(Color.CYAN);
-        else
+        } else {
             holder.itemView.setBackgroundColor(Color.WHITE);
+        }
 
         holder.mItem = mValues.get(position);
 
         //holder.mProduct.setText(product.getDescription());
         //holder.mProduct.setText(mValues.get(position).getProductInfo().getDescription());
         holder.mStore.setText(mValues.get(position).getStoreDescription());
-        if(mValues.get(position).getCharact().isEmpty()){
+        if (mValues.get(position).getCharact().isEmpty()) {
             holder.mCharact.setVisibility(View.GONE);
-        }
-        else
-        {
+        } else {
             holder.mCharact.setVisibility(View.VISIBLE);
             holder.mCharact.setText(mValues.get(position).getCharact_Description());
         }
@@ -70,13 +70,13 @@ public class Stock_Adapter extends RecyclerView.Adapter<Stock_Adapter.ViewHolder
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        //public final View mView;
+        //public final initView mView;
         public final TextView mStore;
         public final TextView mCharact;
         public final TextView mPrice;
         public final TextView mQty;
         public final TextView mUnit;
-     //  public final TextView mProduct;
+        //  public final TextView mProduct;
         public Stock mItem;
 
         public ViewHolder(final View view) {
@@ -99,7 +99,7 @@ public class Stock_Adapter extends RecyclerView.Adapter<Stock_Adapter.ViewHolder
                     notifyItemChanged(selectedItem);
                     selectedItem = getLayoutPosition();
                     notifyItemChanged(selectedItem);
-                    //mListener.onItemSelected(mValues.get(selectedItem));
+                    mListener.onItemSelected(mValues.get(selectedItem));
                 }
             });
         }

@@ -11,7 +11,7 @@ import ru.sk42.tradeodata.Model.Catalogs.HelperLists.VehicleTypesList;
  * Created by я on 12.09.2016.
  */
 public interface VehicleTypesRequest {
-        @GET("ut836/odata/standard.odata/Catalog_ТипыТС")
+    @GET("/tradeodata/odata/standard.odata/Catalog_ТипыТС")
         Call<VehicleTypesList> call(
                 @QueryMap Map<String, String> options
         );

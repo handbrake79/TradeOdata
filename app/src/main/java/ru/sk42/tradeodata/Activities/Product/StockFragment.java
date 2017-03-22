@@ -26,7 +26,7 @@ import ru.sk42.tradeodata.R;
  * Activities containing this fragment MUST implement the {@link InteractionInterface}
  * interface.
  */
-public class StockFragment extends android.support.v4.app.Fragment {
+public class StockFragment extends android.support.v4.app.Fragment implements InteractionInterface {
 
     private static final String TAG = "ProductInfo***";
     public ProductInfo productInfo;
@@ -35,7 +35,7 @@ public class StockFragment extends android.support.v4.app.Fragment {
     private InteractionInterface mListener;
     private Stock_Adapter mAdapter;
 
-
+    TextView tvSelect;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -78,14 +78,14 @@ public class StockFragment extends android.support.v4.app.Fragment {
         View view = inflater.inflate(R.layout.product_info__stock_fragment, container, false);
 
         TextView tvOutOfStock = (TextView) view.findViewById(R.id.tvProductInfo_outofstock);
-        Button btnSelect = (Button) view.findViewById(R.id.btnSelectStock);
+        tvSelect = (TextView) view.findViewById(R.id.btnSelectStock);
         if(productInfo.getArrayList().size() == 0){
             tvOutOfStock.setVisibility(View.VISIBLE);
-            btnSelect.setVisibility(View.GONE);
+            tvSelect.setVisibility(View.GONE);
         }
 
         View rvView = view.findViewById(R.id.rvStock);
-        btnSelect.setOnClickListener(new View.OnClickListener() {
+        tvSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onStockSelected();
@@ -143,4 +143,15 @@ public class StockFragment extends android.support.v4.app.Fragment {
     }
 
 
+    @Override
+    public void onItemSelected(Object selectedObject) {
+        //это вызывается в адаптере
+        //нужно чтобы изменить цвет "кнопки" при выборе товара
+        tvSelect.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onRequestSuccess(Object obj) {
+
+    }
 }

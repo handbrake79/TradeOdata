@@ -1,9 +1,11 @@
 package ru.sk42.tradeodata.Activities.Settings;
 
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,13 +17,18 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.generalscan.NotifyStyle;
+import com.generalscan.OnDataReceive;
+import com.generalscan.bluetooth.BluetoothConnect;
+
+import java.sql.SQLException;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DrawerAdapter;
-import ru.sk42.tradeodata.Model.Catalogs.HelperLists.UsersList;
 import ru.sk42.tradeodata.Model.Catalogs.User;
+import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.Printers;
 import ru.sk42.tradeodata.R;
 
 
@@ -39,13 +46,12 @@ import ru.sk42.tradeodata.R;
 public class SettingsActivity extends AppCompatActivity implements SettingsInterface {
 
     static final String TAG = "SETTINGS";
-    public static Printers printers;
-    public static UsersList usersList;
+
+    Activity mActivity;
 
     Toolbar myToolbar;
 
     ActionBarDrawerToggle mDrawerToggle;
-
 
     @Bind(R.id.settings_listview)
     ListView mDrawerList;
@@ -59,6 +65,9 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings__activity);
         ButterKnife.bind(this, this);
+
+        mActivity = this;
+
         int[] colors = {0, 0xFFFF0000, 0}; // red for the example
         mDrawerList.setDivider(new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors));
         mDrawerList.setDividerHeight(2);
@@ -154,7 +163,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
                 showConnectionFragment();
                 break;
             case 1:
-                //mUser select
+                //mVehicleType select
                 UserListFragment userListFragment = UserListFragment.newInstance(1);
 
                 getSupportFragmentManager()
@@ -184,6 +193,12 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
                 //scanner
                 break;
             case 4:
+                VehicleTypesFragment vehicleTypesFragment = VehicleTypesFragment.newInstance(1);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.settings_frame, vehicleTypesFragment, vehicleTypesFragment.getClass().getName())
+                        .addToBackStack(vehicleTypesFragment.getClass().getName())
+                        .commit();
                 break;
         }
     }
@@ -206,12 +221,25 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
             Settings.setCurrentUserStatic(user);
            Toast.makeText(this, "Выбран пользователь " + user.getDescription(), Toast.LENGTH_SHORT).show();
         }
+        if (object instanceof VehicleType) {
+            VehicleType vehicleType = (VehicleType) object;
+            try {
+                vehicleType.save();
+                showMessage("Изменения вступят в силу после перезапуска программы");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         if(object instanceof String){
             Settings.getSettings().setPrinterStatic((String) object);
 
             Toast.makeText(this, "Выбран принтер " + Settings.getPrinterStatic(), Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    private void showMessage(String s) {
+        Snackbar.make(this.getWindow().getDecorView(), s, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -231,5 +259,6 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
     public void onBackPressed() {
         finish();
     }
+
 
 }

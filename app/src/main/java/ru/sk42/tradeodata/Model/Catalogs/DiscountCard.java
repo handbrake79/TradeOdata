@@ -114,4 +114,12 @@ public class DiscountCard extends CDO {
         return this.getDescription().toString();
     }
 
+    public static DiscountCard findCardByNumber(String cardNumber) {
+        try {
+            return MyHelper.getDiscountCardDao().queryForEq("code", cardNumber).get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

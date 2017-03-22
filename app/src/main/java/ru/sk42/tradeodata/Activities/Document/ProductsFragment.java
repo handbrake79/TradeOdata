@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.ProductRecordsAdapter;
 import ru.sk42.tradeodata.Activities.ProductsList.DividerDecoration;
 import ru.sk42.tradeodata.Model.Document.DocSale;
+import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.R;
 
 
@@ -43,9 +44,11 @@ public class ProductsFragment extends Fragment {
         ButterKnife.bind(this, mProductsRecyclerView);
 
         mProductsRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
-        mProductsRecyclerView.setSelected(true);
+        //      mProductsRecyclerView.setSelected(true);
         mProductsRecyclerView.setLayoutManager(new LinearLayoutManager(mProductsRecyclerView.getContext()));
-        setAdapter();
+
+        initView();
+
         return mProductsRecyclerView;
     }
 
@@ -57,9 +60,24 @@ public class ProductsFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    public void notifyDataChanged() {
+    public void notifyItemChanged(SaleRecord record) {
+        adapter.updateValue(record);
+    }
+
+    public void notifyItemAdded() {
         setAdapter();
+        scrollToLastPosition();
+    }
+
+    public void notifyItemRemoved() {
+        setAdapter();
+    }
+
+    public void scrollToLastPosition() {
         mProductsRecyclerView.scrollToPosition(docSale.getProducts().size() - 1);
     }
 
+    public void initView() {
+        setAdapter();
+    }
 }

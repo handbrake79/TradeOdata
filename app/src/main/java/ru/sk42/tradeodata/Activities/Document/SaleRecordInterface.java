@@ -12,7 +12,7 @@ public interface SaleRecordInterface {
 
     void minus(SaleRecord record);
 
-    void deleteRecord(SaleRecord record);
+    void removeRecord(SaleRecord record);
 
     void onRecordSelected(SaleRecord record, int action);
 

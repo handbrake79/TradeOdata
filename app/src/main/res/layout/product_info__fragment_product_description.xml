@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     tools:context="ru.sk42.tradeodata.Activities.Product.DescriptionFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -93,8 +92,8 @@
             android:paddingTop="5dp"
             android:text="Показать описание"
 
-            android:textColor="@color/bpLine_dark"
-            android:textSize="12sp"
+            android:textColor="@color/bpBlue"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView

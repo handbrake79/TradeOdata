@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -51,6 +52,7 @@ import ru.sk42.tradeodata.Model.Catalogs.ImageProduct;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
+import ru.sk42.tradeodata.Model.PrintResult;
 import ru.sk42.tradeodata.Model.Printer;
 import ru.sk42.tradeodata.Model.Printers;
 import ru.sk42.tradeodata.Model.ProductInfo;
@@ -94,7 +96,7 @@ import ru.sk42.tradeodata.NetworkRequests.VehicleTypesRequest;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p/>
- * TODO: Customize class - update mIntent actions, extra parameters and static
+ * TODO: Customize class - initView mIntent actions, extra parameters and static
  * helper methods.
  */
 public class CommunicationWithServer extends IntentService {
@@ -147,6 +149,9 @@ public class CommunicationWithServer extends IntentService {
             case LOAD_IMAGE:
                 loadImage();
                 break;
+            case DISCOUNT_CARD:
+                findDiscountCard();
+                break;
         }
 
     }
@@ -158,53 +163,68 @@ public class CommunicationWithServer extends IntentService {
         final RequestResult result = new RequestResult(Constants.REQUESTS.PRINT_DOCUMENT);
 
         PrintRequest request = ServiceGenerator.createService(PrintRequest.class);
-        Call<String> call = request.call(docNumber, printerName);
+        Call<PrintResult> call = request.call(docNumber, printerName);
         call.enqueue(
-                new Callback<String>() {
+                new Callback<PrintResult>() {
                     @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
+                    public void onResponse(Call<PrintResult> call, Response<PrintResult> response) {
+                        PrintResult printResult = response.body();
                         result.resultCode = response.raw().code();
+                        result.message = printResult.getResult();
                         if (result.resultCode == 200) {
-                            result.message = "Документ поставлен в очередь печати";
                             result.success = true;
                         } else {
                             //Разбираемся что за хня
                             Log.d(TAG, "onResponse: хуйня какая-то опять...");
-                            result.message = "Ошибка печати!";
                             result.success = false;
                         }
                         sendRequestFinished(result);
                     }
 
                     @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-                        Log.e(TAG, "onFailure: ");
+                    public void onFailure(Call<PrintResult> call, Throwable t) {
+                        Log.e(TAG, "onFailure: " + t.toString());
                     }
                 }
         );
     }
 
 
-    private void productRequest() {
-        final String ref_Key = mIntent.getStringExtra(Constants.REF_KEY_LABEL);
-        final RequestResult result = new RequestResult(Constants.REQUESTS.PRODUCT_INFO);
+    private boolean cachedProductInfoIsValid(ProductInfo productInfo, RequestResult result) {
 
-        ProductInfo productInfo = ProductInfo.getObject(ProductInfo.class, ref_Key);
         if (productInfo != null) {
             Date now = GregorianCalendar.getInstance().getTime();
             long timeDiff = (now.getTime() - productInfo.getRequestDate().getTime()) / 1000;
-            if (timeDiff < 60) {
-                result.message = "По GUID " + ref_Key + " найден товар " + productInfo.getDescription();
+            if (timeDiff < Constants.PRODUCT_INFO_EXPIRATION_TIME_SECONDS) {
+                result.message = "По GUID " + productInfo.getRef_Key() + " найден товар " + productInfo.getDescription();
                 result.ref_Key = productInfo.getRef_Key();
                 result.success = true;
                 DataLoader.LoadMissingDataForObject(productInfo, ProductInfo.class);
                 sendRequestFinished(result);
 
-                return;
+                return true;
             }
+        } else {
+            return false;
         }
+        return false;
+    }
 
+    private void productRequest() {
+        final String ref_Key = mIntent.getStringExtra(Constants.REF_KEY_LABEL);
+        final RequestResult result = new RequestResult(Constants.REQUESTS.PRODUCT_INFO);
+
+        ProductInfo productInfo = ProductInfo.getObject(ProductInfo.class, ref_Key);
+        if (cachedProductInfoIsValid(productInfo, result)) {
+            return;
+        }
         ProductInfoRequest request = ServiceGenerator.createService(ProductInfoRequest.class);
+        if (request == null) {
+            result.message = "Ошибка при обращении к серверу, попробуйте позже";
+            result.ref_Key = ref_Key;
+            result.success = false;
+            result.resultCode = -1;
+        }
         Call<ProductInfo> call = request.call(ref_Key);
         call.enqueue(new Callback<ProductInfo>() {
             @Override
@@ -230,26 +250,36 @@ public class CommunicationWithServer extends IntentService {
 
     private void barcodeRequest() {
 
+
         final RequestResult result = new RequestResult(Constants.REQUESTS.BARCODE);
         final String barcode = mIntent.getStringExtra(Constants.BARCODE_LABEL);
+        ProductInfo productInfo = ProductInfo.getByBarcode(barcode);
+        if (cachedProductInfoIsValid(productInfo, result)) {
+            return;
+        }
         final BarcodeRequest request = ServiceGenerator.createService(BarcodeRequest.class);
         Call<ProductInfo> call = request.call(barcode);
         call.enqueue(new Callback<ProductInfo>() {
             @Override
             public void onResponse(Call<ProductInfo> call, Response<ProductInfo> response) {
+                result.resultCode = response.code();
                 ProductInfo productInfo = response.body();
                 if (productInfo != null) {
+                    productInfo.setBarcode(barcode);
                     productInfo.save();
                     result.message = "По штрихкоду " + barcode + " найден товар " + productInfo.getDescription();
                     result.ref_Key = productInfo.getRef_Key();
                     result.success = true;
                     DataLoader.LoadMissingDataForObject(productInfo, ProductInfo.class);
-                    sendRequestFinished(result);
 
                 } else {
-                    result.message = "Ошибка";
-                    sendRequestFinished(result);
+                    if (response.code() == 404) {
+                        result.message = "По штрихкоду " + barcode + " товар не найден";
+                    } else {
+                        result.message = "Неизвестная ошибка";
+                    }
                 }
+                sendRequestFinished(result);
             }
 
             @Override
@@ -342,28 +372,47 @@ public class CommunicationWithServer extends IntentService {
             }
             Log.d(TAG, "getPrinters: " + response.toString());
         } catch (Exception e) {
-
+            Log.d(TAG, "getPrinters: " + e.toString());
         }
     }
 
     private void loadShippingRates() {
-
-        long count = 0;
-
-        try {
-            count = MyHelper.getShippingRouteDao().countOf();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (count > 0) {
-            return;
-        }
+//
+//        long count = 0;
+//
+//        try {
+//            count = MyHelper.getShippingRouteDao().countOf();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (count > 0) {
+//            return;
+//        }
 
         sendFeedback("Начата загрузка тарифов на доставку");
 
         ShippingRatesRequest request = ServiceGenerator.createService(ShippingRatesRequest.class);
-        Call<ShippingRatesList> call = request.call(RetroConstants.getMap(""));
+        Call<ShippingRatesList> call = null;
+        try {
+            List<VehicleType> list = MyHelper.getVehicleTypesDao().queryForEq("enabled", true);
+            String eq = "ТипТС_Key eq guid'";
+            Iterator<VehicleType> it = list.iterator();
+            String condition = "";
+            int i = 0;
+            while (it.hasNext()) {
+                VehicleType v = it.next();
+                if (i > 0) {
+                    condition += " or ";
+                }
+                condition += eq + v.getRef_Key() + "'";
+                i++;
+            }
+            call = request.call(RetroConstants.getMapWithCondition(condition));
+        } catch (SQLException e) {
+            call = request.call(RetroConstants.getMap(""));
+        }
+
         try {
 
             Response<ShippingRatesList> response = call.execute();
@@ -383,7 +432,9 @@ public class CommunicationWithServer extends IntentService {
 
     private void loadCustomers() {
         Customer object = new Customer();
-        if (!isLoadRequired(object)) return;
+        if (!isLoadRequired(object)) {
+            return;
+        }
         CustomersRequest request = ServiceGenerator.createService(CustomersRequest.class);
         Call<CustomersList> call = request.call(RetroConstants.getMap(object.getRetroFilterString()));
         try {
@@ -531,7 +582,11 @@ public class CommunicationWithServer extends IntentService {
         if (shipping == null || unload == null) {
 
             ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
-            Call<ProductsList> call = request.call(RetroConstants.getMap("Ref_Key eq guid'" + Constants.SHIPPING_GUID + "'" + " or Ref_Key eq guid'" + Constants.UNLOAD_GUID + "'"));
+            Call<ProductsList> call = request.call(RetroConstants.getMapWithFieldRestriction("Ref_Key eq guid'"
+                            + Constants.SHIPPING_GUID + "'"
+                            + " or Ref_Key eq guid'"
+                            + Constants.UNLOAD_GUID + "'",
+                    RetroConstants.productFieldsList));
             try {
                 Response<ProductsList> response = call.execute();
                 ProductsList list = response.body();
@@ -632,12 +687,16 @@ public class CommunicationWithServer extends IntentService {
             filter = "?$filter=" + filter;
         }
 
-        Call<Integer> call = request.call(Settings.getInfoBaseNameStatic() + "/odata/standard.odata/" + object.getMaintainedTableName() + "/$count" + filter);
+        Call<Integer> call = request.call(Settings.getServerAddressStatic() + "/tradeodata/odata/standard.odata/" + object.getMaintainedTableName() + "/$count" + filter);
         Integer count = 0;
         try {
             Response<Integer> response = call.execute();
             count = response.body();
-            return count;
+            if (count == null) {
+                return 0;
+            } else {
+                return count;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -731,6 +790,8 @@ public class CommunicationWithServer extends IntentService {
 
     private void loadImage() {
 
+        Log.d(TAG, "loadImage: -----------------------------------------------------------------------");
+        Log.d(TAG, "loadImage: -----------------------------------------------------------------------");
 
         final String ref_Key = mIntent.getStringExtra(Constants.REF_KEY_LABEL);
         //Объект eq cast(guid'0d4a79cb-9843-4147-bcd9-80ac3ca2b9c7', 'Catalog_Товары')
@@ -781,6 +842,9 @@ public class CommunicationWithServer extends IntentService {
     }
 
     private void sendRequestFinished(RequestResult result) {
+        if (mResultReceiver == null) {
+            return;
+        }
         Bundle mResultBundle = new Bundle();
         fillResultBundle(result, mResultBundle);
         mResultReceiver.send(result.requestedOperation.ordinal(), mResultBundle);
@@ -848,6 +912,10 @@ public class CommunicationWithServer extends IntentService {
 
     private boolean isLoadRequired(CDO object) {
         long serverRecordsCount = getRecordsCountFromServer(object);
+        if (serverRecordsCount < 0) {
+            return false;
+
+        }
         long localRecordsCount = 0;
         try {
             localRecordsCount = object.getDao().countOf();
@@ -937,8 +1005,7 @@ public class CommunicationWithServer extends IntentService {
             );
         }
 
-        if (!docSale.getRef_Key().equals(Constants.ZERO_GUID))
-        {
+        if (!docSale.getRef_Key().equals(Constants.ZERO_GUID)) {
             //вызываем метод patch такой документ уже есть в базе 1с
             SaveExistingDocument mPatchRequest = ServiceGenerator.createXMLService(SaveExistingDocument.class);
             Call<ResponseBody> call = mPatchRequest.call(docSale.getRef_Key(), body);
@@ -986,6 +1053,7 @@ public class CommunicationWithServer extends IntentService {
                                  result.message = "Документ проведен";
                                  result.success = true;
                              } else {
+                                 result.message = response.raw().message();
                                  //Разбираемся что за хня
                                  Log.d(TAG, "onResponse: хуйня какая-то опять...");
                              }
@@ -1014,6 +1082,51 @@ public class CommunicationWithServer extends IntentService {
         } else {
             sendRequestFinished(result);
         }
+    }
+
+
+    private void findDiscountCard() {
+        final RequestResult result = new RequestResult(Constants.REQUESTS.DISCOUNT_CARD);
+        final String cardNumber = mIntent.getStringExtra(Constants.REF_KEY_LABEL);
+        DiscountCard card = DiscountCard.findCardByNumber(cardNumber);
+
+        if (card != null) {
+            result.success = true;
+            result.ref_Key = card.getRef_Key();
+            sendRequestFinished(result);
+        }
+
+
+        String filter = "КодКарты eq '" + cardNumber + "'";
+        DiscountCardsRequest request = ServiceGenerator.createService(DiscountCardsRequest.class);
+        Call<DiscountCardsList> call = request.call(RetroConstants.getMap(filter));
+        call.enqueue(new Callback<DiscountCardsList>() {
+            @Override
+            public void onResponse(Call<DiscountCardsList> call, Response<DiscountCardsList> response) {
+                result.resultCode = response.code();
+                DiscountCardsList list = response.body();
+                if (list == null) {
+                    result.message = "Сервер вернул неверный результат";
+                } else {
+                    if (list.size() > 0) {
+                        DiscountCard card = list.getValues().iterator().next();
+                        card.save();
+                        result.ref_Key = card.getRef_Key();
+                        result.success = true;
+                    } else {
+                        result.message = "Карта номер " + cardNumber + " не найдена";
+                    }
+                }
+                sendRequestFinished(result);
+            }
+
+            @Override
+            public void onFailure(Call<DiscountCardsList> call, Throwable t) {
+                result.message = t.toString();
+                result.resultCode = 0;
+                sendRequestFinished(result);
+            }
+        });
     }
 
 

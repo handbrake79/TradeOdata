@@ -4,11 +4,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
+import ru.sk42.tradeodata.Model.Catalogs.ImageProduct;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.R;
 
@@ -49,6 +51,7 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
         holder.mItem = items.get(position);
         holder.tvCode.setText(items.get(position).getCode());
         holder.tvDescription.setText(items.get(position).getDescription());
+        holder.mImage.setImageBitmap(ImageProduct.getBitMapByRefKey(items.get(position).getRef_Key()));
         if (holder.mItem.isFolder()) {
             holder.tvCode.setVisibility(View.GONE);
 //            holder.mView.setBackgroundColor(Color.GRAY);
@@ -79,12 +82,14 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
         public final TextView tvCode;
         public final TextView tvDescription;
         public Product mItem;
+        public final ImageView mImage;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             tvCode = (TextView) view.findViewById(R.id.products_list_browser_product_code);
             tvDescription = (TextView) view.findViewById(R.id.tvProduct);
+            mImage = (ImageView) view.findViewById(R.id.doclist__image_small);
         }
 
         @Override

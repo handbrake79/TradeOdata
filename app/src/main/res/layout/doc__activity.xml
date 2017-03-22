@@ -1,85 +1,82 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/doc_drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar_document"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/holo_red_light"
-        android:elevation="5dp"
-        android:gravity="top|start"
-        android:onClick="onToolbarClick"
-        tools:targetApi="17"
-        app:title="TITLE">
-    </android.support.v7.widget.Toolbar>
-
-    <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:divider="#FFCC00"
-        android:dividerHeight="4px"
-        android:id="@+id/doc_drawer_layout"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/doc__coord"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:descendantFocusability="blocksDescendants">
-        <!-- The main content view -->
-        <ListView
-            android:background="@android:color/holo_blue_dark"
-            android:id="@+id/doc_listview"
-            android:layout_width="240dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:choiceMode="singleChoice"
-            android:descendantFocusability="blocksDescendants"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp" />
+        android:orientation="vertical">
 
-
-        <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/llDocMainFragment"
+        <LinearLayout
+            android:id="@+id/doc__ll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="10"
-            android:background="@color/cardview_light_background"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:orientation="vertical">
 
-
-            <LinearLayout
-                android:id="@+id/ll_test"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/document_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/holo_red_light"
+                android:elevation="5dp"
+                android:gravity="top|start"
+                app:title="TITLE"
+                tools:targetApi="17">
 
-                <com.astuetz.PagerSlidingTabStrip
-                    android:id="@+id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:layout_margin="5dp"
-                    android:layout_weight="5"
-                    android:elevation="5dp"
-                    android:fillViewport="true"
-                    android:padding="5dp"
-                    app:pstsShouldExpand="true"
-                    app:pstsTextAllCaps="true" />
+            </android.support.v7.widget.Toolbar>
 
-                <android.support.v4.view.ViewPager
-                    android:id="@+id/viewpager"
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/doc__viewpager"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.v4.view.PagerTabStrip
+                    android:id="@+id/pagerTabStrip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="7"
-                    android:background="@android:color/white" />
-
-            </LinearLayout>
-
-            <include layout="@layout/doc__bottom_sheet_total" />
-
-        </android.support.design.widget.CoordinatorLayout>
+                    android:scrollIndicators="left|right"
+                    android:scrollbars="horizontal"></android.support.v4.view.PagerTabStrip>
 
 
-    </android.support.v4.widget.DrawerLayout>
+            </android.support.v4.view.ViewPager>
 
-</LinearLayout>
+
+        </LinearLayout>
+
+        <include
+            android:id="@+id/include"
+            layout="@layout/doc__bottom_sheet_total" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/document_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|left"
+            android:layout_margin="20dp"
+            android:onClick="fab_onclick"
+            android:src="@drawable/products_list"
+            app:backgroundTint="@android:color/holo_blue_dark"
+            app:rippleColor="@color/bpRed"
+            app:fabSize="mini"
+            app:layout_anchor="@+id/include"
+            app:layout_anchorGravity="top|right" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/document_nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:background="@android:color/holo_blue_dark"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/doc_drawer_menu"></android.support.design.widget.NavigationView>
+</android.support.v4.widget.DrawerLayout>
+

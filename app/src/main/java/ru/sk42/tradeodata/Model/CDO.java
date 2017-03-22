@@ -26,7 +26,7 @@ public abstract class CDO {
                     MyHelper.getInstance().getDao(clazz).queryForEq(Constants.REF_KEY_LABEL, key);
             if (list.size() > 0)
                 return list.get(0);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

@@ -1,8 +1,8 @@
 package ru.sk42.tradeodata.Activities.ProductsList;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,6 +33,7 @@ import ru.sk42.tradeodata.Activities.Settings.Settings;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.NetworkRequests.ProductsRequest;
 import ru.sk42.tradeodata.NetworkRequests.RetroConstants;
+import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceGenerator;
 
 
@@ -179,11 +180,23 @@ public class ProductsListFragment extends Fragment {
         parentACtivity.setActionBarTitle(title);
     }
 
+    void loadImage(String ref_Key) {
+        Intent i = new Intent(this.getActivity(), CommunicationWithServer.class);
+        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.LOAD_IMAGE.ordinal());
+        i.putExtra(Constants.REF_KEY_LABEL, ref_Key);
+        getActivity().startService(i);
+    }
+
+
     public void showChildProducts(Product product) {
 
         if (!product.isFolder()) {
             return; //это не группа, оставляем всё как есть
         }
+
+        showMessage("Запрос к 1С, ждите");
+
+        loadImage(product.getRef_Key());
 
         setTitle("Группа " + product.getDescription());
 
@@ -194,14 +207,17 @@ public class ProductsListFragment extends Fragment {
 
         if (list == null || list.size() == 0) {
             final ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
-            Call<ProductsList> call = request.call(RetroConstants.getMap("Parent_Key eq guid'" + guid + "'"));
+            Call<ProductsList> call = request
+                    .call(RetroConstants.getMapWithFieldRestriction("Parent_Key eq guid'" + guid + "'",
+                            RetroConstants.productFieldsList)
+                    );
             call.enqueue(new MyCallBack());
         } else
             updateView(list);
     }
 
     public void showMessage(String msg) {
-        Snackbar.make(view, msg, Snackbar.LENGTH_SHORT).show();
+        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_SHORT).show();
     }
 
     public void showTopLevelProducts() {
@@ -212,7 +228,7 @@ public class ProductsListFragment extends Fragment {
         if (list == null || list.size() == 0) {
             showMessage("Запрос к 1С");
             final ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
-            Call<ProductsList> call = request.call(RetroConstants.getMap("Parent_Key eq guid'" + guid + "'"));
+            Call<ProductsList> call = request.call(RetroConstants.getMapWithFieldRestriction("Parent_Key eq guid'" + guid + "'", RetroConstants.productFieldsList));
             call.enqueue(new MyCallBack());
         } else
             updateView(list);

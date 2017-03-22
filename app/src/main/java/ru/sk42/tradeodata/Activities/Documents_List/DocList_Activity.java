@@ -30,12 +30,11 @@ import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.DocSaleList;
 import ru.sk42.tradeodata.Activities.Settings.Settings;
-import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
-public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.ReceiverInterface {
+public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.ServiceResultReceiverInterface {
 
     private static final String TAG = "***Doclist activity";
 
@@ -55,7 +54,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         Log.d(TAG, "onCreate: ***OnCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.doclist__activity);
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (Settings.getCurrentUserStatic() == null) {
@@ -81,7 +79,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
             requestDocList();
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.doclist__fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,15 +87,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
                 intent.putExtra(Constants.MODE_LABEL, Constants.ModeNewOrder);
                 startActivityForResult(intent, 0);
                 mAdapter.notifyDataSetChanged();
-
-//                Snackbar.make(view, "", Snackbar.LENGTH_LONG)
-//                        .setAction("", new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View view1) {
-//                                selectDate();
-//                            }
-//                        }).show();
-//
             }
         });
 
@@ -118,11 +107,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
     private void setActionBarTitle() {
         getWindow().setTitle("");
-        String title = Uttils.DATE_FORMATTER.format(startDate.getTime());
-//        if (doc_list != null)
-//            title += " документов " + doc_list.size().toString() + "";
-//        else
-//            title += " документов еще нет";
+        String title = "Реализации " + Settings.getCurrentUserStatic().getDescription();// + Uttils.DATE_FORMATTER.format(startDate.getTime());
 
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewActionBar = inflater.inflate(R.layout.doclist__custom_actionbar, null);
@@ -155,7 +140,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
             @Override
             public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
                 startDate.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
-                St.setStartDate(startDate.getTime());
                 requestDocList();
             }
         }
@@ -204,7 +188,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
 
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
+    public void onReceiveResultFromService(int resultCode, Bundle resultData) {
         if (resultCode == Constants.FEEDBACK) {
             String message = resultData.getString("Message");
             showMessage(message);
@@ -235,6 +219,9 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     }
 
     void showMessage(String message) {
+        if (message == null) {
+            return;
+        }
         Log.d(TAG, "progress: " + Constants.getCurrentTimeStamp() + " - " + message);
         if (progress == null) {
             progress = new ProgressDialog(this);

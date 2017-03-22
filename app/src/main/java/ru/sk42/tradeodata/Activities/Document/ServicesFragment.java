@@ -30,11 +30,6 @@ public class ServicesFragment extends Fragment {
     View view;
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         DocumentActivity activity = (DocumentActivity) getActivity();
@@ -43,8 +38,8 @@ public class ServicesFragment extends Fragment {
         view = inflater.inflate(R.layout.doc__page_services, container, false);
         ButterKnife.bind(this, view);
 
-        mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
-        mServicesRecyclerView.setSelected(true);
+//        mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
+//        mServicesRecyclerView.setSelected(true);
         mServicesRecyclerView.setLayoutManager(new LinearLayoutManager(mServicesRecyclerView.getContext()));
 
         setAdapter();
@@ -54,15 +49,31 @@ public class ServicesFragment extends Fragment {
     }
 
     private void setAdapter() {
-        adapter = new ServicesRecordsAdapter(docSale.getServicesList(), (SaleRecordInterface) getActivity());
+        if (adapter == null) {
+            adapter = new ServicesRecordsAdapter(docSale.getServicesList(), (SaleRecordInterface) getActivity());
+        }
         mServicesRecyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
     }
 
-    public void notifyDataChanged(){
-        if(adapter != null) {
-            setAdapter();
-            mServicesRecyclerView.scrollToPosition(docSale.getServices().size() - 1);
-        }
+    public void notifyItemChanged(int position) {
+        adapter.setValues(docSale.getServicesList());
+        adapter.notifyItemChanged(position - 1);
+    }
+
+    public void notifyItemAdded() {
+        setAdapter();
+        scrollToLastPosition();
+    }
+
+    public void notifyItemRemoved() {
+        setAdapter();
+    }
+
+    public void scrollToLastPosition() {
+        mServicesRecyclerView.scrollToPosition(docSale.getProducts().size() - 1);
+    }
+
+    public void initView() {
+        setAdapter();
     }
 }

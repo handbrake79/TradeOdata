@@ -10,7 +10,7 @@ import ru.sk42.tradeodata.Model.Printers;
  * Created by я on 12.09.2016.
  */
 public interface PrintersRequest {
-        @GET("ut836/hs/TradeOdata/Printers")
+    @GET("/tradeodata/hs/TradeOdata/Printers")
         Call<Printers> call(
         );
 }

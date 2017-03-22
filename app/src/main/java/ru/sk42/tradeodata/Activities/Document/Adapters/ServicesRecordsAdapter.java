@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -31,6 +32,10 @@ public class ServicesRecordsAdapter extends RecyclerView.Adapter<ServicesRecords
     public ServicesRecordsAdapter(ArrayList<SaleRecordService> mValues, SaleRecordInterface mListener) {
         this.mListener = mListener;
         this.mValues = mValues;
+    }
+
+    public void setValues(ArrayList<SaleRecordService> values) {
+        mValues = values;
     }
 
     private SaleRecordService getSelectedObject() {
@@ -70,7 +75,7 @@ public class ServicesRecordsAdapter extends RecyclerView.Adapter<ServicesRecords
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        //public final View mView;
+        //public final initView mView;
         public final TextView tvProduct;
         public final TextView tvQty;
         public final TextView tvPrice;
@@ -82,6 +87,9 @@ public class ServicesRecordsAdapter extends RecyclerView.Adapter<ServicesRecords
 
         @Bind(R.id.doc__servicecard_minus)
         TextView tvMinus;
+
+        @Bind(R.id.doc__servicecard_delete_button1)
+        ImageButton mDeleteButton;
 
 
         public ViewHolder(View view) {
@@ -126,6 +134,15 @@ public class ServicesRecordsAdapter extends RecyclerView.Adapter<ServicesRecords
                     mListener.onRecordSelected(getSelectedObject(), Constants.SELECT_RECORD_FOR_VIEW_PRODUCT);
                 }
             });
+
+            mDeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectedItem = getLayoutPosition();
+                    mListener.removeRecord(getSelectedObject());
+                }
+            });
+
         }
 
 

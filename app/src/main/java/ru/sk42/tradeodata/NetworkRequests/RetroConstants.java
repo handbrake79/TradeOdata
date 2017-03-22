@@ -10,11 +10,30 @@ import ru.sk42.tradeodata.Model.Constants;
  */
 public class RetroConstants {
 
+    public static final String productFieldsList = "Ref_Key, Parent_Key, Code, Description, IsFolder, Услуга, Артикул, ДополнительноеОписаниеНоменклатуры";
+
     public static Map<String, String> getMap(String filter){
         Map<String, String> map = new HashMap<>();
         map.put("$format", "json");
         //map.put("$odata","nometadata");
         map.put("$filter", filter);
+        return map;
+    }
+
+
+    public static Map<String, String> getMapWithFieldRestriction(String filter, String selectedFields) {
+        Map<String, String> map = new HashMap<>();
+        map.put("$format", "json");
+        //map.put("$odata","nometadata");
+        map.put("$filter", filter);
+        map.put("$select", selectedFields);
+        return map;
+    }
+
+    public static Map<String, String> getMapWithCondition(String condition) {
+        Map<String, String> map = new HashMap<>();
+        map.put("$format", "json");
+        map.put("Condition", condition);
         return map;
     }
 

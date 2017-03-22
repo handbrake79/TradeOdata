@@ -44,13 +44,13 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
         } else {
             holder.itemView.setBackgroundColor(Color.WHITE);
         }
-//        holder.mView.setOnClickListener(new View.OnClickListener() {
+//        holder.mView.setOnClickListener(new initView.OnClickListener() {
 //            @Override
-//            public void onClick(View v) {
+//            public void onClick(initView v) {
 //                if (null != mListener) {
 //                    // Notify the active callbacks interface (the activity, if the
 //                    // fragment is attached to one) that an item has been selected.
-//                    mListener.onValueSelected(holder.mUser);
+//                    mListener.onValueSelected(holder.mVehicleType);
 //                }
 //            }
 //        });

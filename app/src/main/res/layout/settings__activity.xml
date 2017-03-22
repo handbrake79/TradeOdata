@@ -12,7 +12,6 @@
         android:background="@android:color/holo_red_light"
         android:elevation="5dp"
         android:gravity="top|start"
-        android:onClick="onToolbarClick"
         title="Настройки"
         android:layout_height="56dp">
     </android.support.v7.widget.Toolbar>

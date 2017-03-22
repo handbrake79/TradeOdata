@@ -40,7 +40,6 @@ public class Customer extends CDO {
         return Customer.getObject(Customer.class, Constants.CUSTOMER_GUID);
     }
 
-
     public String getDescription() {
         return Description;
     }
@@ -68,7 +67,6 @@ public class Customer extends CDO {
         return RetroConstants.FILTERS.CUSTOMER;
     }
 
-
     @Override
     public Dao<Customer, Object> getDao() {
         return MyHelper.getCustomerDao();
@@ -90,7 +88,11 @@ public class Customer extends CDO {
 
     @Override
     public String toString() {
-        return this.getDescription().toString();
+        if (this.getDescription() == null) {
+            return "N/A";
+        } else {
+            return this.getDescription().toString();
+        }
     }
 
 }

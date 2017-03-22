@@ -9,77 +9,87 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bpWhite"
-        android:gravity="left"
-        android:padding="16dp">
+        android:padding="5dp">
 
         <TextView
-            android:textColor="@color/accent"
             android:id="@+id/doc__servicecard_product"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginBottom="10dp"
-            android:text="Номенклатура" />
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:text="Номенклатура"
+            android:textColor="@color/accent" />
 
+        <ImageButton
+            android:id="@+id/doc__servicecard_delete_button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/ic_delete" />
 
         <TextView
-            android:height="30dp"
-            android:gravity="center_vertical"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/doc__servicecard_product"
             android:id="@+id/doc__servicecard_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp"
-            android:textColor="@color/accent"
-            android:text="123.45" />
+            android:layout_alignBaseline="@+id/doc__servicecard_minus"
+            android:layout_alignBottom="@+id/doc__servicecard_minus"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:height="30dp"
+            android:gravity="center_vertical"
+            android:text="123.45"
+            android:textColor="@color/accent" />
 
         <TextView
-            android:layout_marginLeft="3dp"
-            android:layout_height="30dp"
-            android:layout_toRightOf="@+id/doc__servicecard_price"
-            android:layout_below="@+id/doc__servicecard_product"
             android:id="@+id/doc__servicecard_price_caption"
             android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/doc__servicecard_price"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/doc__servicecard_price"
             android:gravity="center"
-            android:text="руб."/>
+            android:text="руб." />
 
         <TextView
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/doc__servicecard_price_caption"
+            android:id="@+id/doc__servicecard_minus"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_below="@+id/doc__servicecard_product"
 
-            android:id="@+id/doc__servicecard_minus"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/doc__servicecard_qty"
+            android:gravity="center"
             android:text="-"
             android:textColor="@color/gray"
             android:textStyle="bold"
-            android:gravity="center"
             tools:text="-" />
 
         <TextView
-            android:gravity="center"
-            android:layout_height="30dp"
-            android:textColor="@color/accent"
-            android:layout_toRightOf="@+id/doc__servicecard_minus"
-            android:layout_below="@+id/doc__servicecard_product"
             android:id="@+id/doc__servicecard_qty"
             android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@+id/doc__servicecard_product"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/doc__servicecard_plus"
+            android:gravity="center"
             android:text="Количество"
+            android:textColor="@color/accent"
 
             android:textStyle="bold" />
 
 
         <TextView
-            android:layout_marginLeft="10dp"
             android:id="@+id/doc__servicecard_plus"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
             android:layout_below="@+id/doc__servicecard_product"
-            android:layout_toRightOf="@+id/doc__servicecard_qty"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="+"
             android:textColor="@color/gray"
@@ -89,32 +99,31 @@
             />
 
 
-
-
-
         <TextView
-            android:gravity="center"
-            android:height="30dp"
-            android:layout_toRightOf="@+id/doc__servicecard_plus"
             android:id="@+id/tv_DocSale_Services_Total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/doc__servicecard_product"
-            android:layout_marginLeft="10dp"
+            android:layout_below="@id/doc__servicecard_qty"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toLeftOf="@+id/tv_DocSale_Services_Rub_Char"
+            android:height="30dp"
+            android:gravity="center"
             android:text="Сумма"
             android:textStyle="bold" />
 
         <TextView
-            android:gravity="center"
-            android:height="30dp"
             android:id="@+id/tv_DocSale_Services_Rub_Char"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/doc__servicecard_product"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/doc__servicecard_qty"
             android:layout_marginLeft="3dp"
-            android:layout_toRightOf="@id/tv_DocSale_Services_Total"
+            android:layout_marginTop="5dp"
+            android:height="30dp"
+            android:gravity="center"
             android:text="р."
-            tools:text="руб."/>
+            tools:text="руб." />
 
 
     </RelativeLayout>

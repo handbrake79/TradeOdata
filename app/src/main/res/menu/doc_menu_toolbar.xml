@@ -4,32 +4,39 @@
     tools:context=".DocumentActivity">
     <item
         android:id="@+id/action_view_product_list"
-        android:icon="@drawable/ic_view_list_black_24dp"
+        android:icon="@drawable/products_list"
         android:title="@string/ACTION_VIEW_PRODUCT_LIST"
-        app:showAsAction="always"
+        app:showAsAction="never"
         />
 
     <item android:id="@+id/action_scanner_pair"
         android:title="@string/action_scanner_pair"
-        android:icon="@drawable/barcode_scan"
         app:showAsAction="never"
         />
 
     <item android:id="@+id/action_scanner_set"
         android:title="@string/action_scanner_set"
-        android:icon="@drawable/barcode_scan"
         app:showAsAction="never"
         />
 
     <item android:id="@+id/action_scanner_connect"
         android:title="@string/action_scanner_connect"
-        android:icon="@drawable/barcode_scan"
         app:showAsAction="never"
         />
 
-    <item android:id="@+id/action_input_barcode"
+    <item
+        android:id="@+id/action_find_barcode"
         android:title="Поиск по штрихкоду"
         android:icon="@drawable/barcode_scan"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_find_product_by_description"
+        android:title="Поиск по названию"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="Настройки"
         app:showAsAction="never"
         />
 

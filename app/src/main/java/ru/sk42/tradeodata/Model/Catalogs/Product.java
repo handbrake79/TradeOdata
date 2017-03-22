@@ -177,4 +177,7 @@ public class Product extends CDO {
         }
     }
 
+    public boolean isService() {
+        return isService;
+    }
 }

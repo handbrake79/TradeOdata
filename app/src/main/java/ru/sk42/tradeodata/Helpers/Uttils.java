@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import ru.sk42.tradeodata.Model.Catalogs.Product;
@@ -32,12 +33,8 @@ public class Uttils {
 
     public static boolean isShippingDateValid(Calendar shippingDate) {
         Calendar yesterday = getYesterday();
-        if (shippingDate.after(yesterday)) {
-            //если дата доставки больше или равна текущей дате, это годная дата
-            return true;
-        } else {
-            return false;
-        }
+        //если дата доставки больше или равна текущей дате, это годная дата
+        return shippingDate.after(yesterday);
     }
 
     public static Calendar getYesterday() {
@@ -50,11 +47,7 @@ public class Uttils {
     }
 
     public static boolean isShippingTimeValid(Date shippingTimeFrom, Date shippingTimeTo) {
-        if (shippingTimeFrom.getTime() <= shippingTimeTo.getTime()) {
-            return true;
-        } else {
-            return false;
-        }
+        return shippingTimeFrom.getTime() <= shippingTimeTo.getTime();
     }
 
     public static boolean dateIsNotSet(Calendar mShippingDate) {
@@ -62,11 +55,7 @@ public class Uttils {
         c.set(Calendar.YEAR, 1);
         c.set(Calendar.MONTH, 1);
         c.set(Calendar.DATE, 2);
-        if (c.after(mShippingDate)) {
-            return true;
-        } else {
-            return false;
-        }
+        return c.after(mShippingDate);
     }
 
     public static String formatDoubleToMoney(double d) {
@@ -80,11 +69,8 @@ public class Uttils {
     }
 
     public static boolean isPredefined(Product product) {
-        if (product.getRef_Key().equals(Constants.SHIPPING_GUID)
-                || product.getRef_Key().equals(Constants.UNLOAD_GUID)) {
-            return true;
-        }
-        return false;
+        return product.getRef_Key().equals(Constants.SHIPPING_GUID)
+                || product.getRef_Key().equals(Constants.UNLOAD_GUID);
     }
 
     public static String formatInt(int i) {

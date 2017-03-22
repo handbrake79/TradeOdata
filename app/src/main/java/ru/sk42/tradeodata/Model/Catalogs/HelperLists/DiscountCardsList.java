@@ -38,4 +38,8 @@ public class DiscountCardsList {
             e.printStackTrace();
         }
     }
+
+    public int size() {
+        return values.size();
+    }
 }

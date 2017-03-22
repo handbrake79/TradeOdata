@@ -16,9 +16,11 @@
         <RelativeLayout
             android:gravity="center_vertical"
             android:layout_width="match_parent"
+            android:layout_gravity="center_vertical"
             android:layout_height="60dp">
 
             <TextView
+                android:gravity="center_vertical"
                 android:textColor="@color/accent"
                 android:id="@+id/products_list_group_caption"
                 android:layout_width="match_parent"
@@ -28,13 +30,15 @@
                 android:textSize="15sp" />
 
             <ImageButton
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:id="@+id/products_list_button_back"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentRight="true"
                 android:background="@drawable/icon_return"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentBottom="true" />
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 

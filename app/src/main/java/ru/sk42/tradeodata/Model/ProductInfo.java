@@ -23,6 +23,11 @@ public class ProductInfo extends CDO {
     private String ref_Key;
 
     @DatabaseField
+    @JsonProperty("Barcode")
+    private String barcode;
+
+
+    @DatabaseField
     @JsonProperty("Description")
     private String description;
 
@@ -100,6 +105,14 @@ public class ProductInfo extends CDO {
         this.ref_Key = ref_Key;
     }
 
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
     @Override
     public void save() {
         this.setRequestDate(GregorianCalendar.getInstance().getTime());
@@ -131,4 +144,12 @@ public class ProductInfo extends CDO {
         return stockArrayList;
     }
 
+    public static ProductInfo getByBarcode(String barcode) {
+        try {
+            return MyHelper.getProductInfoDao().queryForEq("barcode", barcode).get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

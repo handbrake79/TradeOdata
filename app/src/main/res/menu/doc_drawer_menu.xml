@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/menu_top"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/drawer_item_save"
+            android:icon="@drawable/ic_save_black_24dp"
+            android:title="Записать" />
+        <item
+            android:id="@+id/drawer_item_post"
+            android:icon="@drawable/ic_done_black_24dp"
+            android:title="Провести" />
+        <item
+            android:id="@+id/drawer_item_print"
+            android:icon="@drawable/ic_print_black_24dp"
+            android:title="Печать" />
+    </group>
+
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/drawer_item_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="Настройки"></item>
+    </group>
+</menu>

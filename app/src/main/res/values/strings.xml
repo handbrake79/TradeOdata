@@ -7,11 +7,10 @@
     <string name="title_activity_documents__list_"></string>
     <string name="action_settings">Настройки</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="speech_prompt">Произнесите вслух адрес доставки</string>
     <string name="speech_not_supported">Распознавание речи не поддерживается!</string>
-    <string name="drawer_open">ящик открыт</string>
-    <string name="drawer_close">ящик закрыт</string>
+    <string name="drawer_open">Открыть навигацию</string>
+    <string name="drawer_close">Закрыть навигацию</string>
     <string name="ACTION_VIEW_PRODUCT_LIST">Номенклатура</string>
     <string name="ACTION_SAVE">Сохранить</string>
     <string name="ACTION_SAVE_1C">Записать в 1С</string>
@@ -23,7 +22,6 @@
     <string name="CONNECTION_SETTINGS">Настройка подключения</string>
     <string name="ACTION_CLOSE">Закрыть</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ShowProductDescription">Показать описание</string>
 

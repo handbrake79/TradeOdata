@@ -73,7 +73,7 @@ public class DescriptionFragment extends Fragment implements ProductPresenterCon
                 product = MyHelper.getInstance().getDao(Product.class).queryForEq(Constants.REF_KEY_LABEL, ref_Key).get(0);
                 productInfo = MyHelper.getProductInfoDao().queryForEq(Constants.REF_KEY_LABEL, ref_Key).get(0);
             } catch (Exception e) {
-                Toast.makeText(this.getContext(), "не найден товар в базе по ссылке " + ref_Key, Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getContext(), "не найден товар в базе по ссылке " + ref_Key, Toast.LENGTH_SHORT).show();
             }
         }else {
             throw new RuntimeException("Жопа какая-то!");
@@ -114,6 +114,8 @@ public class DescriptionFragment extends Fragment implements ProductPresenterCon
 
     @Override
     public void showImage(@Nullable Bitmap bitmap) {
-        mImageView.setImageBitmap(bitmap);
+        if (bitmap != null && mImageView != null) {
+            mImageView.setImageBitmap(bitmap);
+        }
     }
 }

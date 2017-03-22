@@ -12,7 +12,7 @@ import ru.sk42.tradeodata.R;
  */
 public class Constants {
 
-    public static final int SCANNER_EVENT = 11;
+    public static final int SCANNER_EVENT = 10101;
     public static final String SCANNER_DATA_LABEL = "scanner_data";
     public static final String BARCODE_LABEL = "barcode";
     public static final String REF_KEY_LABEL = "ref_Key";
@@ -22,7 +22,7 @@ public class Constants {
     public static final int PRODUCT_INFO_REQUEST_FINISHED = 12;
     public static final int PRINT_REQUEST_FINISHED = 13;
     public static final int PRODUCT_SELECTED = 14;
-    public static final int ON_RECORD_SELECTED_IN_DOCUMENT = 15;
+    public static final int RECORD_SELECTED_IN_DOCUMENT = 15;
     public static final int SHOW_PRODUCTS_LIST = 16;
     public static final int SELECT_RECORD_FOR_CHANGE = 17;
     public static final int SELECT_RECORD_FOR_VIEW_PRODUCT = 18;
@@ -33,7 +33,14 @@ public class Constants {
     public static final String MESSAGE_LABEL = "message";
     public static final String RESULT_CODE_LABEL = "result_code";
     public static final String MODE_LABEL = "mode";
+    public static final int MAX_IMG_LENGTH_BYTES = 500000;
+    public static final String LINE_NUMBER = "line_number";
+    public static final int PRODUCT_INFO_EXPIRATION_TIME_SECONDS = 10;
     public static ArrayList<String> DOCUMENT_ACTIONS;
+    public static String QUANTITY = "qty";
+    public static String DESCR = "descr";
+    public static String CHARACT = "charact";
+    public static String PRICE = "price";
 
     static {
         DOCUMENT_ACTIONS = new ArrayList<>();
@@ -52,6 +59,7 @@ public class Constants {
         SETTINGS_ACTIONS.add("Пользователь");
         SETTINGS_ACTIONS.add("Принтер");
         SETTINGS_ACTIONS.add("Настройки сканера");
+        SETTINGS_ACTIONS.add("Типы транспорта");
         SETTINGS_ACTIONS.add("Прочие настройки");
     }
 
@@ -91,7 +99,7 @@ public class Constants {
         BARCODE,
         PRODUCT_INFO,
         PRINT_DOCUMENT,
-        LOAD_IMAGE
+        DISCOUNT_CARD, LOAD_IMAGE
     }
 
     public class COLORS {

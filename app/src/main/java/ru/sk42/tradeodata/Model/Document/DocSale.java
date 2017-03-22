@@ -54,14 +54,25 @@ import ru.sk42.tradeodata.XML.DateConverter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
 public class DocSale extends CDO {
+    private boolean changed;
+
+    public boolean isChanged() {
+        return changed;
+    }
+
+    public void setChanged(boolean b) {
+        changed = b;
+    }
+
     private static final String TAG = "DocSale class";
 
     public static DocSale newInstance() {
         DocSale docSale = new DocSale();
+        docSale.setChanged(true);
         docSale.setDeviceID();
         docSale.setRef_Key(Constants.ZERO_GUID);
         docSale.setNumber("");
-        docSale.setComment("Создано в андроиде");
+        docSale.setComment("");
 
         docSale.products = new ArrayList<>();
         docSale.services = new ArrayList<>();
@@ -113,9 +124,7 @@ public class DocSale extends CDO {
     }
 
     public String getDeviceID() {
-        deviceID = android.provider.Settings.Secure.getString(St.getApp().getApplicationContext().getContentResolver(),
-                android.provider.Settings.Secure.ANDROID_ID);
-        return deviceID;
+        return Settings.getDeviceID();
     }
 
     public void setDeviceID(String deviceID) {
@@ -717,11 +726,16 @@ public class DocSale extends CDO {
     }
 
     @Override
-    public void save() throws SQLException {
+    public void save() {
         deleteProductRecords();
         deleteServiceRecords();
 
-        MyHelper.getDocSaleDao().createOrUpdate(this);
+        try {
+            MyHelper.getDocSaleDao().createOrUpdate(this);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка сохранения документа!");
+        }
 
         int linenumber = 0;
         for (SaleRecordProduct row :
@@ -1015,6 +1029,7 @@ public class DocSale extends CDO {
     }
 
     public void reCalculateTotal() {
+        changed = true;
         if (needShipping) {
 
             int routeCost = ShippingRate.getCost(this.getStartingPoint(), route, this.getVehicleType());
@@ -1048,8 +1063,14 @@ public class DocSale extends CDO {
         this.volume = 0;
         this.total = 0d;
         //вес, объем
-        for (SaleRecordProduct record : getProducts()
-                ) {
+        int lineNumber = 1;
+        Iterator<SaleRecordProduct> it = getProducts().iterator();
+        SaleRecordProduct record;
+        while (it.hasNext()) {
+            record = it.next();
+
+            record.setLineNumber(lineNumber);
+            lineNumber++;
 
             this.weight += (int) (record.getQty() * record.getUnit().getWeight());
             this.volume += (int) (record.getQty() * record.getUnit().getVolume());
@@ -1062,10 +1083,16 @@ public class DocSale extends CDO {
             record.setTotal(recTotal);
             this.total += recTotal;
         }
-        for (SaleRecordService record : getServices()
-                ) {
-            record.setTotal(record.getQty() * record.getPrice());
-            this.total += record.getTotal();
+
+        lineNumber = 1;
+        Iterator<SaleRecordService> its = getServices().iterator();
+        SaleRecordService recordService;
+        while (its.hasNext()) {
+            recordService = its.next();
+            recordService.setLineNumber(lineNumber);
+            lineNumber++;
+            recordService.setTotal(recordService.getQty() * recordService.getPrice());
+            this.total += recordService.getTotal();
         }
 
         this.total = Math.round(this.total * 100.0) / 100.0;

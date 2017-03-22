@@ -129,31 +129,11 @@ public class CheckRelatedDataToLoad {
 
         for (SaleRecordProduct row : docSale.getProducts()) {
             Product product = Product.getObject(Product.class, row.getProduct_Key());
-//            Charact charact = Charact.getObject(Charact.class, row.getCharact_Key());
-//            Unit unit = Unit.getObject(Unit.class, row.getProductUnit_Key());
-//            Store store = Store.getObject(Store.class, row.getStore_Key());
 
             String guid = row.getProduct_Key();
             if (!listProducts.contains(guid) && product == null) {
                 listProducts.add(guid);
             }
-
-//            guid = row.getCharact_Key();
-//            if (!guid.equals(Constants.ZERO_GUID)) {
-//                if (!listCharact.contains(guid) && charact == null) {
-//                    listCharact.add(guid);
-//                }
-//            }
-//
-//            guid = row.getStore_Key();
-//            if (!listStores.contains(guid) && store == null) {
-//                listStores.add(guid);
-//            }
-//
-//            guid = row.getProductUnit_Key();
-//            if (!listUnits.contains(guid) && unit == null) {
-//                listUnits.add(guid);
-//            }
 
         }
         for (SaleRecordService row : docSale.getServices()) {

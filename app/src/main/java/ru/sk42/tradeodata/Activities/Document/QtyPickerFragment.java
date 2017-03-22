@@ -17,7 +17,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.sk42.tradeodata.Helpers.Uttils;
-import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.R;
 
 /**
@@ -29,11 +28,6 @@ import ru.sk42.tradeodata.R;
  * create an instance of this fragment.
  */
 public class QtyPickerFragment extends DialogFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String tagQty = "tagQty";
-    private static final String tagPrice = "tagPrice";
-    private static final String tagLineNumber = "tagLineNumber";
 
     @Bind(R.id.qty_fragment_minus)
     Button inputQtyMinusButton;
@@ -50,13 +44,12 @@ public class QtyPickerFragment extends DialogFragment {
     @Bind(R.id.qty_fragment_total)
     TextView mTotal;
 
-
-    SaleRecord record;
     @Bind(R.id.qty_fragment_product_caption)
     TextView qtyFragmentProductCaption;
-    private double mQty;
+
+    String mDescription;
+    private double quantity;
     private double mPrice;
-    private int mLineNumber;
 
     private OnQtyFragmentInteractionListener mListener;
 
@@ -64,24 +57,19 @@ public class QtyPickerFragment extends DialogFragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment QtyPickerFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static QtyPickerFragment newInstance(SaleRecord record) {
+
+    public static QtyPickerFragment newInstance(String description, double price, double qty) {
         QtyPickerFragment fragment = new QtyPickerFragment();
-        fragment.record = record;
+        fragment.mDescription = description;
+        fragment.quantity = qty;
+        fragment.mPrice = price;
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mQty = record.getQty();
-        mPrice = record.getPrice();
+
     }
 
     @Override
@@ -91,8 +79,8 @@ public class QtyPickerFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.doc__fragment_qty_picker, container, false);
         ButterKnife.bind(this, view);
 
-        inputQtyNumberEdittext.setText(String.valueOf(record.getQty()));
-        qtyFragmentProductCaption.setText(record.getProduct().getDescription());
+        inputQtyNumberEdittext.setText(String.valueOf(quantity));
+        qtyFragmentProductCaption.setText(mDescription);
         recalc();
 
         inputQtyNumberEdittext.addTextChangedListener(new TextWatcher() {
@@ -106,13 +94,12 @@ public class QtyPickerFragment extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                mQty = 0;
+                quantity = 0;
                 try {
-                    mQty = Float.valueOf(editable.toString());
+                    quantity = Double.valueOf(editable.toString());
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
-                record.setQty(mQty);
                 recalc();
             }
         });
@@ -122,7 +109,7 @@ public class QtyPickerFragment extends DialogFragment {
     }
 
     private void recalc() {
-        mTotal.setText("Цена " + Uttils.formatDoubleToMoney(record.getPrice()) + " руб., сумма " + Uttils.formatDoubleToMoney(record.getTotal()) + " руб.");
+        mTotal.setText("Цена " + Uttils.formatDoubleToMoney(mPrice) + " руб., сумма " + Uttils.formatDoubleToMoney(mPrice * quantity) + " руб.");
     }
 
 
@@ -153,37 +140,35 @@ public class QtyPickerFragment extends DialogFragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.qty_fragment_minus:
-                if (mQty > 0) {
-                    if (mQty < 1) {
-                        mQty = 0;
+                if (quantity > 0) {
+                    if (quantity < 1) {
+                        quantity = 0;
                     } else {
-                        mQty--;
+                        quantity--;
                     }
 
                 }
                 break;
             case R.id.qty_fragment_plus:
-                mQty++;
+                quantity++;
                 break;
 
             case R.id.qty_fragment_ok:
 
                 try {
-                    mQty = Float.valueOf(inputQtyNumberEdittext.getText().toString());
+                    quantity = Double.valueOf(inputQtyNumberEdittext.getText().toString());
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
-                record.setQty(mQty);
-                mListener.onQtyFragmentInteraction(record);
+                mListener.onQtyFragmentInteraction(quantity);
                 break;
         }
-        record.setQty(mQty);
         recalc();
     }
 
 
     public interface OnQtyFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onQtyFragmentInteraction(SaleRecord record);
+        void onQtyFragmentInteraction(double quantity);
     }
 }

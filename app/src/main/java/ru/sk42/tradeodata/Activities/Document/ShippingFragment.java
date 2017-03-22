@@ -152,8 +152,11 @@ public class ShippingFragment extends Fragment {
     }
 
 
-    private void initView() {
+    public void initView() {
 
+        if (mNeedShippingSwitch == null) {
+            return;
+        }
         mNeedShippingSwitch.requestFocus();
 
         DocumentActivity activity = (DocumentActivity) getActivity();
@@ -193,7 +196,7 @@ public class ShippingFragment extends Fragment {
 
         try {
             mVehicleTypeArrayAdapter = new ArrayAdapter(this.getContext(),
-                    android.R.layout.simple_dropdown_item_1line, MyHelper.getVehicleTypesDao().queryForAll().toArray());
+                    android.R.layout.simple_dropdown_item_1line, MyHelper.getVehicleTypesDao().queryForEq("enabled", true).toArray());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -233,7 +236,7 @@ public class ShippingFragment extends Fragment {
 //        mStartingPointSpinner.setSelection(getIndexOfSpinnerValue(mStartingPointSpinner, docSale.getStartingPoint().toString()));
 //        mStartingPointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 //                                                            @Override
-//                                                            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+//                                                            public void onItemSelected(AdapterView<?> adapterView, initView view, int position, long l) {
 //                                                                mListenerShipping.onStartingPointChanged(adapterView.getItemAtPosition(position).toString(), (TextView) mStartingPointSpinner.getSelectedView());
 //                                                                setShippingCostText();
 //                                                            }

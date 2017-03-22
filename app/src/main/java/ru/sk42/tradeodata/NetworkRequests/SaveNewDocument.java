@@ -20,6 +20,6 @@ public interface SaveNewDocument {
                     "Content-Type: application/octet-stream"
             }
     )
-    @POST("ut836/odata/standard.odata/Document_РеализацияТоваровУслуг")
+    @POST("/tradeodata/odata/standard.odata/Document_РеализацияТоваровУслуг")
     Call<ResponseBody> call(@Body RequestBody body);
 }

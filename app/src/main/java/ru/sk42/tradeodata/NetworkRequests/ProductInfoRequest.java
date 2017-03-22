@@ -10,7 +10,7 @@ import ru.sk42.tradeodata.Model.ProductInfo;
  * Created by я on 12.09.2016.
  */
 public interface ProductInfoRequest {
-        @GET("ut836/hs/TradeOdata/ProductInfo")
+    @GET("/tradeodata/hs/TradeOdata/ProductInfo")
         Call<ProductInfo> call(
                 @Query(Constants.REF_KEY_LABEL) String ref_Key
         );

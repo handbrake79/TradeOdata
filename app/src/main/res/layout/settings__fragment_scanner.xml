@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     tools:context="ru.sk42.tradeodata.Activities.Settings.ScannerFragment">
 
-    <!-- TODO: Update blank fragment layout -->
 
     <Button
         android:text="1. Подключить сканер как устройство Bluetooth (pair device)"
@@ -51,5 +50,17 @@
             android:layout_height="wrap_content"
             android:text="500"
             />
+
     </android.support.design.widget.TextInputLayout>
+
+    <EditText
+        android:layout_alignParentEnd="true"
+        android:id="@+id/settings_barcode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text=""
+        android:hint="Штрихкод"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>

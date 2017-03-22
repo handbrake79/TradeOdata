@@ -3,16 +3,22 @@ package ru.sk42.tradeodata.Activities.Document;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.Configuration;
-import android.graphics.drawable.GradientDrawable;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,17 +32,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.astuetz.PagerSlidingTabStrip;
 import com.generalscan.NotifyStyle;
-import com.generalscan.OnConnectedListener;
-import com.generalscan.OnDisconnectListener;
-import com.generalscan.SendConstant;
+import com.generalscan.OnDataReceive;
 import com.generalscan.bluetooth.BluetoothConnect;
 import com.generalscan.bluetooth.BluetoothSettings;
 
@@ -44,16 +47,16 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.StringTokenizer;
+import java.util.Iterator;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DocumentFragmentPageAdapter;
-import ru.sk42.tradeodata.Activities.Document.Adapters.DrawerAdapter;
+import ru.sk42.tradeodata.Activities.LoadingFragment;
 import ru.sk42.tradeodata.Activities.Product.ProductActivity;
 import ru.sk42.tradeodata.Activities.ProductsList.ProductsListActivity;
-import ru.sk42.tradeodata.Activities.Scanner.ReadBroadcast;
 import ru.sk42.tradeodata.Activities.Settings.Settings;
+import ru.sk42.tradeodata.Activities.Settings.SettingsActivity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
@@ -66,15 +69,19 @@ import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
 import ru.sk42.tradeodata.Model.Document.SaleRecordService;
-import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
+import static ru.sk42.tradeodata.R.id.doc__viewpager;
+import static ru.sk42.tradeodata.R.id.doc__ll;
 
-public class DocumentActivity extends AppCompatActivity implements SaleRecordInterface,
-        ServiceResultReceiver.ReceiverInterface,
+
+public class DocumentActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener,
+        SaleRecordInterface,
+        ServiceResultReceiver.ServiceResultReceiverInterface,
         DocumentListenerInterface {
 
     private static final String TAG = "Document ACTIVITY***";
@@ -82,26 +89,23 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     private int productsCount;
 
-    Toolbar myToolbar;
     Activity mActivity;
-    private ReadBroadcast mReadBroadcast;
     private String barcode = "";
 
     ActionBarDrawerToggle mDrawerToggle;
 
     DocumentFragmentPageAdapter fragmentPagerAdapter;
-    ViewPager viewPager;
 
-    PagerSlidingTabStrip pagerSlidingTabStrip;
+    RequisitesFragment requisitesFragment;
+    ProductsFragment productsFragment;
+    ServicesFragment servicesFragment;
+    ShippingFragment shippingFragment;
 
-    private SaleRecord currentRecord;
+    ViewPager pager;
 
     boolean exit = false;
 
     public ServiceResultReceiver mReceiver;
-
-    public void onToolbarClick(View view) {
-    }
 
     ProgressDialog progressDialog;
     private DocSale docSale;
@@ -109,9 +113,13 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     private long doc_id;
 
+    Snackbar bar;
+
     @Bind(R.id.doc_footer_total_text)
     TextView mTotalText;
 
+    @Bind(R.id.document_toolbar)
+    Toolbar myToolbar;
 
     @Bind(R.id.doc_total_need_shipping_text)
     TextView mNeedShippingText;
@@ -140,8 +148,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     @Bind(R.id.doc_drawer_layout)
     DrawerLayout mDrawerLayout;
 
-    @Bind(R.id.doc_listview)
-    ListView mDrawerList;
+    @Bind(R.id.document_nav_view)
+    NavigationView navigationView;
+
 
     public String getDocRef_Key() {
         return docRef_Key;
@@ -164,6 +173,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         setContentView(R.layout.doc__activity);
         ButterKnife.bind(this, this);
 
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -171,16 +181,21 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
         fragmentPagerAdapter = new DocumentFragmentPageAdapter(getSupportFragmentManager());
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(fragmentPagerAdapter);
-
-        // Give the PagerSlidingTabStrip the ViewPager
-        pagerSlidingTabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-        // Attach the view pager to the tab strip
-        pagerSlidingTabStrip.setViewPager(viewPager);
+        pager = (ViewPager) findViewById(R.id.doc__viewpager);
+        pager.setPageTransformer(true, new ZoomOutPageTransformer());
+        pager.setAdapter(fragmentPagerAdapter);
+        pager.setCurrentItem(1);
+        requisitesFragment = (RequisitesFragment) fragmentPagerAdapter.getItem(0);
+        productsFragment = (ProductsFragment) fragmentPagerAdapter.getItem(1);
+        servicesFragment = (ServicesFragment) fragmentPagerAdapter.getItem(2);
+        shippingFragment = (ShippingFragment) fragmentPagerAdapter.getItem(3);
 
         mReceiver = new ServiceResultReceiver(new Handler());
         mReceiver.setReceiver(this);
+
+        setToolbar();
+
+        setDrawer();
 
         Intent intent = getIntent();
         int mode = intent.getIntExtra(Constants.MODE_LABEL, Constants.ModeNewOrder);
@@ -195,80 +210,39 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             docRef_Key = docSale.getRef_Key();
         }
 
-        if (docSale == null)
+        if (docSale == null) {
             loadDocumentFromDB();
+        }
 
-        pagerSlidingTabStrip.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                fragmentPagerAdapter.notifyFragmentDataSetChanged(position);
-            }
+        if (mode == Constants.ModeExistingOrder) {
+            LoadMissingObjectsFrom1C();
+        }
 
-            @Override
-            public void onPageSelected(int position) {
+        attachScanner();
 
-            }
+        updateActionBarTitle();
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
+    }
 
-            }
-        });
-
-        int[] colors = {0, 0xFFFF0000, 0}; // red for the example
-        mDrawerList.setDivider(new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors));
-        mDrawerList.setDividerHeight(1);
-        // Set the adapter for the list view
-        mDrawerList.setAdapter(new DrawerAdapter<String>(this,
-                R.layout.drawer_list_item_layout, Constants.DOCUMENT_ACTIONS));
-        // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        mDrawerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                Toast.makeText(DocumentActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-//                Toast.makeText(DocumentActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
+    private void setDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                null,  /* nav drawer image to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
-        ) {
-            public void onDrawerClosed(View view) {
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                mDrawerList.bringToFront();
-                mDrawerLayout.requestLayout();
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-
+                this, mDrawerLayout, myToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
-        myToolbar = (Toolbar) findViewById(R.id.toolbar_document);
+        navigationView.setNavigationItemSelectedListener(this);
+        mDrawerToggle.syncState();
+    }
+
+    private void setToolbar() {
         setSupportActionBar(myToolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
-        //**
-        if (mode == Constants.ModeExistingOrder) {
-            LoadMissingObjectsFrom1C();
-        }
+    }
 
-        //Scanner
+    private void attachScanner() {
         mActivity = this;
         BluetoothConnect.CurrentNotifyStyle = NotifyStyle.NotificationStyle1;
         BluetoothConnect.BindService(mActivity);
@@ -276,26 +250,19 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         /**
          * 连接成功
          */
-        BluetoothConnect.SetOnConnectedListener(new OnConnectedListener() {
-
+        BluetoothConnect.SetOnDataReceive(new OnDataReceive() {
             @Override
-            public void Connected() {
-                //Toast.makeText(mActivity, "Сканер подключен", Toast.LENGTH_SHORT).show();
+            public void DataReceive(String s) {
+                if ((s.equals("\n") || s.equals("\r")) && barcode.length() > 0) {
+
+                    onBarcodeAquired(barcode);
+                    barcode = "";
+                }
+                if (!s.equals("\n") && !s.equals("\r")) {
+                    barcode += s;
+                }
             }
-
         });
-        /**
-         * 断开连接
-         */
-        BluetoothConnect.SetOnDisconnectListener(new OnDisconnectListener() {
-
-            @Override
-            public void Disconnected() {
-                //Toast.makeText(mActivity, "Сканер отключен", Toast.LENGTH_SHORT).show();
-            }
-
-        });
-
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -303,9 +270,6 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
                 connectScaner();
             }
         }, Settings.getScannerStartDelayMillisStatic());
-
-        setActionBarTitle();
-
 
     }
 
@@ -323,32 +287,6 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void setBroadcast() {
-        // 设置数据广播
-        mReadBroadcast = new ReadBroadcast(mReceiver);
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(SendConstant.GetDataAction);
-        filter.addAction(SendConstant.GetReadDataAction);
-        filter.addAction(SendConstant.GetBatteryDataAction);
-        registerReceiver(mReadBroadcast, filter);
-    }
-
-    @Override
-    protected void onStart() {
-        // 设置读取数据的广播
-        setBroadcast();
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        if (mReadBroadcast != null) {
-            // 取消广播
-            this.unregisterReceiver(mReadBroadcast);
-        }
-        super.onStop();
     }
 
     @Override
@@ -380,12 +318,23 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             case R.id.action_scanner_connect:
                 connectScaner();
                 break;
-            case R.id.action_input_barcode:
+            case R.id.action_find_barcode:
                 inputBarcode();
+                break;
+            case R.id.action_find_product_by_description:
+                //TODO поиск по названию товара
+                break;
+            case R.id.action_settings:
+                showSettingsActivity();
                 break;
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void inputBarcode() {
@@ -416,63 +365,59 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     private void addProduct(Stock stock) {
         Product product = Product.getObject(Product.class, stock.getProductInfo().getRef_Key());
-        if (product.getService()) {
+        if (product.isService()) {
             addServiceToDocument(stock, product);
-
-            recalc();
-            fragmentPagerAdapter.notifyFragmentDataSetChanged(2);
-            viewPager.post(new Runnable() {
-                @Override
-                public void run() {
-                    viewPager.setCurrentItem(2);
-                }
-            });
-
         } else {
             addProductToDocument(stock, product);
-            recalc();
-            fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
-            viewPager.post(new Runnable() {
-                @Override
-                public void run() {
-                    viewPager.setCurrentItem(1);
-                }
-            });
         }
 
     }
 
-    private void addProductToDocument(Stock stock, Product product) {
-        SaleRecordProduct row = new SaleRecordProduct();
-        row.setDocSale(docSale);
-        row.setRef_Key(docSale.getRef_Key());
-        row.setLineNumber(docSale.getProducts().size() + 1);
-        row.setProduct(product);
-        row.setProduct_Key(row.getProduct().getRef_Key());
-        row.setCharact(stock.getCharact());
-        row.setStore(stock.getStore());
-        row.setUnit(stock.getUnit());
-        row.setPrice(stock.getPrice());
-        row.setTotal(row.getPrice());
-        row.setQty(1f);
-        row.setDiscountPercentAuto(0);
-        row.setDiscountPercentManual(0);
+    private void notifyItemAdded(SaleRecord record) {
+        recalc();
+        if (record instanceof SaleRecordProduct) {
+            pager.setCurrentItem(1);
+            productsFragment.notifyItemAdded();
+        } else {
+            pager.setCurrentItem(2);
+            servicesFragment.notifyItemAdded();
+        }
+    }
 
-        docSale.getProducts().add(row);
+    private void addProductToDocument(Stock stock, Product product) {
+        SaleRecordProduct record = new SaleRecordProduct();
+        record.setDocSale(docSale);
+        record.setRef_Key(docSale.getRef_Key());
+        record.setLineNumber(docSale.getProducts().size() + 1);
+        record.setProduct(product);
+        record.setProduct_Key(record.getProduct().getRef_Key());
+        record.setCharact(stock.getCharact());
+        record.setStore(stock.getStore());
+        record.setUnit(stock.getUnit());
+        record.setPrice(stock.getPrice());
+        record.setTotal(record.getPrice());
+        record.setQty(1f);
+        record.setDiscountPercentAuto(0);
+        record.setDiscountPercentManual(0);
+
+        docSale.getProducts().add(record);
+        notifyItemAdded(record);
 
     }
 
+
     private void addServiceToDocument(Stock stock, Product product) {
-        SaleRecordService row = new SaleRecordService();
-        row.setDocSale(docSale);
-        row.setRef_Key(docSale.getRef_Key());
-        row.setLineNumber(docSale.getProducts().size() + 1);
-        row.setProduct(product);
-        row.setProduct_Key(row.getProduct().getRef_Key());
-        row.setPrice(stock.getPrice());
-        row.setTotal(row.getPrice());
-        row.setQty(1f);
-        docSale.getServices().add(row);
+        SaleRecordService record = new SaleRecordService();
+        record.setDocSale(docSale);
+        record.setRef_Key(docSale.getRef_Key());
+        record.setLineNumber(docSale.getProducts().size() + 1);
+        record.setProduct(product);
+        record.setProduct_Key(record.getProduct().getRef_Key());
+        record.setPrice(stock.getPrice());
+        record.setTotal(record.getPrice());
+        record.setQty(1f);
+        docSale.getServices().add(record);
+        notifyItemAdded(record);
     }
 
 
@@ -484,59 +429,70 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             Log.d(TAG, "onBackPressed: popBackStack");
             fm.popBackStack();
         } else {
-
-            SaveDialogListener listener = new SaveDialogListener();
-
-            AlertDialog.Builder adb = new AlertDialog.Builder(this)
-                    .setTitle("Документ").setPositiveButton("Да", listener)
-                    .setNegativeButton("Нет", listener)
-                    .setNeutralButton("Отмена", listener)
-                    .setMessage("Сохранить изменения локально?");
-            adb.create().show();
-
-            if (exit) {
+            saveLocal();
                 finish();
             }
-
-        }
     }
 
     @Override
     public void onCommentChanged(String mComment) {
+
+        docSale.setChanged(true);
+
         docSale.setComment(mComment);
     }
 
     @Override
     public void onPassPersonChanged(String mPassPerson) {
+
+        docSale.setChanged(true);
+
         docSale.setPassPerson(mPassPerson);
     }
 
     @Override
     public void onPassVehicleChanged(String mPassVehicle) {
+
+        docSale.setChanged(true);
+
         docSale.setPassVehicle(mPassVehicle);
     }
 
     @Override
     public void onNeedShippingChanged(boolean needShipping) {
+
+        docSale.setChanged(true);
+
         docSale.setNeedShipping(needShipping);
         recalc();
     }
 
     private void recalc() {
+
+
+        docSale.setChanged(true);
+
         docSale.reCalculateTotal();
-        refreshTotal();
-        fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
-        fragmentPagerAdapter.notifyFragmentDataSetChanged(2);
+
+        //docSale.save();
+
+        updateViewTotal();
+
     }
 
     @Override
     public void onNeedUnloadChanged(boolean needUnload) {
+
+        docSale.setChanged(true);
+
         docSale.setNeedUnload(needUnload);
         recalc();
     }
 
     @Override
     public void onShippingCostChanged(int shippingCost, TextInputLayout til) {
+
+        docSale.setChanged(true);
 
         docSale.setShippingCost(shippingCost);
         if (docSale.getNeedShipping() &&
@@ -550,6 +506,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onUnloadCostChanged(int unloadCost, TextInputLayout til) {
+
+        docSale.setChanged(true);
+
         docSale.setUnloadCost(unloadCost);
         if (unloadCost == 0 && docSale.getNeedUnload()) {
             til.setError("Проверьте стоимость!");
@@ -562,6 +521,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onWorkersChanged(int workers, TextInputLayout til) {
+
+        docSale.setChanged(true);
+
         docSale.setWorkersCount(workers);
         if (workers == 0 && docSale.getNeedUnload() || workers > 5) {
             til.setError("проверьте грузчиков!");
@@ -573,11 +535,17 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onAddressChanged(String address) {
+
+        docSale.setChanged(true);
+
         docSale.setShippingAddress(address);
     }
 
     @Override
     public void onDateChanged(Calendar shippingDate, TextView editText) {
+
+        docSale.setChanged(true);
+
         if (Uttils.isShippingDateValid(shippingDate)) {
             docSale.setShippingDate(shippingDate.getTime());
             editText.setError(null);
@@ -588,6 +556,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onTimeFromChanged(Calendar timeFrom, TextView editText) {
+
+        docSale.setChanged(true);
+
         docSale.setShippingTimeFrom(timeFrom.getTime());
         if (Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())) {
             editText.setError(null);
@@ -598,6 +569,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onTimeToChanged(Calendar timeTo, TextView editText) {
+
+        docSale.setChanged(true);
+
         docSale.setShippingTimeTo(timeTo.getTime());
         if (Uttils.isShippingTimeValid(docSale.getShippingTimeFrom(), docSale.getShippingTimeTo())) {
             editText.setError(null);
@@ -608,6 +582,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onRouteChanged(String mRoute, TextView textView) {
+
+        docSale.setChanged(true);
+
         if (!docSale.getNeedShipping()) {
             return;
         }
@@ -624,6 +601,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onStartingPointChanged(String mStartingPoint, TextView textView) {
+
+        docSale.setChanged(true);
+
         if (!docSale.getNeedShipping()) {
             return;
         }
@@ -646,6 +626,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onVehicleTypeChanged(String mVehicleType, TextView textView) {
+
+        docSale.setChanged(true);
+
         if (!docSale.getNeedShipping()) {
             return;
         }
@@ -673,6 +656,8 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onContactPersonChanged(String text, TextInputLayout tilContactPerson) {
+        docSale.setChanged(true);
+
         docSale.setContactPerson(text);
 
         if (tilContactPerson != null) {
@@ -687,6 +672,9 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     @Override
     public void onContactPersonPhoneChanged(String text, TextInputLayout tilContactPersonPhone) {
+
+        docSale.setChanged(true);
+
         docSale.setContactPersonPhone(text);
 
         if (tilContactPersonPhone != null) {
@@ -701,10 +689,69 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
     }
 
     @Override
-    public void setDiscountCard(DiscountCard card) {
-        docSale.setDiscountCard(card);
-        showMessage("Скидка будет применена при записи документа");
+    public void onDiscountCardNumberEntered(String cardNumber, TextInputLayout tilCardNumber) {
+
+        hideKeyboard();
+
+        docSale.setChanged(true);
+
+        if (cardNumber.isEmpty()) {
+            docSale.setDiscountCard(DiscountCard.newInstance());
+            return;
+        }
+
+        if (docSale.getPosted()) {
+            tilCardNumber.setError("Документ проведен!");
+            showError("Документ проведен, действие отменено");
+            return;
+        }
+
+        Intent i = new Intent(this, CommunicationWithServer.class);
+        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.DISCOUNT_CARD.ordinal());
+        i.putExtra(Constants.REF_KEY_LABEL, cardNumber);
+        i.putExtra("receiverTag", mReceiver);
+        i.putExtra("from", "Document_Activity");
+        startMyService(i);
+
     }
+
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.drawer_item_save:
+                saveTo1C(false);
+                break;
+            case R.id.drawer_item_post:
+                saveTo1C(true);
+                break;
+            case R.id.drawer_item_print:
+                print();
+                break;
+            case R.id.drawer_item_settings:
+                showSettingsActivity();
+                break;
+
+        }
+
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    public void fab_onclick(View view) {
+        showProductsListFragment();
+    }
+
 
     class SaveDialogListener implements DialogInterface.OnClickListener {
         @Override
@@ -724,12 +771,18 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
     }
 
-    class DeleteRecordDialogListener implements DialogInterface.OnClickListener {
+    class RemoveRecordDialogListener implements DialogInterface.OnClickListener {
+        SaleRecord record;
+
+        RemoveRecordDialogListener(SaleRecord mRecord) {
+            record = mRecord;
+        }
+
         @Override
         public void onClick(DialogInterface dialogInterface, int which) {
             switch (which) {
                 case Dialog.BUTTON_POSITIVE:
-                    deleteCurrentProductRecord();
+                    actuallyRemoveRecord(record);
                     break;
                 case Dialog.BUTTON_NEGATIVE:
                     break;
@@ -739,15 +792,38 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
     }
 
-    private void deleteCurrentProductRecord() {
-        docSale.getProducts().remove(currentRecord);
-        recalc();
+
+    @Override
+    public void removeRecord(SaleRecord record) {
+        if (docSale.getPosted()) {
+            showError("Документ проведен, изменения запрещены.");
+            return;
+        }
+        handleRecordRemoved(record);
+    }
+
+
+    private void actuallyRemoveRecord(SaleRecord record) {
+        SaleRecord currentRecord = findRecordInCollection(record);
+        if (record instanceof SaleRecordProduct) {
+            docSale.getProducts().remove(currentRecord);
+            recalc();
+            productsFragment.notifyItemRemoved();
+            pager.setCurrentItem(1);
+        }
+
+        if (record instanceof SaleRecordService) {
+            docSale.getServices().remove(currentRecord);
+            recalc();
+            servicesFragment.notifyItemRemoved();
+            pager.setCurrentItem(2);
+        }
     }
 
 
     private void showProductsListFragment() {
         if (docSale.getPosted()) {
-            showMessage("Документ проведен, изменения запрещены.");
+            showError("Документ проведен, изменения запрещены.");
             return;
         }
         Intent intent = new Intent(this, ProductsListActivity.class);
@@ -760,7 +836,7 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             return;
         }
 
-        if (requestCode == Constants.SHOW_PRODUCTS_LIST && resultCode == 0) {
+        if (requestCode == Constants.SHOW_PRODUCTS_LIST && resultCode == 0 && !docSale.getPosted()) {
 
             Stock stock = null;
             int id = data.getIntExtra("id", -1);
@@ -776,77 +852,113 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             }
         }
 
-        if (requestCode == Constants.ON_RECORD_SELECTED_IN_DOCUMENT && resultCode == 0) {
-
-            SaleRecordProduct record = null;
-            long id = data.getLongExtra("id", -1);
+        if (requestCode == Constants.RECORD_SELECTED_IN_DOCUMENT && resultCode == 0) {
+            //вызывается только для товаров, не для услуг
+            //вызывается только для товаров, не для услуг
             double qty = data.getDoubleExtra("qty", -1);
+            long id = data.getLongExtra(Constants.ID, -1);
             if (id != -1) {
-                try {
-                    record = MyHelper.getSaleRecordProductDao().queryForId(id);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                if (record != null) {
-                    for (SaleRecordProduct rec :
-                            docSale.getProducts()) {
-                        if (rec.getId() == id) {
-                            rec.setQty(qty);
-                        }
-                    }
-                }
+                SaleRecordProduct record = getRecordByID(id);
+                record.setQty(qty);
+                pager.setCurrentItem(1);
+                notifyItemChanged(record);
             }
-
-            recalc();
-
-            viewPager.post(new Runnable() {
-                @Override
-                public void run() {
-                    viewPager.setCurrentItem(1);
-                }
-            });
-
-            fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
-
         }
-
     }
 
+
+    private void notifyItemChanged(SaleRecord record) {
+
+        recalc();
+
+        if (record instanceof SaleRecordProduct) {
+            //pager.setCurrentItem(1);
+            productsFragment.notifyItemChanged(record);
+        }
+        if (record instanceof SaleRecordService) {
+            //pager.setCurrentItem(2);
+            servicesFragment.notifyItemChanged(record.getLineNumber());
+        }
+    }
+
+    private SaleRecord findRecordInCollection(SaleRecord record) {
+        SaleRecord currentRecord = null;
+        if (record instanceof SaleRecordProduct) {
+            Iterator<SaleRecordProduct> it = docSale.getProducts().iterator();
+            while (it.hasNext()) {
+                currentRecord = it.next();
+                if (currentRecord.getLineNumber() == record.getLineNumber()) {
+                    return currentRecord;
+                }
+            }
+        }
+        if (record instanceof SaleRecordService) {
+            Iterator<SaleRecordService> it = docSale.getServices().iterator();
+            while (it.hasNext()) {
+                currentRecord = it.next();
+                if (currentRecord.getLineNumber() == record.getLineNumber()) {
+                    return currentRecord;
+                }
+            }
+        }
+        if (currentRecord == null) {
+            throw new RuntimeException("Ошибка поиска строки");
+        }
+        return currentRecord;
+    }
+
+    private SaleRecordProduct getRecordByID(long id) {
+        SaleRecordProduct currentRecord = null;
+        Iterator<SaleRecordProduct> it = docSale.getProducts().iterator();
+        while (it.hasNext()) {
+            currentRecord = it.next();
+            if (currentRecord.getId() == id) {
+                return currentRecord;
+            }
+        }
+        if (currentRecord == null) {
+            throw new RuntimeException("Ошибка поиска строки");
+        }
+        return currentRecord;
+    }
 
     @Override
     public void plus(SaleRecord record) {
         if (docSale.getPosted()) {
-            showMessage("Документ проведен, изменения запрещены.");
+            showError("Документ проведен, изменения запрещены.");
             return;
         }
-        double q = record.getQty() + 1;
-        record.setQty(q);
-        recalc();
+        SaleRecord changedRecord = findRecordInCollection(record);
+        changedRecord.setQty(record.getQty() + 1);
+        notifyItemChanged(changedRecord);
     }
 
     @Override
     public void minus(SaleRecord record) {
+
         if (docSale.getPosted()) {
-            showMessage("Документ проведен, изменения запрещены.");
+            showError("Документ проведен, изменения запрещены.");
             return;
         }
+
+        SaleRecord changedRecord = findRecordInCollection(record);
+
         double q = record.getQty();
         if (q <= 1) {
-            currentRecord = record;
-            handleRecordDeletion();
+            handleRecordRemoved(changedRecord);
         }
         if (q > 1) {
             q--;
-            record.setQty(q);
-            recalc();
+            changedRecord.setQty(q);
+            notifyItemChanged(changedRecord);
         }
     }
 
-    private void handleRecordDeletion() {
-        DeleteRecordDialogListener listener = new DeleteRecordDialogListener();
+    private void handleRecordRemoved(SaleRecord record) {
+        RemoveRecordDialogListener listener = new RemoveRecordDialogListener(record);
 
         AlertDialog.Builder adb = new AlertDialog.Builder(this)
-                .setTitle(currentRecord.getProduct().getDescription())
+                .setTitle(record.getProduct().getDescription())
                 .setPositiveButton("Да", listener)
                 .setNegativeButton("Нет", listener)
                 .setMessage("Удалить?");
@@ -854,41 +966,30 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     }
 
-    @Override
-    public void deleteRecord(SaleRecord record) {
-        if (docSale.getPosted()) {
-            showMessage("Документ проведен, изменения запрещены.");
-            return;
-        }
-        currentRecord = record;
-        handleRecordDeletion();
-    }
 
     @Override
     public void onRecordSelected(SaleRecord record, int action) {
         if (action == Constants.SELECT_RECORD_FOR_CHANGE) {
-            try {
-                docSale.save();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
             if (record.getProduct_Key().equals(Constants.SHIPPING_GUID) ||
                     record.getProduct_Key().equals(Constants.UNLOAD_GUID)) {
                 return; //для услуг по доставке и разгрузке не редактируем кол-во
             }
 
+            recalc();
             Intent intent = new Intent(this, QtyInputActivity.class);
-            intent.putExtra("id", record.getId());
-            intent.putExtra("qty", record.getQty());
-            startActivityForResult(intent, Constants.ON_RECORD_SELECTED_IN_DOCUMENT);
+            intent.putExtra(Constants.ID, record.getId());
+            intent.putExtra(Constants.QUANTITY, record.getQty());
+            intent.putExtra(Constants.PRICE, record.getPrice());
+            intent.putExtra(Constants.DESCR, record.getProduct().getDescription());
+            startActivityForResult(intent, Constants.RECORD_SELECTED_IN_DOCUMENT);
         }
         if (action == Constants.SELECT_RECORD_FOR_VIEW_PRODUCT) {
-            ShowProductActivity(record.getProduct_Key());
+            showProductActivity(record.getProduct_Key());
         }
     }
 
 
-    private void setActionBarTitle() {
+    private void updateActionBarTitle() {
         if (docSale.getPosted()) {
             myToolbar.setBackgroundColor(Constants.COLORS.DISABLED);
         } else {
@@ -908,33 +1009,38 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
     }
 
+    private void soundNotification() {
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+        r.play();
+    }
+
     private void showMessage(String text) {
         Snackbar.make(getWindow().getDecorView(), text, Toast.LENGTH_SHORT).show();
     }
 
     public void saveLocal() {
-
+        if (docSale.getProductsList().isEmpty() && docSale.getServicesList().isEmpty()) {
+            return;
+        }
         //проверим некоторые поля на null
         if (docSale.getDiscountCard() == null) {
             docSale.setDiscountCard(DiscountCard.newInstance());
         }
 
+        recalc();
+
         docSale.setDate(new Date());
 
-        try {
-            docSale.save();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-        }
+        docSale.save();
     }
 
-    public void refreshTotal() {
+    public void updateViewTotal() {
 
-        String total = "Итого " + Uttils.formatDoubleToMoney(docSale.getTotal()) + " руб, вес "
-                + Uttils.formatDoubleToMoney(docSale.getWeight()) + " кг, объем "
+        String total = "Итого " + Uttils.formatDoubleToMoney(docSale.getTotal()) + " руб, "
+                + Uttils.formatDoubleToMoney(docSale.getWeight()) + " кг, V "
                 + Uttils.formatDoubleToMoney(docSale.getVolume()) + " м3, "
-                + docSale.getProducts().size() + " товаров";
+                + docSale.getProducts().size() + " тов.";
 
         mTotalText.setText(total);
 
@@ -955,83 +1061,103 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         mShippingTotalText.setText(Uttils.formatInt(docSale.getShippingTotal()));
     }
 
-    private class DrawerItemClickListener implements android.widget.AdapterView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            Log.d(TAG, "onItemClick: DrawerItemClickListener");
-            selectItem(position);
-        }
-
-    }
-
-    //Это в дравере
-    private void selectItem(int position) {
-        mDrawerList.setItemChecked(position, true);
-        mDrawerLayout.closeDrawer(mDrawerList);
-        String selectedAction = Constants.DOCUMENT_ACTIONS.get(position);
-        if (St.getApp().getResources().getString(R.string.ACTION_PRINT).equals(selectedAction)) {
-            print();
-        }
-
-        if (St.getApp().getResources().getString(R.string.ACTION_CLOSE).equals(selectedAction)) {
-            onBackPressed();
-        }
-
-        if (St.getApp().getResources().getString(R.string.ACTION_SAVE).equals(selectedAction)) {
-            saveLocal();
-        }
-
-        if (St.getApp().getResources().getString(R.string.ACTION_SAVE_1C).equals(selectedAction)) {
-            saveTo1C(false);
-        }
-
-        if (St.getApp().getResources().getString(R.string.ACTION_POST_1C).equals(selectedAction)) {
-            saveTo1C(true);
-        }
-    }
 
     private void print() {
+        if (!docSale.getPosted()) {
+            showError("Документ не проведен, печать не выполнена");
+            return;
+        }
+        String printer = Settings.getPrinterStatic();
+        if (printer == null) {
+            showError("Не выбран принтер!");
+            return;
+        }
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.PRINT_DOCUMENT.ordinal());
         i.putExtra(Constants.DOC_NUMBER, docSale.getNumber());
-        i.putExtra(Constants.PRINTER_NAME, Settings.getPrinterStatic());
+        i.putExtra(Constants.PRINTER_NAME, printer);
         i.putExtra("receiverTag", mReceiver);
-        i.putExtra("from", "DocList");
-        startService(i);
+        i.putExtra("from", "Document_Activity");
+        startMyService(i);
 
     }
 
+    private void startMyService(Intent i) {
+        String s = Constants.REQUESTS.values()[i.getIntExtra(Constants.MODE_LABEL, -1)].name();
+        showLoading(s);
+        startService(i);
+    }
+
+    private void showLoading(String... params) {
+        LoadingFragment fragment = LoadingFragment.newInstance(params);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.doc__coord, fragment)
+                .addToBackStack("loading")
+                .commit();
+
+    }
+
+
+    private void hideLoading() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("loading");
+        if (fragment != null)
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        getSupportFragmentManager().popBackStack();
+    }
+
+    private void vibrate() {
+        Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        v.vibrate(500);
+
+    }
+
+    private void showError(String s) {
+        //здесь навалить всяких вибраций и звуков, ошибка же!
+        soundNotification();
+        vibrate();
+        showMessage(s);
+    }
+
     private void saveTo1C(boolean post) {
+        saveLocal();
         productsCount = docSale.getProducts().size();
         Calendar shippingDate = GregorianCalendar.getInstance();
         shippingDate.setTime(docSale.getShippingDate());
-        if(docSale.getNeedShipping() && !Uttils.isShippingDateValid(shippingDate)){
-            showMessage("Дата доставки указана неверно!");
+        if (docSale.getNeedShipping() && !Uttils.isShippingDateValid(shippingDate)) {
+            showError("Дата доставки указана неверно!");
             return;
         }
         if (post && docSale.getNeedShipping() && docSale.getWeight() == 0) {
-            showMessage("Не указан вес товаров, оформление доставки невозможно!");
+            showError("Не указан вес товаров, оформление доставки невозможно!");
             return;
         }
 
         if (post && docSale.getNeedUnload() && docSale.getWorkersCount() == 0) {
-            showMessage("Указана разгрузка, но нет грузчиков!");
+            showError("Указана разгрузка, но нет грузчиков!");
             return;
         }
 
         if (docSale.getPosted()) {
-            showMessage("Документ проведен, изменения запрещены.");
+            showError("Документ проведен, изменения запрещены.");
             return;
         }
 
-        if (docSale.getProducts().size() > 0) {
-            saveLocal();
-        } else {
-            showMessage("В документе нет товаров");
+        if (docSale.getRef_Key().equals(Constants.ZERO_GUID) && post) {
+            showError("Документ не записан в 1С, проведение возможно только после записи.");
             return;
         }
-        if (docSale.getRef_Key().equals(Constants.ZERO_GUID) && post) {
-            showMessage("Документ не записан в 1С, проведение возможно только после записи.");
+        if (docSale.getNeedUnload()) {
+            if (docSale.getWorkersCount() == 0 || docSale.getUnloadCost() == 0) {
+                showError("Проверьте количество грузчиков и оплату за разгрузку.");
+                return;
+            }
+        }
+
+        if (docSale.getProducts().size() > 0 || docSale.getServices().size() > 0) {
+            saveLocal();
+        } else {
+            showError("В документе нет товаров");
             return;
         }
 
@@ -1041,16 +1167,16 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             i.putExtra(Constants.ID, docSale.getId());
             i.putExtra(Constants.REF_KEY_LABEL, docRef_Key);
             i.putExtra("receiverTag", mReceiver);
-            i.putExtra("from", "DocList");
-            startService(i);
+            i.putExtra("from", "Document_Activity");
+            startMyService(i);
 
         } else {
             Intent i = new Intent(this, CommunicationWithServer.class);
             i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.SAVE_DOCUMENT.ordinal());
             i.putExtra("id", docSale.getId());
             i.putExtra("receiverTag", mReceiver);
-            i.putExtra("from", "DocList");
-            startService(i);
+            i.putExtra("from", "Document_Activity");
+            startMyService(i);
         }
     }
 
@@ -1060,10 +1186,10 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         i.putExtra("from", "Document");
         i.putExtra(Constants.REF_KEY_LABEL, getDocRef_Key());
         i.putExtra("receiverTag", mReceiver);
-        startService(i);
+        startMyService(i);
     }
 
-    private void ShowProductActivity(String ref_Key) {
+    private void showProductActivity(String ref_Key) {
         Intent intent = new Intent(this, ProductActivity.class);
         intent.putExtra(Constants.REF_KEY_LABEL, ref_Key);
         startActivityForResult(intent, Constants.SHOW_PRODUCTS_LIST);
@@ -1072,32 +1198,27 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
 
     private void onBarcodeAquired(String barcode) {
         barcode = barcode.replaceAll("[^0-9.]", "");
-        showMessage(barcode);
+        showSnackWithLoading(barcode);
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.BARCODE.ordinal());
         i.putExtra(Constants.BARCODE_LABEL, barcode);
         i.putExtra("receiverTag", mReceiver);
-        i.putExtra("from", "DocList");
-        startService(i);
+        i.putExtra("from", "Document_Activity");
+        startMyService(i);
 
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
+    private void showSnackWithLoading(String s) {
+        bar = Snackbar.make(getWindow().getDecorView(), s, Toast.LENGTH_SHORT);
+        Snackbar.SnackbarLayout snack_view = (Snackbar.SnackbarLayout) bar.getView();
+        snack_view.addView(new ProgressBar(this));
+        bar.show();
     }
 
 
     @Override
-    public void onReceiveResult(int code, Bundle mResult) {
+    public void onReceiveResultFromService(int code, Bundle mResult) {
+        hideLoading();
         if (code == Constants.FEEDBACK) {
             showMessage(mResult.getString(Constants.MESSAGE_LABEL));
             return;
@@ -1116,28 +1237,51 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
             return;
         }
 
-        Constants.REQUESTS ro = Constants.REQUESTS.values()[code];
+        Constants.REQUESTS requestedOperation = Constants.REQUESTS.values()[code];
         boolean success = mResult.getBoolean(Constants.OPERATION_SUCCESS_LABEL);
         String message = mResult.getString(Constants.MESSAGE_LABEL, "Ошибка не передана сервисом!");
         int resultCode = mResult.getInt(Constants.RESULT_CODE_LABEL);
-        if (ro == Constants.REQUESTS.PRODUCT_INFO) {
-            if (mResult.getBoolean(Constants.OPERATION_SUCCESS_LABEL)) {
-                ShowProductActivity(mResult.getString(Constants.REF_KEY_LABEL));
-            } else {
-                showMessage(mResult.getString("error"));
-            }
+
+        if (requestedOperation == Constants.REQUESTS.PRINT_DOCUMENT) {
+            showMessage(message + "(" + String.valueOf(resultCode) + ")");
         }
-        if (ro == Constants.REQUESTS.SAVE_DOCUMENT || ro == Constants.REQUESTS.POST_DOCUMENT || ro == Constants.REQUESTS.LOAD_MISSING_FOR_DOCUMENT) {
-            if(ro != Constants.REQUESTS.LOAD_MISSING_FOR_DOCUMENT){
+
+        if (requestedOperation == Constants.REQUESTS.DISCOUNT_CARD) {
+            if (success) {
+                onDiscountCardFound(mResult.getString(Constants.REF_KEY_LABEL));
+            } else {
                 showMessage(message + "(" + String.valueOf(resultCode) + ")");
             }
-            if(success) {
+        }
+
+        if (requestedOperation == Constants.REQUESTS.PRODUCT_INFO) {
+            if (mResult.getBoolean(Constants.OPERATION_SUCCESS_LABEL)) {
+                showProductActivity(mResult.getString(Constants.REF_KEY_LABEL));
+            } else {
+                showError(mResult.getString("message"));
+            }
+        }
+
+        if (requestedOperation == Constants.REQUESTS.BARCODE) {
+            if (success) {
+                showProductActivity(mResult.getString(Constants.REF_KEY_LABEL));
+            } else {
+                showMessage(message + "(" + String.valueOf(resultCode) + ")");
+            }
+        }
+
+        if (requestedOperation == Constants.REQUESTS.SAVE_DOCUMENT || requestedOperation == Constants.REQUESTS.POST_DOCUMENT || requestedOperation == Constants.REQUESTS.LOAD_MISSING_FOR_DOCUMENT) {
+            if (requestedOperation != Constants.REQUESTS.LOAD_MISSING_FOR_DOCUMENT) {
+                showMessage(message + "(" + String.valueOf(resultCode) + ")");
+            }
+            if (success) {
                 //Видимо здесь нужно показывать фрагмент
                 docRef_Key = mResult.getString(Constants.REF_KEY_LABEL);
                 loadDocumentFromDB();
-                setActionBarTitle();
-                fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
-                refreshTotal();
+                updateActionBarTitle();
+//                fragmentPagerAdapter.notifyFragmentDataSetChanged(1);
+                updateViewTotal();
+                updateFragments();
                 if (code == Constants.SAVE_COMPLETE) {
                     //покажем подарки
                     int gifts = docSale.getProducts().size() - productsCount;
@@ -1149,6 +1293,60 @@ public class DocumentActivity extends AppCompatActivity implements SaleRecordInt
         }
     }
 
+    private void updateFragments() {
+        requisitesFragment.initView();
+        productsFragment.initView();
+        servicesFragment.initView();
+        shippingFragment.initView();
+    }
+
+    private void onDiscountCardFound(String ref_Key) {
+        DiscountCard card = DiscountCard.getObject(DiscountCard.class, ref_Key);
+        if (card != null) {
+            docSale.setDiscountCard(card);
+            showMessage("Скидочная карта " + card.getDescription() + " выбрана");
+            requisitesFragment.notifyDataChanged();
+        }
+    }
+
+    public class ZoomOutPageTransformer implements ViewPager.PageTransformer {
+        private static final float MIN_SCALE = 0.85f;
+        private static final float MIN_ALPHA = 0.5f;
+
+        public void transformPage(View view, float position) {
+            int pageWidth = view.getWidth();
+            int pageHeight = view.getHeight();
+
+            if (position < -1) { // [-Infinity,-1)
+                // This page is way off-screen to the left.
+                view.setAlpha(0);
+
+            } else if (position <= 1) { // [-1,1]
+                // Modify the default slide transition to shrink the page as well
+                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
+                float vertMargin = pageHeight * (1 - scaleFactor) / 2;
+                float horzMargin = pageWidth * (1 - scaleFactor) / 2;
+                if (position < 0) {
+                    view.setTranslationX(horzMargin - vertMargin / 2);
+                } else {
+                    view.setTranslationX(-horzMargin + vertMargin / 2);
+                }
+
+                // Scale the page down (between MIN_SCALE and 1)
+                view.setScaleX(scaleFactor);
+                view.setScaleY(scaleFactor);
+
+                // Fade the page relative to its size.
+                view.setAlpha(MIN_ALPHA +
+                        (scaleFactor - MIN_SCALE) /
+                                (1 - MIN_SCALE) * (1 - MIN_ALPHA));
+
+            } else { // (1,+Infinity]
+                // This page is way off-screen to the right.
+                view.setAlpha(0);
+            }
+        }
+    }
 
 }
 

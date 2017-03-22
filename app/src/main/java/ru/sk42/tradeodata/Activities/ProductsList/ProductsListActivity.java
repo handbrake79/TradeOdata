@@ -30,7 +30,7 @@ import static ru.sk42.tradeodata.Model.Constants.SHOW_PRODUCTS_LIST;
 import static ru.sk42.tradeodata.Model.Constants.OPERATION_SUCCESS_LABEL;
 import static ru.sk42.tradeodata.R.id.frame_view_products_list;
 
-public class ProductsListActivity extends AppCompatActivity implements ServiceResultReceiver.ReceiverInterface, InteractionInterface {
+public class ProductsListActivity extends AppCompatActivity implements ServiceResultReceiver.ServiceResultReceiverInterface, InteractionInterface {
 
     private static final String TAG = "ProdListAct***";
 
@@ -161,7 +161,7 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
     }
 
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
+    public void onReceiveResultFromService(int resultCode, Bundle resultData) {
         if (resultCode == Constants.REQUESTS.PRODUCT_INFO.ordinal()) {
             boolean success = resultData.getBoolean(OPERATION_SUCCESS_LABEL, false);
             if (success) {

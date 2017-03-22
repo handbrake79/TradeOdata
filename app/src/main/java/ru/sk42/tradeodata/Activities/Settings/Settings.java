@@ -10,6 +10,7 @@ import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Model.St;
 
 /**
  * Created by хрюн моржов on 20.10.2016.
@@ -202,7 +203,7 @@ public class Settings {
         if (settings == null) {
             settings = new Settings();
             settings.setScannerStartDelayMillis(500);
-            settings.setBaseName("ut836");
+            settings.setBaseName("tradeodata");
             settings.setServerAddress("192.168.0.171");
             settings.setLogin("kogan");
             settings.setPassword("1");
@@ -214,28 +215,32 @@ public class Settings {
     protected void save() {
         try {
             MyHelper.getSettingsDao().createOrUpdate(this);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static int getScannerStartDelayMillisStatic(){
+    public static int getScannerStartDelayMillisStatic() {
         return getSettings().getScannerStartDelayMillis();
     }
 
-    public static String getServerAddressStatic(){
+    public static String getServerAddressStatic() {
         return "http://" + getSettings().serverAddress + "/";
     }
-    public static String getInfoBaseNameStatic(){
-        return getSettings().baseName;
+
+    public static String getInfoBaseNameStatic() {
+        return getSettings().baseName + "/";
     }
-    public static String getLoginStatic(){
+
+    public static String getLoginStatic() {
         return getSettings().login;
     }
-    public static String getPasswordStatic(){
+
+    public static String getPasswordStatic() {
         return getSettings().password;
     }
-    public static String getPrinterStatic(){
+
+    public static String getPrinterStatic() {
         return getSettings().getPrinter();
     }
 
@@ -245,4 +250,16 @@ public class Settings {
         settings.setPrinter(printerName);
         settings.save();
     }
+
+    public static String getDeviceID() {
+        try {
+            String deviceID = android.provider.Settings.Secure.getString(St.getApp().getApplicationContext().getContentResolver(),
+                    android.provider.Settings.Secure.ANDROID_ID);
+            return deviceID;
+        } catch (Exception e) {
+            return "unknown";
+        }
+
+    }
+
 }
