@@ -1,6 +1,7 @@
 package ru.sk42.tradeodata.Activities.Settings;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -15,17 +16,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import com.generalscan.NotifyStyle;
-import com.generalscan.OnDataReceive;
-import com.generalscan.bluetooth.BluetoothConnect;
 
 import java.sql.SQLException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.Adapters.DrawerAdapter;
+import ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
@@ -123,9 +122,24 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
         mDrawerToggle.setDrawerIndicatorEnabled(true);
-        showConnectionFragment();
+        this.setTitle("");
+        setSettingsTitle("Настройки", "");
+        if (getIntent().getIntExtra(Constants.REQUEST_SETTINGS_USER_LABEL, 0) == 0) {
+            showConnectionFragment();
+        } else {
+            showUserSelectionFragment();
+        }
     }
 
+    public void setSettingsTitle(String t, String st) {
+        myToolbar.setSubtitle("");
+        myToolbar.setTitle("");
+        TextView tv = (TextView) myToolbar.findViewById(R.id.settings__title);
+        tv.setText(t);
+        tv = (TextView) myToolbar.findViewById(R.id.settings__subtitle);
+        tv.setText(st);
+
+    }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         // TODO Auto-generated method isEmpty
@@ -164,14 +178,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
                 break;
             case 1:
                 //mVehicleType select
-                UserListFragment userListFragment = UserListFragment.newInstance(1);
-
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.settings_frame, userListFragment, userListFragment.getClass().getName())
-                        .addToBackStack(userListFragment.getClass().getName())
-                        .commit();
-
+                showUserSelectionFragment();
                 break;
             case 2:
                 //printer
@@ -188,7 +195,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.settings_frame, fragment, fragment.getClass().getName())
-                      //  .addToBackStack(fragment.getClass().getName())
+                        //  .addToBackStack(fragment.getClass().getName())
                         .commit();
                 //scanner
                 break;
@@ -201,6 +208,16 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
                         .commit();
                 break;
         }
+    }
+
+    private void showUserSelectionFragment() {
+        UserSelectionFragment userSelectionFragment = UserSelectionFragment.newInstance(1);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.settings_frame, userSelectionFragment, userSelectionFragment.getClass().getName())
+                .addToBackStack(userSelectionFragment.getClass().getName())
+                .commit();
     }
 
     private void showConnectionFragment() {
@@ -216,10 +233,12 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
 
     @Override
     public void onValueSelected(Object object) {
-        if(object instanceof User) {
+        if (object instanceof User) {
             User user = (User) object;
             Settings.setCurrentUserStatic(user);
-           Toast.makeText(this, "Выбран пользователь " + user.getDescription(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Выбран пользователь " + user.getDescription(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, DocList_Activity.class);
+            startActivity(intent);
         }
         if (object instanceof VehicleType) {
             VehicleType vehicleType = (VehicleType) object;
@@ -230,7 +249,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
                 e.printStackTrace();
             }
         }
-        if(object instanceof String){
+        if (object instanceof String) {
             Settings.getSettings().setPrinterStatic((String) object);
 
             Toast.makeText(this, "Выбран принтер " + Settings.getPrinterStatic(), Toast.LENGTH_SHORT).show();

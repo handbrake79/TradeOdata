@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -49,13 +50,13 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        initApplication();
+        if (St.getInitComplete()) {
+            finish();
+            System.exit(0);
+        } else {
+            initApplication();
+        }
 
-    }
-
-    public void deleteDatabaseAndReload(View view) {
-        MyHelper.dropAndCreateTables();
-        initApplication();
     }
 
     public class CheckServerAvailabilityAsync extends AsyncTask<String, Void, Boolean> {
@@ -79,13 +80,20 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         }
 
         protected void onPostExecute(Boolean result) {
+
             if (result) {
                 callPreload();
             } else {
-                progressDialog.hide();
+                hideLoading();
                 MainActivity.this.showToast("Сервер недоступен!");
+                showSettingsActivity();
             }
         }
+    }
+
+    private void showSettingsActivity() {
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void callPreload() {
@@ -96,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         i.putExtra("from", "MainAct");
         i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.PRELOAD.ordinal());
         i.putExtra("receiverTag", mReceiver);
+        showLoading("Загрузка данных с сервера 1С");
         startService(i);
     }
 
@@ -108,17 +117,10 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
         St.setApplication(getApplication());
 
-        progressDialog.setTitle("Проверка доступности сервера");
-        progressDialog.show();
+        showLoading("Проверка доступности сервера 1С");
         AsyncTask<String, Void, Boolean> task = new CheckServerAvailabilityAsync();
         task.execute();
 
-    }
-
-
-    public void btnSettingsOnClick(View view) {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
     }
 
 
@@ -139,37 +141,56 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     }
 
 
-    public void btnDocListClick(View view) {
-        showDocList();
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (St.getInitComplete()) {
+            System.exit(0);
+            this.finish();
+        }
     }
 
-    private void showDocList() {
-        Intent intent = new Intent(this, DocList_Activity.class);
-        startActivity(intent);
+    private void showLoading(String... params) {
+        LoadingFragment fragment = LoadingFragment.newInstance(params);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.loading, fragment, "loading")
+                .addToBackStack("loading")
+                .commit();
 
+    }
+
+    private void hideLoading() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("loading");
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            getSupportFragmentManager().popBackStack();
+        }
     }
 
     @Override
-    public void onReceiveResultFromService(int resultCode, Bundle resultData) {
-
+    public void onReceiveResultFromService(int resultCode, Bundle mResult) {
         if (resultCode == Constants.FEEDBACK) {
-            String message = resultData.getString(MESSAGE_LABEL);
+            String message = mResult.getString(MESSAGE_LABEL);
 
             if (message != null) {
-                progressDialog.setIndeterminate(true);
-                progressDialog.setTitle("Загрузка данных с сервера");
-                progressDialog.setMessage(message);
-                if (!progressDialog.isShowing())
-                    progressDialog.show();
+                showLoading(message);
             }
             return;
         }
 
+        hideLoading();
         Constants.REQUESTS requestedOperation = Constants.REQUESTS.values()[resultCode];
         if (requestedOperation == Constants.REQUESTS.PRELOAD) {
-            progressDialog.dismiss();
+            boolean success = mResult.getBoolean(Constants.OPERATION_SUCCESS_LABEL);
+            if (!success) {
+                showToast(mResult.getString(Constants.MESSAGE_LABEL));
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return;
+            }
 
-            showSnack("Предварительная загрузка завершена");
+//            showSnack("Предварительная загрузка завершена");
+            St.setInitComplete();
 
             //TODO         // переписать нормально
             try {
@@ -182,7 +203,8 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            showDocList();
+            Intent intent = new Intent(this, DocList_Activity.class);
+            startActivity(intent);
         }
     }
 

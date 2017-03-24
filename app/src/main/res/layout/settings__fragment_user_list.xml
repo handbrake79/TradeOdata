@@ -9,5 +9,5 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="ru.sk42.tradeodata.Activities.Settings.UserListFragment"
+    tools:context="ru.sk42.tradeodata.Activities.Settings.UserSelectionFragment"
     tools:listitem="@layout/settings__fragment_user" />

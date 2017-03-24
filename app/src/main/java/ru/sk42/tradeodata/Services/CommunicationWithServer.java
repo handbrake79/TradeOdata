@@ -5,9 +5,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
+import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.table.TableUtils;
 
 import java.io.IOException;
@@ -52,6 +54,7 @@ import ru.sk42.tradeodata.Model.Catalogs.ImageProduct;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
+import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
 import ru.sk42.tradeodata.Model.PrintResult;
 import ru.sk42.tradeodata.Model.Printer;
 import ru.sk42.tradeodata.Model.Printers;
@@ -376,20 +379,32 @@ public class CommunicationWithServer extends IntentService {
         }
     }
 
-    private void loadShippingRates() {
-//
-//        long count = 0;
-//
-//        try {
-//            count = MyHelper.getShippingRouteDao().countOf();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//
-//        if (count > 0) {
-//            return;
-//        }
+    private boolean needToLoadShippingRates() {
+        try {
+            ShippingRate rate = MyHelper.getShippingRouteDao().queryBuilder().queryForFirst();
+            if (rate == null) {
+                return true;
+            }
 
+            Calendar c = Uttils.getEndOfYesterday();
+            Date date = rate.getDate();
+
+            //тариф доставки загружали вчера или еще раньше, нужно обновить
+//тариф свежий, можно использовать из базы
+            return date != null && c.after(rate.getDate());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return true;
+        }
+
+    }
+
+    private void loadShippingRates() {
+
+        if (!needToLoadShippingRates()) {
+            sendFeedback("Тарифы не обновлялись");
+            return;
+        }
         sendFeedback("Начата загрузка тарифов на доставку");
 
         ShippingRatesRequest request = ServiceGenerator.createService(ShippingRatesRequest.class);
@@ -678,6 +693,7 @@ public class CommunicationWithServer extends IntentService {
         }
     }
 
+    @Nullable
     private Integer getRecordsCountFromServer(CDO object) {
         RecordsCountRequest request = ServiceGenerator.createService(RecordsCountRequest.class);
         String filter = object.getRetroFilterString();
@@ -688,6 +704,9 @@ public class CommunicationWithServer extends IntentService {
         }
 
         Call<Integer> call = request.call(Settings.getServerAddressStatic() + "/tradeodata/odata/standard.odata/" + object.getMaintainedTableName() + "/$count" + filter);
+        if (call == null) {
+            return null;
+        }
         Integer count = 0;
         try {
             Response<Integer> response = call.execute();
@@ -910,8 +929,16 @@ public class CommunicationWithServer extends IntentService {
     }
 
 
-    private boolean isLoadRequired(CDO object) {
-        long serverRecordsCount = getRecordsCountFromServer(object);
+    @Nullable
+    private Boolean isLoadRequired(CDO object) {
+        Integer serverRecordsCount = getRecordsCountFromServer(object);
+        if (serverRecordsCount == null) {
+            RequestResult result = new RequestResult(Constants.REQUESTS.NONE);
+            result.message = "Ошибка связи!";
+            result.success = false;
+            result.resultCode = -1;
+            sendRequestFinished(result);
+        }
         if (serverRecordsCount < 0) {
             return false;
 

@@ -1,47 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="5dp"
-    android:layout_marginTop="5dp"
-    android:gravity="center_vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:elevation="7dp"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="5dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    >
-
-    <ImageView
-        android:id="@+id/doclist__image_small"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginLeft="10dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        app:srcCompat="@drawable/noimg" />
-
-
-
-    <TextView
-        android:id="@+id/tvProduct"
-        android:layout_toRightOf="@id/doclist__image_small"
-        android:layout_marginLeft="5dp"
-        android:layout_width="match_parent"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Description"
-        android:textSize= "20sp"
-        />
-    <TextView
-        android:layout_below="@+id/tvProduct"
-        android:layout_alignParentRight="true"
-        android:id="@+id/products_list_browser_product_code"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Code"
-        android:textColor="@color/accent"
-        android:textSize="18sp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
 
-        />
+        >
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/doclist__image_small"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            app:srcCompat="@drawable/noimg" />
+
+
+        <TextView
+            android:id="@+id/tvProduct"
+            android:textColor="@color/bpBlack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/doclist__image_small"
+            android:text="Description"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:layout_below="@+id/tvProduct"
+            android:layout_toRightOf="@+id/doclist__image_small"
+            android:layout_marginLeft="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:src="@drawable/separator" />
+
+        <TextView
+            android:id="@+id/products_list_browser_product_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tvProduct"
+            android:layout_margin="5dp"
+            android:text="Code"
+            android:textColor="@color/gray"
+            android:textSize="12sp"
+
+            />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

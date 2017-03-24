@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/drawer_item_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="Настройки"></item>
+        <item
+            android:id="@+id/drawer_item_exit"
+            android:icon="@drawable/ic_exit_to_app_white_18dp"
+            android:title="Выход"></item>
+    </group>
+
+</menu>

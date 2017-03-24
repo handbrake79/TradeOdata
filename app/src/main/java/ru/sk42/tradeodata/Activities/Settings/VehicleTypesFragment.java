@@ -62,6 +62,8 @@ public class VehicleTypesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings__fragment_vehicletypes, container, false);
+        SettingsActivity settingsActivity = (SettingsActivity) getActivity();
+        settingsActivity.setSettingsTitle("Типы транспорта", "будут использоваться только выбранные");
 
         // Set the adapter
         if (view instanceof RecyclerView) {

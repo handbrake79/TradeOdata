@@ -60,16 +60,10 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         }
         holder.mPosted.setText(holder.mItem.getPostedDescr());
 
-        holder.mContract.setText(holder.mItem.getContract().getDescription());
-       // Integer productsCount, servicesCount;
-//        productsCount = holder.mItem.getProducts().size();
-//        servicesCount = holder.mItem.getServices().size();
-//        //holder.mProductCount.setText("Товаров " + productsCount.toString());
         if (holder.mItem.getNeedShipping()) {
             holder.mShipping.setVisibility(View.VISIBLE);
         } else {
             holder.mShipping.setVisibility(View.GONE);
-
         }
 
 
@@ -95,7 +89,6 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         public final TextView mAuthor;
         public final TextView mTotal;
         public final TextView mPosted;
-        public final TextView mContract;
         public final ImageView mShipping;
         public DocSale mItem;
 
@@ -109,7 +102,6 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
             mAuthor = (TextView) view.findViewById(R.id.docList_Author);
             mTotal = (TextView) view.findViewById(R.id.docList_Total);
             mPosted = (TextView) view.findViewById(R.id.docList_Posted);
-            mContract = (TextView) view.findViewById(R.id.docList_Contract);
             mShipping = (ImageView) view.findViewById(R.id.icon_shipping);
 
         }

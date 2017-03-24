@@ -53,7 +53,7 @@ public class RequisitesFragment extends Fragment {
     }
 
 
-    // Inflate the fragment layout we defined above for this fragment
+    // Inflate the fragment shake_anim we defined above for this fragment
     // Set the associated text for the title
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

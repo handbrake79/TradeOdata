@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -54,6 +55,9 @@ public class ProductsListFragment extends Fragment {
     private ProductsListActivity parentACtivity;
     String lastViewedGroupKey;
 
+    AVLoadingIndicatorView avLoadingIndicatorView;
+    RecyclerView mRecyclerView;
+
     //ProgressDialog progressDialog;
 
     /**
@@ -79,34 +83,33 @@ public class ProductsListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.products_list__fragment_products_browser_recyclerview, container, false);
-
+        view = inflater.inflate(R.layout.products_list__recyclerview, container, false);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.rvProductsListFragment);
+        avLoadingIndicatorView = (AVLoadingIndicatorView) view.findViewById(R.id.avi_product_list);
+        avLoadingIndicatorView.setVisibility(View.GONE);
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView mRecyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            mAdapter = new ProductsListAdapter(productArrayList, mListener, this);
-            mRecyclerView.setAdapter(mAdapter);
-            mRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
+        Context context = mRecyclerView.getContext();
 
-
-            lastViewedGroupKey = Settings.getLastViewedProductGroupStatic();
-            if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.ZERO_GUID)) {
-                Product lastViewedGroup = Product.getObject(Product.class, lastViewedGroupKey);
-                if (lastViewedGroup != null) {
-                    showChildProducts(lastViewedGroup);
-                }
-            } else {
-                showTopLevelProducts();
-            }
-
-
+        if (mColumnCount <= 1) {
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        } else {
+            mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
+        mAdapter = new ProductsListAdapter(productArrayList, mListener, this);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
+
+
+        lastViewedGroupKey = Settings.getLastViewedProductGroupStatic();
+        if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.ZERO_GUID)) {
+            Product lastViewedGroup = Product.getObject(Product.class, lastViewedGroupKey);
+            if (lastViewedGroup != null) {
+                showChildProducts(lastViewedGroup);
+            }
+        } else {
+            showTopLevelProducts();
+        }
+
 
         return view;
     }
@@ -176,10 +179,6 @@ public class ProductsListFragment extends Fragment {
         return list;
     }
 
-    private void setTitle(String title) {
-        parentACtivity.setActionBarTitle(title);
-    }
-
     void loadImage(String ref_Key) {
         Intent i = new Intent(this.getActivity(), CommunicationWithServer.class);
         i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.LOAD_IMAGE.ordinal());
@@ -194,11 +193,11 @@ public class ProductsListFragment extends Fragment {
             return; //это не группа, оставляем всё как есть
         }
 
-        showMessage("Запрос к 1С, ждите");
+        showLoading();
 
         loadImage(product.getRef_Key());
 
-        setTitle("Группа " + product.getDescription());
+        parentACtivity.setActivityTitle("Группа " + product.getDescription(), false);
 
         String guid = product.getRef_Key();
         currentCategory = product;
@@ -216,17 +215,25 @@ public class ProductsListFragment extends Fragment {
             updateView(list);
     }
 
-    public void showMessage(String msg) {
-        Toast.makeText(this.getActivity(), msg, Toast.LENGTH_SHORT).show();
+    private void hideLoading() {
+        avLoadingIndicatorView.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+        avLoadingIndicatorView.hide();
+    }
+
+    public void showLoading() {
+        mRecyclerView.setVisibility(View.GONE);
+        avLoadingIndicatorView.setVisibility(View.VISIBLE);
+        avLoadingIndicatorView.show();
     }
 
     public void showTopLevelProducts() {
         currentCategory = Product.getStub();
-        setTitle("Верхний уровень справочника");
+        parentACtivity.setActivityTitle("Верхний уровень справочника", true);
         String guid = Constants.ZERO_GUID;
         List<Product> list = getProductsByParent(guid);
         if (list == null || list.size() == 0) {
-            showMessage("Запрос к 1С");
+            showLoading();
             final ProductsRequest request = ServiceGenerator.createService(ProductsRequest.class);
             Call<ProductsList> call = request.call(RetroConstants.getMapWithFieldRestriction("Parent_Key eq guid'" + guid + "'", RetroConstants.productFieldsList));
             call.enqueue(new MyCallBack());
@@ -242,6 +249,7 @@ public class ProductsListFragment extends Fragment {
     }
 
     public void updateView(Object list) {
+        hideLoading();
         productArrayList.clear();
         if (list instanceof ProductsList) {
             ProductsList mlist = (ProductsList) list;

@@ -20,13 +20,9 @@ import ru.sk42.tradeodata.Model.Catalogs.User;
  * Created by PostRaw on 14.03.2016.
  */
 public class St {
-    private static String InfoBaseName;
-    private static String ServerAddress;
-    private static String ServerPassword;
-    private static String Printer;
-    private static String ServerUser;
-    private static Date startDate;
     private static Application application;
+    private static boolean initComplete;
+
 
     public static Application getApp() {
         return application;
@@ -37,4 +33,11 @@ public class St {
     }
 
 
+    public static void setInitComplete() {
+        initComplete = true;
+    }
+
+    public static boolean getInitComplete() {
+        return initComplete;
+    }
 }

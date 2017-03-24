@@ -22,10 +22,9 @@ import java.util.List;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class UserListFragment extends Fragment {
+public class UserSelectionFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -37,13 +36,13 @@ public class UserListFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public UserListFragment() {
+    public UserSelectionFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static UserListFragment newInstance(int columnCount) {
-        UserListFragment fragment = new UserListFragment();
+    public static UserSelectionFragment newInstance(int columnCount) {
+        UserSelectionFragment fragment = new UserSelectionFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -64,6 +63,8 @@ public class UserListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings__fragment_user_list, container, false);
 
+        SettingsActivity settingsActivity = (SettingsActivity) getActivity();
+        settingsActivity.setSettingsTitle("Пользователи", "выберите пользователя");
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();

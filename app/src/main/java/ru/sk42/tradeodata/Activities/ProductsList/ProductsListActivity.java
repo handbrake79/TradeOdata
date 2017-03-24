@@ -5,16 +5,17 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
+import ru.sk42.tradeodata.Activities.LoadingFragment;
 import ru.sk42.tradeodata.Activities.Product.ProductActivity;
 import ru.sk42.tradeodata.Activities.Product.StockFragment;
 import ru.sk42.tradeodata.Helpers.MyHelper;
@@ -28,7 +29,7 @@ import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 import static ru.sk42.tradeodata.Model.Constants.MODE_LABEL;
 import static ru.sk42.tradeodata.Model.Constants.SHOW_PRODUCTS_LIST;
 import static ru.sk42.tradeodata.Model.Constants.OPERATION_SUCCESS_LABEL;
-import static ru.sk42.tradeodata.R.id.frame_view_products_list;
+import static ru.sk42.tradeodata.R.id.product_list__frame_list;
 
 public class ProductsListActivity extends AppCompatActivity implements ServiceResultReceiver.ServiceResultReceiverInterface, InteractionInterface {
 
@@ -41,22 +42,22 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        setContentView(R.layout.products_list__view_products_list);
+        setContentView(R.layout.products_list__main_layout);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //setTitle("");
+        //setSettingsTitle("");
         mReceiver.setReceiver(this);
 
         productsListFragment = new ProductsListFragment();
 
         getSupportFragmentManager().beginTransaction()
-                .replace(frame_view_products_list, productsListFragment)
+                .replace(product_list__frame_list, productsListFragment)
                 .addToBackStack(productsListFragment.getClass().getName())
                 .commit();
 
     }
 
     private void onButtonBackPressed() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(frame_view_products_list);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(product_list__frame_list);
         if (fragment instanceof StockFragment) {
             getSupportFragmentManager().popBackStack();
         } else {
@@ -65,8 +66,16 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
 
     }
 
-    public void setActionBarTitle(String title) {
+    public void setActivityTitle(String title, boolean upperLevel) {
+        CardView cardView = (CardView) findViewById(R.id.products_list_card_caption);
+        if (upperLevel) {
+            int color = cardView.getContext().getResources().getColor(R.color.gray);
+            cardView.setCardBackgroundColor(color);
+        } else {
+            int color = cardView.getContext().getResources().getColor(R.color.accent);
+            cardView.setCardBackgroundColor(color);
 
+        }
         TextView tv = (TextView) findViewById(R.id.products_list_group_caption);
         tv.setText(title);
         tv.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +126,7 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
         StockFragment fragment = StockFragment.newInstance(productInfo.getRef_Key());
 
         getSupportFragmentManager().beginTransaction()
-                .replace(frame_view_products_list, fragment)
+                .replace(product_list__frame_list, fragment)
                 .addToBackStack(fragment.getClass().getName())
                 .commit();
 
@@ -129,16 +138,32 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
         i.putExtra("ref_Key", product_key);
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "DocList");
+        showLoading("Запрос товара");
         startService(i);
     }
 
-    private void showMessage(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+    private void showLoading(String... params) {
+        LoadingFragment fragment = LoadingFragment.newInstance(params);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.product_list__frame_list, fragment, "loading")
+                .addToBackStack("loading")
+                .commit();
+
+    }
+
+    private void hideLoading() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("loading");
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            getSupportFragmentManager().popBackStack();
+        }
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        hideLoading();
+
         if (data == null) {
             return;
         }
@@ -162,6 +187,7 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
 
     @Override
     public void onReceiveResultFromService(int resultCode, Bundle resultData) {
+        hideLoading();
         if (resultCode == Constants.REQUESTS.PRODUCT_INFO.ordinal()) {
             boolean success = resultData.getBoolean(OPERATION_SUCCESS_LABEL, false);
             if (success) {

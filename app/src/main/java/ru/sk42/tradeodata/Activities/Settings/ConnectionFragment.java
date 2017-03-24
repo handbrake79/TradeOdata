@@ -75,10 +75,12 @@ public class ConnectionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the shake_anim for this fragment
         View view = inflater.inflate(R.layout.settings_fragment_connection, container, false);
         ButterKnife.bind(this, view);
 
+        SettingsActivity settingsActivity = (SettingsActivity) getActivity();
+        settingsActivity.setSettingsTitle("Параметры соединения с сервером", "");
         Settings settings = Settings.getSettings();
         serverAddress.setText(settings.getServerAddress());
         baseName.setText(settings.getBaseName());

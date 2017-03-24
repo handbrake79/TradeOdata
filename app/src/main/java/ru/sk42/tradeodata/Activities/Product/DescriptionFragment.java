@@ -14,6 +14,7 @@ import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Helpers.MyHelper;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.ProductInfo;
@@ -61,8 +62,8 @@ public class DescriptionFragment extends Fragment implements ProductPresenterCon
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.product_info__fragment_product_description, container, false);
+        // Inflate the shake_anim for this fragment
+        View view = inflater.inflate(R.layout.product__description, container, false);
         ButterKnife.bind(this, view);
 
 
@@ -80,7 +81,7 @@ public class DescriptionFragment extends Fragment implements ProductPresenterCon
         }
 
         tvProductName.setText(product.getDescription());
-        tvProductPrice.setText("Розничная цена " + String.valueOf(productInfo.getPrice()) + " р.");
+        tvProductPrice.setText("В розницу по " + Uttils.formatDoubleToMoney(productInfo.getPrice()) + "р");
         tvProductCode.setText(product.getCode());
         tvProductSKU.setText(product.getSKU());
 

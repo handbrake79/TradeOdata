@@ -36,6 +36,8 @@ public class Constants {
     public static final int MAX_IMG_LENGTH_BYTES = 500000;
     public static final String LINE_NUMBER = "line_number";
     public static final int PRODUCT_INFO_EXPIRATION_TIME_SECONDS = 10;
+    public static final int REQUEST_SETTINGS_USER = 22;
+    public static final String REQUEST_SETTINGS_USER_LABEL = "REQUEST_SETTINGS_USER";
     public static ArrayList<String> DOCUMENT_ACTIONS;
     public static String QUANTITY = "qty";
     public static String DESCR = "descr";
@@ -99,7 +101,9 @@ public class Constants {
         BARCODE,
         PRODUCT_INFO,
         PRINT_DOCUMENT,
-        DISCOUNT_CARD, LOAD_IMAGE
+        DISCOUNT_CARD,
+        LOAD_IMAGE,
+        NONE
     }
 
     public class COLORS {

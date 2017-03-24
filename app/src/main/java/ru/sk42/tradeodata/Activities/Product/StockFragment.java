@@ -8,12 +8,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.sk42.tradeodata.Activities.InteractionInterface;
-import ru.sk42.tradeodata.Activities.ProductsList.DividerDecoration;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.ProductInfo;
@@ -75,7 +73,7 @@ public class StockFragment extends android.support.v4.app.Fragment implements In
             throw new RuntimeException("Жопа какая-то!");
         }
 
-        View view = inflater.inflate(R.layout.product_info__stock_fragment, container, false);
+        View view = inflater.inflate(R.layout.product__stock, container, false);
 
         TextView tvOutOfStock = (TextView) view.findViewById(R.id.tvProductInfo_outofstock);
         tvSelect = (TextView) view.findViewById(R.id.btnSelectStock);
@@ -104,7 +102,7 @@ public class StockFragment extends android.support.v4.app.Fragment implements In
             productInfo = ProductInfo.getObject(ProductInfo.class, productInfo.getRef_Key());
             mAdapter = new Stock_Adapter(productInfo.getArrayList(), mListener);
             mRecyclerView.setAdapter(mAdapter);
-            mRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
+            //mRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
 
         }
         return view;

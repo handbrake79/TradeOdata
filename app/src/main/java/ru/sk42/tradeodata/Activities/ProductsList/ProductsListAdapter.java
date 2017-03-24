@@ -1,5 +1,7 @@
 package ru.sk42.tradeodata.Activities.ProductsList;
 
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,11 +56,11 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
         holder.mImage.setImageBitmap(ImageProduct.getBitMapByRefKey(items.get(position).getRef_Key()));
         if (holder.mItem.isFolder()) {
             holder.tvCode.setVisibility(View.GONE);
-//            holder.mView.setBackgroundColor(Color.GRAY);
+            holder.mView.setBackgroundColor(ContextCompat.getColor(holder.mView.getContext(), R.color.bpDarker_blue));
             holder.tvDescription.setTextSize(26);
         } else {
             holder.tvCode.setVisibility(View.VISIBLE);
-//            holder.mView.setBackgroundColor(Color.WHITE);
+            holder.mView.setBackgroundColor(Color.WHITE);
             holder.tvDescription.setTextSize(20);
         }
 

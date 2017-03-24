@@ -73,9 +73,7 @@ import ru.sk42.tradeodata.Model.Stock;
 import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
-
-import static ru.sk42.tradeodata.R.id.doc__viewpager;
-import static ru.sk42.tradeodata.R.id.doc__ll;
+import ru.sk42.tradeodata.View.SlidingTabLayout;
 
 
 public class DocumentActivity extends AppCompatActivity
@@ -101,7 +99,7 @@ public class DocumentActivity extends AppCompatActivity
     ServicesFragment servicesFragment;
     ShippingFragment shippingFragment;
 
-    ViewPager pager;
+    ViewPager mViewPager;
 
     boolean exit = false;
 
@@ -151,6 +149,7 @@ public class DocumentActivity extends AppCompatActivity
     @Bind(R.id.document_nav_view)
     NavigationView navigationView;
 
+    private SlidingTabLayout mSlidingTabLayout;
 
     public String getDocRef_Key() {
         return docRef_Key;
@@ -181,10 +180,19 @@ public class DocumentActivity extends AppCompatActivity
 
         fragmentPagerAdapter = new DocumentFragmentPageAdapter(getSupportFragmentManager());
 
-        pager = (ViewPager) findViewById(R.id.doc__viewpager);
-        pager.setPageTransformer(true, new ZoomOutPageTransformer());
-        pager.setAdapter(fragmentPagerAdapter);
-        pager.setCurrentItem(1);
+        mViewPager = (ViewPager) findViewById(R.id.doc__viewpager);
+        mViewPager.setPageMargin(1);
+        int pagerPadding = 1;
+        mViewPager.setClipToPadding(false);
+        mViewPager.setPadding(pagerPadding, 0, pagerPadding, 0);
+        mViewPager.setPageMarginDrawable(R.drawable.dotted_underline);
+
+        mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        mViewPager.setAdapter(fragmentPagerAdapter);
+        mViewPager.setCurrentItem(1);
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout.setViewPager(mViewPager);
+
         requisitesFragment = (RequisitesFragment) fragmentPagerAdapter.getItem(0);
         productsFragment = (ProductsFragment) fragmentPagerAdapter.getItem(1);
         servicesFragment = (ServicesFragment) fragmentPagerAdapter.getItem(2);
@@ -376,10 +384,10 @@ public class DocumentActivity extends AppCompatActivity
     private void notifyItemAdded(SaleRecord record) {
         recalc();
         if (record instanceof SaleRecordProduct) {
-            pager.setCurrentItem(1);
+            mViewPager.setCurrentItem(1);
             productsFragment.notifyItemAdded();
         } else {
-            pager.setCurrentItem(2);
+            mViewPager.setCurrentItem(2);
             servicesFragment.notifyItemAdded();
         }
     }
@@ -809,14 +817,14 @@ public class DocumentActivity extends AppCompatActivity
             docSale.getProducts().remove(currentRecord);
             recalc();
             productsFragment.notifyItemRemoved();
-            pager.setCurrentItem(1);
+            mViewPager.setCurrentItem(1);
         }
 
         if (record instanceof SaleRecordService) {
             docSale.getServices().remove(currentRecord);
             recalc();
             servicesFragment.notifyItemRemoved();
-            pager.setCurrentItem(2);
+            mViewPager.setCurrentItem(2);
         }
     }
 
@@ -860,7 +868,7 @@ public class DocumentActivity extends AppCompatActivity
             if (id != -1) {
                 SaleRecordProduct record = getRecordByID(id);
                 record.setQty(qty);
-                pager.setCurrentItem(1);
+                mViewPager.setCurrentItem(1);
                 notifyItemChanged(record);
             }
         }
@@ -872,11 +880,11 @@ public class DocumentActivity extends AppCompatActivity
         recalc();
 
         if (record instanceof SaleRecordProduct) {
-            //pager.setCurrentItem(1);
+            //mViewPager.setCurrentItem(1);
             productsFragment.notifyItemChanged(record);
         }
         if (record instanceof SaleRecordService) {
-            //pager.setCurrentItem(2);
+            //mViewPager.setCurrentItem(2);
             servicesFragment.notifyItemChanged(record.getLineNumber());
         }
     }
@@ -1198,7 +1206,6 @@ public class DocumentActivity extends AppCompatActivity
 
     private void onBarcodeAquired(String barcode) {
         barcode = barcode.replaceAll("[^0-9.]", "");
-        showSnackWithLoading(barcode);
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.BARCODE.ordinal());
         i.putExtra(Constants.BARCODE_LABEL, barcode);
@@ -1207,14 +1214,6 @@ public class DocumentActivity extends AppCompatActivity
         startMyService(i);
 
     }
-
-    private void showSnackWithLoading(String s) {
-        bar = Snackbar.make(getWindow().getDecorView(), s, Toast.LENGTH_SHORT);
-        Snackbar.SnackbarLayout snack_view = (Snackbar.SnackbarLayout) bar.getView();
-        snack_view.addView(new ProgressBar(this));
-        bar.show();
-    }
-
 
     @Override
     public void onReceiveResultFromService(int code, Bundle mResult) {

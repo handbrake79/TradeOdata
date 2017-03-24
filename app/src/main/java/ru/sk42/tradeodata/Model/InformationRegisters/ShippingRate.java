@@ -11,6 +11,7 @@ import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
@@ -28,6 +29,17 @@ public class ShippingRate extends CDO {
 
     @DatabaseField(generatedId = true)
     int id;
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    @DatabaseField
+    Date date;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     @JsonProperty("ТипТС_Key")

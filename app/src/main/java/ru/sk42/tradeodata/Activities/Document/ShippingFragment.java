@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
@@ -78,9 +79,6 @@ public class ShippingFragment extends Fragment {
     @Bind(R.id.input_vehicle_type)
     Spinner mVehicleTypeSpinner;
 
-//    @Bind(R.id.input_starting_point)
-//    Spinner mStartingPointSpinner;
-
     @Bind(R.id.input_time_from)
     TextView mTimeFromText;
 
@@ -111,7 +109,6 @@ public class ShippingFragment extends Fragment {
     @Bind(R.id.input_need_unload_checkbox)
     SwitchCompat mNeedUnloadSwitch;
 
-
     @Bind(R.id.til_unload_cost)
     TextInputLayout tilUnloadCost;
 
@@ -130,13 +127,29 @@ public class ShippingFragment extends Fragment {
     @Bind(R.id.til_ContactPersonPhone)
     TextInputLayout tilContactPersonPhone;
 
+    @Bind(R.id.doc__shipping_date_caption)
+    TextView tvDateCaption;
+
+    @Bind(R.id.doc__shipping_time_caption)
+    TextView tvTimeCaption;
+
+    @Bind(R.id.til_time_from)
+    TextInputLayout tilTimeFrom;
+
+    @Bind(R.id.til_time_to)
+    TextInputLayout tilTimeTo;
+
+
+
+
+
     @Override
     public void onDetach() {
         super.onDetach();
     }
 
 
-    // Inflate the fragment layout we defined above for this fragment
+    // Inflate the fragment shake_anim we defined above for this fragment
     // Set the associated text for the title
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -601,15 +614,28 @@ public class ShippingFragment extends Fragment {
         llShippingLayout.setEnabled(state);
         if (!state) {
             llShippingLayout.setBackgroundColor(Constants.COLORS.DISABLED);
+            mShippingDateText.setTextColor(Constants.COLORS.DISABLED);
+            mTimeFromText.setTextColor(Constants.COLORS.DISABLED);
+            mTimeToText.setTextColor(Constants.COLORS.DISABLED);
         } else {
+            mShippingDateText.setTextColor(ContextCompat.getColor(getContext(), R.color.bpDarker_blue));
+            mTimeFromText.setTextColor(ContextCompat.getColor(getContext(), R.color.bpDarker_blue));
+            mTimeToText.setTextColor(ContextCompat.getColor(getContext(), R.color.bpDarker_blue));
             llShippingLayout.setBackgroundColor(Constants.COLORS.ENABLED);
 
         }
+
+        tvDateCaption.setEnabled(state);
+        tvTimeCaption.setEnabled(state);
+
+
         mShippingDateText.setEnabled(state);
         mTimeFromText.setEnabled(state);
         mTimeToText.setEnabled(state);
         mShippingAddressEditText.setEnabled(state);
-//        mStartingPointSpinner.setEnabled(state);
+        tilTimeFrom.setEnabled(state);
+        tilTimeTo.setEnabled(state);
+
         mRouteText.setEnabled(state);
         mVehicleTypeSpinner.setEnabled(state);
         mShippingCostEditText.setEnabled(state);

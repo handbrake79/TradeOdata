@@ -3,6 +3,7 @@ package ru.sk42.tradeodata.Model.Catalogs.HelperLists;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,7 +39,9 @@ public class ShippingRatesList {
         try {
             Iterator<ShippingRate> it = getValues().iterator();
             while (it.hasNext()) {
-                MyHelper.getInstance().getDao(ShippingRate.class).createOrUpdate(it.next());
+                ShippingRate rate = it.next();
+                rate.setDate(new Date());
+                MyHelper.getInstance().getDao(ShippingRate.class).createOrUpdate(rate);
             }
         } catch (SQLException e) {
             e.printStackTrace();

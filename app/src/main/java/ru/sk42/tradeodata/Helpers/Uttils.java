@@ -1,25 +1,19 @@
 package ru.sk42.tradeodata.Helpers;
 
 import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
+import ru.sk42.tradeodata.Activities.Settings.Settings;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Constants;
-import ru.sk42.tradeodata.Model.St;
 
 /**
  * Created by хрюн моржов on 26.10.2016.
@@ -32,12 +26,12 @@ public class Uttils {
     static final String TAG = "UTTILS";
 
     public static boolean isShippingDateValid(Calendar shippingDate) {
-        Calendar yesterday = getYesterday();
+        Calendar endOfYesterday = getEndOfYesterday();
         //если дата доставки больше или равна текущей дате, это годная дата
-        return shippingDate.after(yesterday);
+        return shippingDate.after(endOfYesterday);
     }
 
-    public static Calendar getYesterday() {
+    public static Calendar getEndOfYesterday() {
         Calendar yesterday = GregorianCalendar.getInstance();
         yesterday.add(Calendar.DATE, -1);
         yesterday.set(Calendar.HOUR_OF_DAY, 23);
@@ -96,6 +90,14 @@ public class Uttils {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
+    }
+
+    public static boolean isUserSet() {
+        if (Settings.getCurrentUserStatic() == null) {
+            return false;
+        }
+        return !Settings.getCurrentUserStatic().getRef_Key().equals(Constants.ZERO_GUID);
+
     }
 
 

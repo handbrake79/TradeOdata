@@ -4,15 +4,12 @@ package ru.sk42.tradeodata.Activities.Document.Adapters;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -116,13 +113,13 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
-        @Bind(R.id.tv_DocSale_Products_Product)
+        @Bind(R.id.doc__product_card_product)
         TextView tvDocSaleProductsProduct;
 
-        @Bind(R.id.tv_DocSale_Products_Charact)
+        @Bind(R.id.doc__product_card_charact)
         TextView tvDocSaleProductsCharact;
 
-        @Bind(R.id.tv_DocSale_Products_Store)
+        @Bind(R.id.doc__product_card_store)
         TextView tvDocSaleProductsStore;
 
         @Bind(R.id.tv_DocSale_Products_Qty)
@@ -131,10 +128,10 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
         @Bind(R.id.tv_DocSale_Products_Unit)
         TextView tvDocSaleProductsUnit;
 
-        @Bind(R.id.product_record_price)
+        @Bind(R.id.doc__product_card_price)
         TextView tvDocSaleProductsPrice;
 
-        @Bind(R.id.tv_DocSale_Products_Total)
+        @Bind(R.id.doc__product_card_total)
         TextView tvDocSaleProductsTotal;
 
 
@@ -147,7 +144,7 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
         @Bind(R.id.product_record_minus)
         TextView tvMinus;
 
-        @Bind(R.id.order_product_row_delete_button)
+        @Bind(R.id.doc__product_card_delete_button)
         ImageButton mDeleteButton;
 
         public SaleRecordProduct mItem;

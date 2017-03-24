@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +27,7 @@ import java.util.GregorianCalendar;
 
 import ru.sk42.tradeodata.Activities.Document.DocumentActivity;
 import ru.sk42.tradeodata.Activities.InteractionInterface;
+import ru.sk42.tradeodata.Activities.Settings.SettingsActivity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
@@ -37,6 +41,8 @@ import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.ServiceResultReceiverInterface {
 
     private static final String TAG = "***Doclist activity";
+
+    long mPrevTime, curtime;
 
     public ServiceResultReceiver mReceiver;
 
@@ -56,13 +62,13 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         setContentView(R.layout.doclist__activity);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        if (Settings.getCurrentUserStatic() == null) {
-            showToast("Выберите пользователя в настройках");
-            this.finish();
-        }
-        if(Settings.getCurrentUserStatic().getRef_Key().equals(Constants.ZERO_GUID)){
-            showToast("Выберите пользователя в настройках");
-            this.finish();
+        if (!Uttils.isUserSet()) {
+
+            Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra(Constants.REQUEST_SETTINGS_USER_LABEL, Constants.REQUEST_SETTINGS_USER);
+            startActivityForResult(intent, Constants.REQUEST_SETTINGS_USER);
+            //showLoading("Выберите пользователя!");
+            finish();
         }
 
         progress = new ProgressDialog(this);
@@ -75,11 +81,13 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         startDate.setTime(Uttils.getStartOfDay(startDate.getTime()));
         long count = 0;
         count = MyHelper.getDocumentCountOnDate(startDate.getTime());
-        if(count == 0){
+        if (count == 0) {
             requestDocList();
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.doclist__fab);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.shake);
+        fab.startAnimation(animation);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,6 +110,21 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
             setAdapter();
             setActionBarTitle();
 
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mPrevTime != 0) {
+            curtime = System.currentTimeMillis();
+            if ((curtime - mPrevTime) / 1000 <= 3) {
+                System.exit(0);
+            } else mPrevTime = 0;
+        }
+        if (mPrevTime == 0) {
+            showSnack("Нажмите еще раз для выхода");
+            mPrevTime = System.currentTimeMillis();
+            return;
         }
     }
 
@@ -186,7 +209,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     }
 
 
-
     @Override
     public void onReceiveResultFromService(int resultCode, Bundle resultData) {
         if (resultCode == Constants.FEEDBACK) {
@@ -232,4 +254,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         progress.show();
     }
 
+    void showSnack(String s) {
+        Snackbar.make(getWindow().getDecorView(), s, Snackbar.LENGTH_SHORT).show();
+    }
 }
