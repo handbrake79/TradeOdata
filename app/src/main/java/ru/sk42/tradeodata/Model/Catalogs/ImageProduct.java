@@ -122,7 +122,7 @@ public class ImageProduct extends CDO {
             if (decodedBytes.length > Constants.MAX_IMG_LENGTH_BYTES) {
                 return null;
             }
-            //bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
         } catch (Exception e) {
             e.printStackTrace();
         }

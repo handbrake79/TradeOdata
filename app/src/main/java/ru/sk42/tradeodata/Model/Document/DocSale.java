@@ -29,6 +29,7 @@ import java.util.List;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.CDO;
+import ru.sk42.tradeodata.Model.Catalogs.Charact;
 import ru.sk42.tradeodata.Model.Catalogs.Contract;
 import ru.sk42.tradeodata.Model.Catalogs.Currency;
 import ru.sk42.tradeodata.Model.Catalogs.Customer;
@@ -37,6 +38,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Organisation;
 import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
 import ru.sk42.tradeodata.Model.Catalogs.StartingPoint;
+import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
@@ -864,29 +866,6 @@ public class DocSale extends CDO {
     }
 
     public void setForeignObjectsInProductsAndServices() {
-        Iterator<SaleRecordProduct> iterator = getProducts().iterator();
-        while (iterator.hasNext()) {
-            boolean save = false;
-            SaleRecordProduct row = iterator.next();
-            Product product = Product.getObject(Product.class, row.getProduct_Key());
-            if (product != null) {
-                save = true;
-                row.setProduct(product);
-            }
-
-            if (save) {
-                row.update();
-            }
-        }
-
-        for (SaleRecordService saleRecordService : this.getServices()
-                ) {
-            if (saleRecordService.getProduct() == null) {
-                saleRecordService.setProduct(Product.getObject(Product.class, saleRecordService.getProduct_Key()));
-                saleRecordService.update();
-            }
-
-        }
     }
 
     public User getAuthor() {
@@ -951,7 +930,43 @@ public class DocSale extends CDO {
     }
 
     public void setForeignObjects() {
-        this.setForeignObjectsInProductsAndServices();
+        Iterator<SaleRecordProduct> iterator = getProducts().iterator();
+        while (iterator.hasNext()) {
+            boolean save = false;
+            SaleRecordProduct row = iterator.next();
+
+            Unit unit = Unit.getObject(Unit.class, row.getUnit_Key());
+            if (unit != null) {
+                save = true;
+                row.setUnit(unit);
+            }
+
+            Charact charact = Charact.getObject(Charact.class, row.getCharact_Key());
+            if (charact != null) {
+                save = true;
+                row.setCharact(charact);
+            }
+
+            Product product = Product.getObject(Product.class, row.getProduct_Key());
+            if (product != null) {
+                save = true;
+                row.setProduct(product);
+            }
+
+            if (save) {
+                row.update();
+            }
+        }
+
+        for (SaleRecordService saleRecordService : this.getServices()
+                ) {
+            if (saleRecordService.getProduct() == null) {
+                saleRecordService.setProduct(Product.getObject(Product.class, saleRecordService.getProduct_Key()));
+                saleRecordService.update();
+            }
+
+        }
+
         update();
     }
 

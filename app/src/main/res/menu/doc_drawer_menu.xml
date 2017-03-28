@@ -22,7 +22,7 @@
         android:checkableBehavior="none">
 
         <item
-            android:id="@+id/drawer_item_settings"
+            android:id="@+id/doclist__item_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="Настройки"></item>
     </group>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:elevation="7dp"
-    android:layout_margin="6dp"
-    app:cardCornerRadius="5dp"
+    android:layout_margin="2dp"
+    app:cardCornerRadius="3dp"
+    android:elevation="3dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -19,14 +19,15 @@
         >
 
         <ImageView
-            android:id="@+id/doclist__image_small"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_alignBaseline="@+id/tvProduct_SKU_Cap"
+            android:id="@+id/products_list__image_small"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            app:srcCompat="@drawable/noimg" />
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@drawable/noimg"
+            android:layout_alignBottom="@+id/products_list_browser_product_code" />
 
 
         <TextView
@@ -35,16 +36,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/doclist__image_small"
+            android:layout_toRightOf="@id/products_list__image_small"
             android:text="Description"
             android:textSize="20sp" />
 
         <ImageView
+            android:id="@+id/products_list__separator"
             android:layout_below="@+id/tvProduct"
-            android:layout_toRightOf="@+id/doclist__image_small"
+            android:layout_toRightOf="@+id/products_list__image_small"
             android:layout_marginLeft="5dp"
             android:layout_width="match_parent"
-            android:layout_height="5dp"
+            android:layout_height="2dp"
+
             android:src="@drawable/separator" />
 
         <TextView

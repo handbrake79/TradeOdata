@@ -1,5 +1,6 @@
 package ru.sk42.tradeodata.Activities.Documents_List;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,9 +55,9 @@ public class DocList_Adapter extends RecyclerView.Adapter<DocList_Adapter.ViewHo
         holder.mTotal.setText(Uttils.formatDoubleToMoney(holder.mItem.getTotal()));
 
         if (holder.mItem.getPosted()) {
-            holder.mPosted.setTextColor(android.graphics.Color.argb(255, 0, 176, 255));
+            holder.mPosted.setTextColor(ContextCompat.getColor(holder.mAuthor.getContext(), R.color.accent));
         } else {
-            holder.mPosted.setTextColor(android.graphics.Color.argb(255, 128, 128, 128));
+            holder.mPosted.setTextColor(ContextCompat.getColor(holder.mAuthor.getContext(), R.color.primary));
         }
         holder.mPosted.setText(holder.mItem.getPostedDescr());
 

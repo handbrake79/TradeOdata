@@ -330,8 +330,8 @@ public class CommunicationWithServer extends IntentService {
         //sendFeedback("loadCharacts");
         //loadCharacts();
 
-        //sendFeedback("loadUnits");
-        //loadUnits();
+//        sendFeedback("loadUnits");
+//        loadUnits();
 
         sendFeedback("Загрузка договоров");
         loadContracts();
@@ -758,8 +758,10 @@ public class CommunicationWithServer extends IntentService {
         String df1 = Uttils.DATE_FORMAT_1C.format(d1.getTime());
         String df2 = Uttils.DATE_FORMAT_1C.format(d2.getTime());
 
-        String filter = "Date gt datetime'" + df1 + "' and Date lt datetime'" + df2 + "'" + " and Контрагент_Key eq guid'"
-                + Constants.CUSTOMER_GUID + "'" + " and Ответственный_Key eq guid'" + Settings.getCurrentUserStatic().getRef_Key() + "'";
+        String filter = "Date gt datetime'" + df1 + "' and Date lt datetime'" + df2 + "'"
+                + " and Контрагент_Key eq guid'" + Constants.CUSTOMER_GUID + "'"
+                + " and Ответственный_Key eq guid'" + Settings.getCurrentUserStatic().getRef_Key()
+                + "' and ДоговорКонтрагента_Key eq guid'" + Constants.CONTRACT_GUID + "'";
 
         sendFeedback("Загрузка документов на " + Uttils.DATE_FORMATTER.format(d1.getTime()));
 

@@ -43,7 +43,7 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.products_list__fragment_products_browser_category_item, parent, false);
+                .inflate(R.layout.products_list_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -55,10 +55,12 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
         holder.tvDescription.setText(items.get(position).getDescription());
         holder.mImage.setImageBitmap(ImageProduct.getBitMapByRefKey(items.get(position).getRef_Key()));
         if (holder.mItem.isFolder()) {
+            holder.separator.setVisibility(View.GONE);
             holder.tvCode.setVisibility(View.GONE);
-            holder.mView.setBackgroundColor(ContextCompat.getColor(holder.mView.getContext(), R.color.bpDarker_blue));
+            holder.mView.setBackgroundColor(ContextCompat.getColor(holder.mView.getContext(), R.color.primary));
             holder.tvDescription.setTextSize(26);
         } else {
+            holder.separator.setVisibility(View.VISIBLE);
             holder.tvCode.setVisibility(View.VISIBLE);
             holder.mView.setBackgroundColor(Color.WHITE);
             holder.tvDescription.setTextSize(20);
@@ -81,6 +83,7 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
+        public final ImageView separator;
         public final TextView tvCode;
         public final TextView tvDescription;
         public Product mItem;
@@ -89,9 +92,10 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
         public ViewHolder(View view) {
             super(view);
             mView = view;
+            separator = (ImageView) view.findViewById(R.id.products_list__separator);
             tvCode = (TextView) view.findViewById(R.id.products_list_browser_product_code);
             tvDescription = (TextView) view.findViewById(R.id.tvProduct);
-            mImage = (ImageView) view.findViewById(R.id.doclist__image_small);
+            mImage = (ImageView) view.findViewById(R.id.products_list__image_small);
         }
 
         @Override

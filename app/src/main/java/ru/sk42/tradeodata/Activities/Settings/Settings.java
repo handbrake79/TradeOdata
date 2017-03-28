@@ -204,7 +204,7 @@ public class Settings {
             settings = new Settings();
             settings.setScannerStartDelayMillis(500);
             settings.setBaseName("tradeodata");
-            settings.setServerAddress("192.168.0.171");
+            settings.setServerAddress("192.168.1.15");
             settings.setLogin("kogan");
             settings.setPassword("1");
             settings.save();

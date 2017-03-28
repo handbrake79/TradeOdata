@@ -1,27 +1,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/loading__main_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/loading__main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/loading"
-    tools:context="ru.sk42.tradeodata.Activities.LoadingFragment">
+    tools:context="ru.sk42.tradeodata.Activities.LoadingFragment"
+    android:layout_gravity="center">
 
-    <com.wang.avi.AVLoadingIndicatorView
-        android:id="@+id/avi"
-        app:indicatorColor="@color/bpblack"
-        style="@style/AVLoadingIndicatorView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <LinearLayout
         android:layout_centerInParent="true"
-        android:visibility="visible"
-        app:indicatorName="LineScalePulseOutIndicator" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/accent"
+        android:orientation="vertical"
+        android:gravity="center">
 
-    <TextView
-        android:id="@+id/loading_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/avi"
-        android:layout_centerInParent="true"
-        android:text="Ждите завершения операции..." />
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/avi"
+            style="@style/AVLoadingIndicatorView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="visible"
+            app:indicatorColor="@color/bpblack"
+            app:indicatorName="LineScalePulseOutIndicator" />
+
+        <TextView
+            android:id="@+id/loading_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/avi"
+            android:layout_centerInParent="true"
+            android:text="Ждите завершения операции..." />
+    </LinearLayout>
 </RelativeLayout>

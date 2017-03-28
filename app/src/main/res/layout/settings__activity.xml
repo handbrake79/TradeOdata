@@ -12,7 +12,7 @@
         title="Настройки"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/bpBlue_focused"
+        android:background="@color/primary"
         android:elevation="5dp"
         tools:targetApi="17">
 

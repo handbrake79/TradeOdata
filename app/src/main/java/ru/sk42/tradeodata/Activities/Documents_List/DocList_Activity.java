@@ -5,28 +5,36 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import ru.sk42.tradeodata.Activities.Document.DocumentActivity;
 import ru.sk42.tradeodata.Activities.InteractionInterface;
+import ru.sk42.tradeodata.Activities.LoadingFragment;
 import ru.sk42.tradeodata.Activities.Settings.SettingsActivity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
@@ -38,7 +46,11 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 
-public class DocList_Activity extends AppCompatActivity implements InteractionInterface, ServiceResultReceiver.ServiceResultReceiverInterface {
+import static ru.sk42.tradeodata.R.id.doclist__nav_view;
+
+public class DocList_Activity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener,
+        InteractionInterface, ServiceResultReceiver.ServiceResultReceiverInterface {
 
     private static final String TAG = "***Doclist activity";
 
@@ -50,10 +62,18 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
     ProgressDialog progress;
 
+    Toolbar mToolbar;
+
+    ActionBarDrawerToggle mDrawerToggle;
+
     RecyclerView mRecyclerView;
 
     DocList_Adapter mAdapter;
     DocSaleList doc_list;
+
+    DrawerLayout mDrawerLayout;
+
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,22 +87,22 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
             Intent intent = new Intent(this, SettingsActivity.class);
             intent.putExtra(Constants.REQUEST_SETTINGS_USER_LABEL, Constants.REQUEST_SETTINGS_USER);
             startActivityForResult(intent, Constants.REQUEST_SETTINGS_USER);
-            //showLoading("Выберите пользователя!");
             finish();
         }
-
-        progress = new ProgressDialog(this);
-        progress.setIndeterminate(true);
 
         mReceiver = new ServiceResultReceiver(new Handler());
         mReceiver.setReceiver(this);
 
         startDate = GregorianCalendar.getInstance();
         startDate.setTime(Uttils.getStartOfDay(startDate.getTime()));
-        long count = 0;
-        count = MyHelper.getDocumentCountOnDate(startDate.getTime());
-        if (count == 0) {
+
+        setToolbar();
+        setDrawer();
+
+        if (MyHelper.getDocumentCountOnDate(startDate.getTime()) == 0) {
             requestDocList();
+        } else {
+            updateTitle();
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.doclist__fab);
@@ -101,6 +121,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
 
         View rvView = findViewById(R.id.rvDocList);
 
+
         //create RecyclerView
         if (rvView instanceof RecyclerView) {
             Context context = rvView.getContext();
@@ -108,9 +129,49 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
             mRecyclerView.setSelected(true);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             setAdapter();
-            setActionBarTitle();
-
         }
+
+
+    }
+
+    private void updateTitle() {
+        String docsCount = "?";
+        try {
+            docsCount = String.valueOf(MyHelper.getDocSaleDao().countOf());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        mToolbar.setTitle("Реализации " + " " + Uttils.formatDate(startDate) + " (" + docsCount + ")");
+        mToolbar.setSubtitle(Settings.getCurrentUserStatic().getDescription());
+
+    }
+
+    private void setToolbar() {
+        mToolbar = (Toolbar) findViewById(R.id.doclist__toolbar);
+        mToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectDate();
+            }
+        });
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+
+    }
+
+
+    private void setDrawer() {
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.doclist__drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        navigationView = (NavigationView) findViewById(doclist__nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        mDrawerToggle.syncState();
+
     }
 
     @Override
@@ -118,7 +179,7 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         if (mPrevTime != 0) {
             curtime = System.currentTimeMillis();
             if ((curtime - mPrevTime) / 1000 <= 3) {
-                System.exit(0);
+                finish();
             } else mPrevTime = 0;
         }
         if (mPrevTime == 0) {
@@ -128,25 +189,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         }
     }
 
-    private void setActionBarTitle() {
-        getWindow().setTitle("");
-        String title = "Реализации " + Settings.getCurrentUserStatic().getDescription();// + Uttils.DATE_FORMATTER.format(startDate.getTime());
-
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View viewActionBar = inflater.inflate(R.layout.doclist__custom_actionbar, null);
-
-        TextView tv = (TextView) viewActionBar.findViewById(R.id.customt_actionbar_caption);
-        tv.setText(title);
-        tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectDate();
-            }
-        });
-        getSupportActionBar().setCustomView(viewActionBar);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setTitle("");
-    }
 
     private void setAdapter() {
         mAdapter = new DocList_Adapter(new ArrayList<DocSale>(), this);
@@ -154,7 +196,6 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setmValues(doc_list.getArrayList());
         mAdapter.notifyDataSetChanged();
-        setActionBarTitle();
     }
 
 
@@ -212,18 +253,20 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     @Override
     public void onReceiveResultFromService(int resultCode, Bundle resultData) {
         if (resultCode == Constants.FEEDBACK) {
-            String message = resultData.getString("Message");
-            showMessage(message);
+            String message = resultData.getString(Constants.MESSAGE_LABEL);
+            showLoading(message);
             return;
         }
         if (resultCode == Constants.REQUESTS.LOAD_DOCUMENTS.ordinal()) {
-            progress.hide();
+            hideLoading();
+            updateTitle();
             setAdapter();
         }
     }
 
 
     public void requestDocList() {
+        showLoading("Загрузка документов пользователя");
 
         Intent i = new Intent(this, CommunicationWithServer.class);
         i.putExtra("StartDate", startDate.getTimeInMillis());
@@ -257,4 +300,45 @@ public class DocList_Activity extends AppCompatActivity implements InteractionIn
     void showSnack(String s) {
         Snackbar.make(getWindow().getDecorView(), s, Snackbar.LENGTH_SHORT).show();
     }
+
+    private void showSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.doclist__item_settings:
+                showSettingsActivity();
+                break;
+            case R.id.doclist__item_exit:
+                finish();
+        }
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        return false;
+    }
+
+
+    private void showLoading(String... params) {
+        LoadingFragment fragment = LoadingFragment.newInstance(params);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.doclist__coord, fragment, "loading")
+                .addToBackStack("loading")
+                .commit();
+
+    }
+
+
+    private void hideLoading() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("loading");
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
+        //getSupportFragmentManager().popBackStack();
+    }
+
+
 }

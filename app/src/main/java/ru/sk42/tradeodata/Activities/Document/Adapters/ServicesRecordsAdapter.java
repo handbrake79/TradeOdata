@@ -54,13 +54,7 @@ public class ServicesRecordsAdapter extends RecyclerView.Adapter<ServicesRecords
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         holder.itemView.setSelected(selectedItem == position);
-        if (selectedItem == position)
-            holder.itemView.setBackgroundColor(Constants.COLORS.SELECTED_COLOR);
-        else
-            holder.itemView.setBackgroundColor(Color.WHITE);
-
         holder.mItem = mValues.get(position);
-
         holder.tvProduct.setText(holder.mItem.getProduct().getDescription());
         holder.tvQty.setText(Uttils.formatDoubleToQty(holder.mItem.getQty()));
         holder.tvPrice.setText(Uttils.formatDoubleToMoney(holder.mItem.getPrice()));

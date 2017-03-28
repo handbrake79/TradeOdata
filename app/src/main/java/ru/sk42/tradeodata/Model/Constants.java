@@ -106,15 +106,5 @@ public class Constants {
         NONE
     }
 
-    public class COLORS {
-
-        public static final int SELECTED_COLOR = 4370350;
-        public static final int REGULAR_COLOR = 13882323;
-        public static final int LIGHT_YELLOW = 0xffff66;
-
-
-        public static final int DISABLED = 0x939393;
-        public static final int ENABLED = 0xffff;
-    }
 
 }

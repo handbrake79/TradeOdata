@@ -2,12 +2,13 @@
 <resources>
     <color name="button_color">#00b0ff</color>
     <color name="colorAccent">#00b0ff</color>
-    <color name="primary">#fbcc</color>
+    <color name="primary">#009688</color>
     <color name="primary_dark">#3949AB</color>
     <color name="accent">#00B0FF</color>
     <color name="gray">#ff999999</color>
-    <color name="loading">#21cf18d9</color>
+    <color name="loading">#cfd8dc</color>
     <color name="bpBlack">#000</color>
+    <color name="disabled_element">#bdbdbd</color>
 
 
 </resources>

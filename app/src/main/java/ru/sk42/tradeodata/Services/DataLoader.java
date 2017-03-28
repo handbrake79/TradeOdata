@@ -36,10 +36,22 @@ public class DataLoader {
     static private CDO objectToCheck;
     static private HashMap<Class<?>, ArrayList<String>> unresolvedLinks;
 
+    public static HashMap getDataToLoad(Object mcdo, Class clazz) {
+
+        if (clazz.getCanonicalName().equals("ru.sk42.tradeodata.Model.Document.DocSaleList")) {
+            unresolvedLinks = CheckRelatedDataToLoad.checkObject(DocSaleList.getList());
+        } else {
+            CDO cdo = (CDO) mcdo;
+            String ref_Key = cdo.getRef_Key();
+            objectToCheck = (CDO) CDO.getObject(clazz, ref_Key);
+            unresolvedLinks = CheckRelatedDataToLoad.checkObject(objectToCheck);
+        }
+        return unresolvedLinks;
+
+    }
 
     public static void LoadMissingDataForObject(Object mcdo, Class clazz) {
 
-       // callBackInterface = mCallBackInterface;
 
         if (clazz.getCanonicalName().equals("ru.sk42.tradeodata.Model.Document.DocSaleList")) {
             unresolvedLinks = CheckRelatedDataToLoad.checkObject(DocSaleList.getList());
@@ -52,7 +64,7 @@ public class DataLoader {
         sendRequestsInNewThread();
     }
 
-    static private void sendRequestsInNewThread(){
+    static private void sendRequestsInNewThread() {
         Runnable myrunnable = new Runnable() {
             @Override
             public void run() {
@@ -76,7 +88,7 @@ public class DataLoader {
 
     }
 
-    static private void makeRequests() throws Exception{
+    static private void makeRequests() throws Exception {
         Class clazz;
         Iterator it = unresolvedLinks.entrySet().iterator();
         while (it.hasNext()) {
@@ -177,7 +189,6 @@ public class DataLoader {
     static private void showProgress(String message) {
         Log.d(TAG, "showProgress: " + message);
     }
-
 
 
 }

@@ -53,7 +53,6 @@ public class DocSaleList {
 
         for (DocSale docSale : this.getValues()
                 ) {
-            List<DocSale> list = MyHelper.getDocSaleDao().queryForAll();
             docSale.save();
 
         }

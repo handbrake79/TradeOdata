@@ -18,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -34,7 +35,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,6 +74,8 @@ import ru.sk42.tradeodata.R;
 import ru.sk42.tradeodata.Services.CommunicationWithServer;
 import ru.sk42.tradeodata.Services.ServiceResultReceiver;
 import ru.sk42.tradeodata.View.SlidingTabLayout;
+
+import static ru.sk42.tradeodata.Model.Constants.MODE_LABEL;
 
 
 public class DocumentActivity extends AppCompatActivity
@@ -438,8 +440,8 @@ public class DocumentActivity extends AppCompatActivity
             fm.popBackStack();
         } else {
             saveLocal();
-                finish();
-            }
+            finish();
+        }
     }
 
     @Override
@@ -746,7 +748,7 @@ public class DocumentActivity extends AppCompatActivity
             case R.id.drawer_item_print:
                 print();
                 break;
-            case R.id.drawer_item_settings:
+            case R.id.doclist__item_settings:
                 showSettingsActivity();
                 break;
 
@@ -992,16 +994,26 @@ public class DocumentActivity extends AppCompatActivity
             startActivityForResult(intent, Constants.RECORD_SELECTED_IN_DOCUMENT);
         }
         if (action == Constants.SELECT_RECORD_FOR_VIEW_PRODUCT) {
-            showProductActivity(record.getProduct_Key());
+            requestProductInfo(record.getProduct_Key());
         }
+    }
+
+    public void requestProductInfo(String product_key) {
+        Intent i = new Intent(this, CommunicationWithServer.class);
+        i.putExtra(MODE_LABEL, Constants.REQUESTS.PRODUCT_INFO.ordinal());
+        i.putExtra("ref_Key", product_key);
+        i.putExtra("receiverTag", mReceiver);
+        i.putExtra("from", "document");
+        showLoading("Запрос товара");
+        startService(i);
     }
 
 
     private void updateActionBarTitle() {
         if (docSale.getPosted()) {
-            myToolbar.setBackgroundColor(Constants.COLORS.DISABLED);
+            myToolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.disabled_element));
         } else {
-            myToolbar.setBackgroundColor(Constants.COLORS.REGULAR_COLOR);
+            myToolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.primary));
         }
         String title = docSale.getNumber().isEmpty() ? "Без номера " : docSale.getNumber();
         //title += " от " + Uttils.DATE_FORMATTER.format(docSale.getDate());
@@ -1099,7 +1111,7 @@ public class DocumentActivity extends AppCompatActivity
     private void showLoading(String... params) {
         LoadingFragment fragment = LoadingFragment.newInstance(params);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.doc__coord, fragment)
+                .replace(R.id.doc__coord, fragment, "loading")
                 .addToBackStack("loading")
                 .commit();
 
@@ -1108,9 +1120,10 @@ public class DocumentActivity extends AppCompatActivity
 
     private void hideLoading() {
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("loading");
-        if (fragment != null)
+        if (fragment != null) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-        getSupportFragmentManager().popBackStack();
+            getSupportFragmentManager().popBackStack();
+        }
     }
 
     private void vibrate() {
@@ -1217,7 +1230,6 @@ public class DocumentActivity extends AppCompatActivity
 
     @Override
     public void onReceiveResultFromService(int code, Bundle mResult) {
-        hideLoading();
         if (code == Constants.FEEDBACK) {
             showMessage(mResult.getString(Constants.MESSAGE_LABEL));
             return;
@@ -1290,6 +1302,7 @@ public class DocumentActivity extends AppCompatActivity
                 }
             }
         }
+        hideLoading();
     }
 
     private void updateFragments() {

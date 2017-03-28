@@ -27,7 +27,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
 public class SaleRecordProduct extends SaleRecord {
 
     @Attribute(name = "type")
-    @Namespace(reference="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata", prefix = "m")
     public static final String saleRecordAttribute = "StandardODATA.Document_РеализацияТоваровУслуг_Товары_RowType";
 
     @Element(name = "СпособСписанияОстаткаТоваров")
@@ -56,35 +56,42 @@ public class SaleRecordProduct extends SaleRecord {
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private int discountPercentAuto;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @DatabaseField
     @JsonProperty("ЕдиницаИзмерения_Key")
+    private String unit_Key;
+
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Unit unit;
 
     @Element(name = "ЕдиницаИзмерения_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    public String getUnit_Key(){
-        return unit.getRef_Key();
+    public String getUnit_Key() {
+        return unit_Key;
     }
 
     @Element(name = "ЕдиницаИзмерения_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    public void setUnit_Key(String s){
+    public void setUnit_Key(String s) {
+        this.unit_Key = s;
     }
 
+    @DatabaseField
+    @JsonProperty("ХарактеристикаНоменклатуры_Key")
+    private String charact_Key;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    @JsonProperty("ХарактеристикаНоменклатуры_Key")
     private Charact charact;
 
     @Element(name = "ХарактеристикаНоменклатуры_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    public String getCharact_Key(){
-        return charact.getRef_Key();
+    public String getCharact_Key() {
+        return charact_Key;
     }
 
     @Element(name = "ХарактеристикаНоменклатуры_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    public void setCharact_Key(String s){
+    public void setCharact_Key(String s) {
+        charact_Key = s;
     }
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
@@ -93,13 +100,13 @@ public class SaleRecordProduct extends SaleRecord {
 
     @Element(name = "Склад_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    public String getStore_Key(){
+    public String getStore_Key() {
         return store.getRef_Key();
     }
 
     @Element(name = "Склад_Key")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    public void setStore_Key(String s){
+    public void setStore_Key(String s) {
     }
 
     public SaleRecordProduct() {
@@ -143,6 +150,7 @@ public class SaleRecordProduct extends SaleRecord {
 
     public void setCharact(Charact charact) {
         this.charact = charact;
+        this.charact_Key = charact.getRef_Key();
     }
 
     public Integer getDiscountPercentManual() {
@@ -159,6 +167,7 @@ public class SaleRecordProduct extends SaleRecord {
 
     public void setUnit(Unit unit) {
         this.unit = unit;
+        this.unit_Key = unit.getRef_Key();
     }
 
     public void save() {

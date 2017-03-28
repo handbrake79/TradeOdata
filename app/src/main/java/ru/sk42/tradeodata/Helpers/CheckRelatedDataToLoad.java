@@ -1,5 +1,7 @@
 package ru.sk42.tradeodata.Helpers;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,6 +25,8 @@ import ru.sk42.tradeodata.Model.Stock;
  * Created by я on 01.08.2016.
  */
 public class CheckRelatedDataToLoad {
+
+    static String TAG = "CheckRelatedDataToLoad";
 
     static HashMap<Class<?>, ArrayList<String>> guidsToLoadMap;
 
@@ -135,6 +139,28 @@ public class CheckRelatedDataToLoad {
                 listProducts.add(guid);
             }
 
+            guid = row.getCharact_Key();
+            if (guid == null) {
+                Log.d(TAG, "checkDocProductsAndServices: NULL CHARACT!");
+            }
+            if (!listCharact.contains(guid) && row.getCharact() == null) {
+                listCharact.add(guid);
+            }
+
+            guid = row.getStore().getRef_Key();
+            if (!listStores.contains(guid) && row.getStore() == null) {
+                listStores.add(guid);
+            }
+
+            guid = row.getUnit_Key();
+            if (guid == null) {
+                Log.d(TAG, "checkDocProductsAndServices: NULL UNIT!");
+            }
+            if (!listUnits.contains(guid) && row.getUnit() == null) {
+                listUnits.add(guid);
+            }
+
+
         }
         for (SaleRecordService row : docSale.getServices()) {
             String guid = row.getProduct_Key();
@@ -167,7 +193,7 @@ public class CheckRelatedDataToLoad {
     }
 
     public static ArrayList<String> generateURL(Class clazz, ArrayList<String> refs) {
-        final int maxUrls = 100;
+        final int maxUrls = 30;
         CDO obj = null;
         String tableName = "";
         try {
@@ -205,6 +231,9 @@ public class CheckRelatedDataToLoad {
 
     private static void checkDocContract(DocSale docSale) {
         //если такой гуид уже есть в списке - возврат
+        if (docSale.getContract() == null) {
+            Log.d(TAG, "checkDocContract: жопа какая-то!");
+        }
         String guid = docSale.getContract().getRef_Key();
         ArrayList<String> list = guidsToLoadMap.get(Contract.class);
         if (list.contains(guid))

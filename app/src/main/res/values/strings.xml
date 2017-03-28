@@ -16,9 +16,9 @@
     <string name="ACTION_SAVE_1C">Записать в 1С</string>
     <string name="ACTION_POST_1C">Провести в 1С</string>
     <string name="ACTION_PRINT">Печать</string>
-    <string name="action_scanner_pair">Сканер Bluetooth</string>
+    <string name="action_scanner_pair">Подключить сканер</string>
     <string name="action_scanner_set">Выбрать сканер</string>
-    <string name="action_scanner_connect">Включить сканер</string>
+    <string name="action_scanner_connect">Активировать сканер</string>
     <string name="CONNECTION_SETTINGS">Настройка подключения</string>
     <string name="ACTION_CLOSE">Закрыть</string>
 

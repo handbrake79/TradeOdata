@@ -24,6 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/bpDarker_blue"
+                android:titleTextColor="@color/bpDark_gray"
                 android:elevation="5dp"
                 android:gravity="top|start"
                 app:title="TITLE"

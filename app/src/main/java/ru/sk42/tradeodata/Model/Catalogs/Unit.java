@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.stmt.query.Exists;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.sql.SQLException;
@@ -32,11 +33,11 @@ public class Unit extends CDO {
 
     @JsonProperty("Вес")
     @DatabaseField
-    float weight;
+    private float weight;
 
     @JsonProperty("Объем")
     @DatabaseField
-    float volume;
+    private float volume;
 
     public float getWeight() {
         return weight;
@@ -54,15 +55,13 @@ public class Unit extends CDO {
         this.volume = volume;
     }
 
-    public Unit(String ref_Key) {
-        this.ref_Key = ref_Key;
-    }
-
-
     public Unit(){}
 
-    public String getDescription() {
+    public Unit(String s) {
+        this.ref_Key = s;
+    }
 
+    public String getDescription() {
         return description;
     }
 
@@ -82,16 +81,13 @@ public class Unit extends CDO {
     public void save() {
         try {
             MyHelper.getInstance().getDao(Unit.class).create(this);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public boolean isEmpty() {
-        if (ref_Key.equals(Constants.ZERO_GUID))
-            return true;
-        else
-            return false;
+        return ref_Key.equals(Constants.ZERO_GUID);
     }
 
     @Override

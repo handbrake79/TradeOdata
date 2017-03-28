@@ -145,8 +145,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     public void onResume() {
         super.onResume();
         if (St.getInitComplete()) {
-            System.exit(0);
-            this.finish();
+            finish();
         }
     }
 

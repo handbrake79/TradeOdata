@@ -1,4 +1,5 @@
 <LinearLayout android:id="@+id/custom_actionbar_linearLayout"
+    android:background="@color/primary"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -7,7 +8,8 @@
     <TextView
         android:textSize="22sp"
         tools:text="ДАТА!"
-        android:textColor="@color/accent"
+        android:textColor="@color/bpblack"
+        android:background="@color/primary"
         android:id="@+id/customt_actionbar_caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

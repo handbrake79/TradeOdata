@@ -58,11 +58,6 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         holder.itemView.setSelected(selectedItem == position);
-        if (selectedItem == position)
-            holder.itemView.setBackgroundColor(Constants.COLORS.SELECTED_COLOR); //without theme);
-        else
-            holder.itemView.setBackgroundColor(Color.WHITE);
-
         holder.mItem = mValues.get(position);
 
         if (holder.mItem.getProduct() == null)

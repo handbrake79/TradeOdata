@@ -41,7 +41,7 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
         setContentView(R.layout.products_list__main_layout);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //setSettingsTitle("");
@@ -69,10 +69,10 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
     public void setActivityTitle(String title, boolean upperLevel) {
         CardView cardView = (CardView) findViewById(R.id.products_list_card_caption);
         if (upperLevel) {
-            int color = cardView.getContext().getResources().getColor(R.color.gray);
+            int color = cardView.getContext().getResources().getColor(R.color.disabled_element);
             cardView.setCardBackgroundColor(color);
         } else {
-            int color = cardView.getContext().getResources().getColor(R.color.accent);
+            int color = cardView.getContext().getResources().getColor(R.color.primary);
             cardView.setCardBackgroundColor(color);
 
         }
@@ -137,7 +137,7 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
         i.putExtra(MODE_LABEL, Constants.REQUESTS.PRODUCT_INFO.ordinal());
         i.putExtra("ref_Key", product_key);
         i.putExtra("receiverTag", mReceiver);
-        i.putExtra("from", "DocList");
+        i.putExtra("from", "product_list");
         showLoading("Запрос товара");
         startService(i);
     }

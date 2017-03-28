@@ -100,6 +100,10 @@ public class Uttils {
 
     }
 
+    public static String formatDate(Calendar date) {
+        return Uttils.DATE_FORMATTER.format(date.getTime()).toString();
+    }
+
 
     private static class checkServerAvailable extends AsyncTask<String, Void, Boolean> {
         protected Boolean doInBackground(String... params) {

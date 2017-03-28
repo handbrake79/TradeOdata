@@ -41,7 +41,6 @@ import butterknife.OnClick;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.Route;
-import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.R;
 
@@ -76,7 +75,7 @@ public class ShippingFragment extends Fragment {
     @Bind(R.id.input_route_text)
     AutoCompleteTextView mRouteText;
 
-    @Bind(R.id.input_vehicle_type)
+    @Bind(R.id.doc__shipping_vehicle_type)
     Spinner mVehicleTypeSpinner;
 
     @Bind(R.id.input_time_from)
@@ -588,16 +587,9 @@ public class ShippingFragment extends Fragment {
         mListenerShipping.onNeedUnloadChanged(needUnload);
     }
 
-    private void toggleUnload(boolean state) {
-        if (state) {
-            rlUnloadLayout.setBackgroundColor(Constants.COLORS.ENABLED);
-
-        } else {
-            rlUnloadLayout.setBackgroundColor(Constants.COLORS.DISABLED);
-        }
-
-        mWorkersCountEditText.setEnabled(state);
-        mUnloadCostEditText.setEnabled(state);
+    private void toggleUnload(boolean stateEnabled) {
+        mWorkersCountEditText.setEnabled(stateEnabled);
+        mUnloadCostEditText.setEnabled(stateEnabled);
     }
 
     private void onNeedShippingChanged() {
@@ -611,18 +603,19 @@ public class ShippingFragment extends Fragment {
     }
 
     private void toggleShippingElements(boolean state) {
+        int disabledColor = ContextCompat.getColor(getContext(), R.color.disabled_element);
+        int enabledColor = ContextCompat.getColor(getContext(), R.color.primary);
         llShippingLayout.setEnabled(state);
         if (!state) {
-            llShippingLayout.setBackgroundColor(Constants.COLORS.DISABLED);
-            mShippingDateText.setTextColor(Constants.COLORS.DISABLED);
-            mTimeFromText.setTextColor(Constants.COLORS.DISABLED);
-            mTimeToText.setTextColor(Constants.COLORS.DISABLED);
+            mShippingDateText.setTextColor(disabledColor);
+            mTimeFromText.setTextColor(disabledColor);
+            mTimeToText.setTextColor(disabledColor);
+            mShippingCostEditText.setTextColor(disabledColor);
         } else {
-            mShippingDateText.setTextColor(ContextCompat.getColor(getContext(), R.color.bpDarker_blue));
-            mTimeFromText.setTextColor(ContextCompat.getColor(getContext(), R.color.bpDarker_blue));
-            mTimeToText.setTextColor(ContextCompat.getColor(getContext(), R.color.bpDarker_blue));
-            llShippingLayout.setBackgroundColor(Constants.COLORS.ENABLED);
-
+            mShippingDateText.setTextColor(enabledColor);
+            mTimeFromText.setTextColor(enabledColor);
+            mTimeToText.setTextColor(enabledColor);
+            mShippingCostEditText.setTextColor(enabledColor);
         }
 
         tvDateCaption.setEnabled(state);

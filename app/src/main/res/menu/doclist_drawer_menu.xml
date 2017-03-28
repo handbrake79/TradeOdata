@@ -6,11 +6,11 @@
         android:checkableBehavior="none">
 
         <item
-            android:id="@+id/drawer_item_settings"
+            android:id="@+id/doclist__item_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="Настройки"></item>
         <item
-            android:id="@+id/drawer_item_exit"
+            android:id="@+id/doclist__item_exit"
             android:icon="@drawable/ic_exit_to_app_white_18dp"
             android:title="Выход"></item>
     </group>
