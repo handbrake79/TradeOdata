@@ -14,7 +14,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Organisation;
  * Created by PostRaw on 04.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrganisationsList {
+public class OrganisationsList implements DataList {
 
 
     @JsonProperty("value")

@@ -12,7 +12,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Store;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class StoreList {
+public class StoreList implements DataList {
 
 
     @JsonProperty("value")

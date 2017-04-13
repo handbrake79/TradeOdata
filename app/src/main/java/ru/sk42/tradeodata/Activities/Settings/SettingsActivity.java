@@ -1,12 +1,13 @@
 package ru.sk42.tradeodata.Activities.Settings;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,8 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,12 +22,14 @@ import java.sql.SQLException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import ru.sk42.tradeodata.Activities.Document.Adapters.DrawerAdapter;
 import ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity;
 import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.R;
+
+import static ru.sk42.tradeodata.R.id.doclist__nav_view;
+import static ru.sk42.tradeodata.R.id.settings__nav;
 
 
 /**
@@ -42,21 +43,22 @@ import ru.sk42.tradeodata.R;
  * href="http://developer.android.com/guide/topics/ui/settings.html">St
  * API Guide</a> for more information on developing a St UI.
  */
-public class SettingsActivity extends AppCompatActivity implements SettingsInterface {
+public class SettingsActivity extends AppCompatActivity implements SettingsInterface, NavigationView.OnNavigationItemSelectedListener {
 
     static final String TAG = "SETTINGS";
 
-    Activity mActivity;
+    boolean calledFromMenu;
 
-    Toolbar myToolbar;
+    Toolbar mToolbar;
 
-    ActionBarDrawerToggle mDrawerToggle;
-
-    @Bind(R.id.settings_listview)
-    ListView mDrawerList;
-
-    @Bind(R.id.settings_drawer_layout)
+    @Bind(R.id.settings__drawer)
     DrawerLayout mDrawerLayout;
+
+
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    @Bind(R.id.settings__nav)
+    NavigationView navigationView;
 
 
     @Override
@@ -65,157 +67,101 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
         setContentView(R.layout.settings__activity);
         ButterKnife.bind(this, this);
 
-        mActivity = this;
+        setToolbar();
+        setDrawer();
+        setTitle("");
+        mDrawerLayout.openDrawer(Gravity.LEFT);
 
-        int[] colors = {0, 0xFFFF0000, 0}; // red for the example
-        mDrawerList.setDivider(new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors));
-        mDrawerList.setDividerHeight(2);
-
-        mDrawerList.setAdapter(new DrawerAdapter<String>(this,
-                R.layout.drawer_list_item_layout, Constants.SETTINGS_ACTIONS));
-        // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                onListItemSelected(i);
-            }
-        });
-
-        mDrawerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                Toast.makeText(SettingsActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-//                Toast.makeText(SettingsActivity.this, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                null,  /* nav drawer image to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
-        ) {
-            public void onDrawerClosed(View view) {
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                mDrawerList.bringToFront();
-                mDrawerLayout.requestLayout();
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-        //mDrawerLayout.openDrawer(Gravity.LEFT);
-
-        myToolbar = (Toolbar) findViewById(R.id.settings_toolbar);
-        setSupportActionBar(myToolbar);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        this.setTitle("");
-        setSettingsTitle("Настройки", "");
-        if (getIntent().getIntExtra(Constants.REQUEST_SETTINGS_USER_LABEL, 0) == 0) {
-            showConnectionFragment();
+        if (getIntent().getIntExtra(Constants.REQUEST_SETTINGS_USER_LABEL, 0) != 0) {
+            showUserSelectionFragment(false);
         } else {
-            showUserSelectionFragment();
+            showConnectionFragment();
         }
+        mDrawerLayout.closeDrawer(Gravity.LEFT);
     }
 
-    public void setSettingsTitle(String t, String st) {
-        myToolbar.setSubtitle("");
-        myToolbar.setTitle("");
-        TextView tv = (TextView) myToolbar.findViewById(R.id.settings__title);
+    public void setTitle(String t, String st) {
+        mToolbar.setSubtitle("");
+        mToolbar.setTitle("");
+        TextView tv = (TextView) mToolbar.findViewById(R.id.settings__title);
         tv.setText(t);
-        tv = (TextView) myToolbar.findViewById(R.id.settings__subtitle);
+        tv = (TextView) mToolbar.findViewById(R.id.settings__subtitle);
         tv.setText(st);
 
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method isEmpty
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
-                    mDrawerLayout.closeDrawer(Gravity.LEFT);
-                } else {
-                    mDrawerLayout.openDrawer(Gravity.LEFT);
-                }
-                break;
-            case R.id.action_view_product_list:
-                //showProductsListFragment();
-                break;
-            case R.id.action_scanner_pair:
-                //pairScaner();
-                break;
-            case R.id.action_scanner_set:
-                //setScaner();
-                break;
-            case R.id.action_scanner_connect:
-                //connectScaner();
-                break;
+    private void setToolbar() {
+        mToolbar = (Toolbar) findViewById(R.id.settings__toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
-        }
-        return super.onOptionsItemSelected(item);
     }
 
 
-    private void onListItemSelected(int pos) {
-        mDrawerLayout.closeDrawer(Gravity.LEFT);
-        switch (pos) {
-            case 0:
+    private void setDrawer() {
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        navigationView = (NavigationView) findViewById(settings__nav);
+        navigationView.setNavigationItemSelectedListener(this);
+        mDrawerToggle.syncState();
+
+    }
+
+
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.settings__connection:
                 //connection settings
                 showConnectionFragment();
                 break;
-            case 1:
+            case R.id.settings__users:
                 //mVehicleType select
-                showUserSelectionFragment();
+                showUserSelectionFragment(true);
                 break;
-            case 2:
+            case R.id.settings__printers:
                 //printer
                 PrinterFragment printerFragment = PrinterFragment.newInstance(1);
 
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.settings_frame, printerFragment, printerFragment.getClass().getName())
+                        .replace(R.id.settings__frame, printerFragment, printerFragment.getClass().getName())
                         .addToBackStack(printerFragment.getClass().getName())
                         .commit();
                 break;
-            case 3:
+            case R.id.settings__scanner:
                 ScannerFragment fragment = ScannerFragment.newInstance();
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.settings_frame, fragment, fragment.getClass().getName())
+                        .replace(R.id.settings__frame, fragment, fragment.getClass().getName())
                         //  .addToBackStack(fragment.getClass().getName())
                         .commit();
                 //scanner
                 break;
-            case 4:
+            case R.id.settings__vehicle_types:
                 VehicleTypesFragment vehicleTypesFragment = VehicleTypesFragment.newInstance(1);
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.settings_frame, vehicleTypesFragment, vehicleTypesFragment.getClass().getName())
+                        .replace(R.id.settings__frame, vehicleTypesFragment, vehicleTypesFragment.getClass().getName())
                         .addToBackStack(vehicleTypesFragment.getClass().getName())
                         .commit();
                 break;
         }
+        return false;
     }
 
-    private void showUserSelectionFragment() {
-        UserSelectionFragment userSelectionFragment = UserSelectionFragment.newInstance(1);
+    private void showUserSelectionFragment(boolean mCalledFromMenu) {
+        calledFromMenu = mCalledFromMenu;
+        UserSelectionFragment userSelectionFragment = UserSelectionFragment.newInstance(mCalledFromMenu);
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.settings_frame, userSelectionFragment, userSelectionFragment.getClass().getName())
+                .replace(R.id.settings__frame, userSelectionFragment, userSelectionFragment.getClass().getName())
                 .addToBackStack(userSelectionFragment.getClass().getName())
                 .commit();
     }
@@ -225,7 +171,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.settings_frame, connectionFragment, connectionFragment.getClass().getName())
+                .replace(R.id.settings__frame, connectionFragment, connectionFragment.getClass().getName())
                 .addToBackStack(connectionFragment.getClass().getName())
                 .commit();
 
@@ -237,8 +183,10 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
             User user = (User) object;
             Settings.setCurrentUserStatic(user);
             Toast.makeText(this, "Выбран пользователь " + user.getDescription(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, DocList_Activity.class);
-            startActivity(intent);
+            if (!calledFromMenu) {
+                Intent intent = new Intent(this, DocList_Activity.class);
+                startActivity(intent);
+            }
         }
         if (object instanceof VehicleType) {
             VehicleType vehicleType = (VehicleType) object;
@@ -278,6 +226,4 @@ public class SettingsActivity extends AppCompatActivity implements SettingsInter
     public void onBackPressed() {
         finish();
     }
-
-
 }

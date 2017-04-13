@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import ru.sk42.tradeodata.Activities.Settings.adapters.UserRecyclerViewAdapter;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.User;
+import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.R;
 
 import java.sql.SQLException;
@@ -31,6 +32,7 @@ public class UserSelectionFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private SettingsInterface mListener;
+    boolean calledFromMenu;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -41,10 +43,10 @@ public class UserSelectionFragment extends Fragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static UserSelectionFragment newInstance(int columnCount) {
+    public static UserSelectionFragment newInstance(boolean calledFromMenu) {
         UserSelectionFragment fragment = new UserSelectionFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putBoolean(Constants.CALLED_FROM_MENU, calledFromMenu);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,7 +56,7 @@ public class UserSelectionFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            calledFromMenu = getArguments().getBoolean(Constants.CALLED_FROM_MENU);
         }
     }
 
@@ -64,7 +66,7 @@ public class UserSelectionFragment extends Fragment {
         View view = inflater.inflate(R.layout.settings__fragment_user_list, container, false);
 
         SettingsActivity settingsActivity = (SettingsActivity) getActivity();
-        settingsActivity.setSettingsTitle("Пользователи", "выберите пользователя");
+        settingsActivity.setTitle("Пользователи", "выберите пользователя");
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -76,13 +78,13 @@ public class UserSelectionFragment extends Fragment {
             }
             List<User> listUsers = null;
             try {
-                listUsers = MyHelper.getUserDao().queryForAll();
+                listUsers = MyHelper.getUserDao().queryBuilder().orderBy("description", true).query();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             recyclerView.setAdapter(new UserRecyclerViewAdapter(listUsers, mListener));
-            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.HORIZONTAL);
-            recyclerView.addItemDecoration(dividerItemDecoration);
+//            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.HORIZONTAL);
+//            recyclerView.addItemDecoration(dividerItemDecoration);
         }
         return view;
     }

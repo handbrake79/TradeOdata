@@ -1,5 +1,7 @@
 package ru.sk42.tradeodata.Model.Catalogs;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
@@ -20,6 +22,8 @@ import ru.sk42.tradeodata.NetworkRequests.RetroConstants;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DatabaseTable
 public class DiscountCard extends CDO {
+
+    static final String TAG = "DiscountCard";
 
     public static DiscountCard newInstance() {
         DiscountCard card = DiscountCard.getObject(DiscountCard.class, Constants.ZERO_GUID);
@@ -121,5 +125,11 @@ public class DiscountCard extends CDO {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static void createStub() {
+        DiscountCard card = new DiscountCard(Constants.ZERO_GUID);
+        card.setDescription("");
+        card.save();
     }
 }

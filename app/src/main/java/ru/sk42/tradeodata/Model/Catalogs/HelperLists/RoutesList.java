@@ -14,7 +14,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Route;
  * Created by я on 29.09.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RoutesList {
+public class RoutesList implements DataList {
     @JsonProperty("value")
     Collection<Route> values;
 

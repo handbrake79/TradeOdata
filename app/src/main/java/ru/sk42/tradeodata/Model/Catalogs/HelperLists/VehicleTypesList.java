@@ -14,7 +14,7 @@ import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
  * Created by я on 29.09.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VehicleTypesList {
+public class VehicleTypesList implements DataList {
     @JsonProperty("value")
     Collection<VehicleType> values;
 

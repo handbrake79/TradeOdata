@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.wang.avi.AVLoadingIndicatorView;
 
+import org.w3c.dom.Text;
+
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.R;
 
@@ -22,6 +24,10 @@ import ru.sk42.tradeodata.R;
  */
 public class LoadingFragment extends Fragment {
 
+
+    View view;
+    TextView tv;
+    LoadingFragment instance;
 
     public LoadingFragment() {
         // Required empty public constructor
@@ -41,16 +47,20 @@ public class LoadingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the shake_anim for this fragment
-        View view = inflater.inflate(R.layout.fragment_loading, container, false);
+        view = inflater.inflate(R.layout.fragment_loading, container, false);
         AVLoadingIndicatorView avi = (AVLoadingIndicatorView) view.findViewById(R.id.avi);
         avi.show();
         if (getArguments() != null) {
             if (!getArguments().isEmpty()) {
-                TextView tv = (TextView) view.findViewById(R.id.loading_message);
-                tv.setText(getArguments().get(Constants.MESSAGE_LABEL).toString());
+                showMessage(getArguments().get(Constants.MESSAGE_LABEL).toString());
             }
         }
         return view;
     }
 
+
+    public void showMessage(String text) {
+        tv = (TextView) view.findViewById(R.id.loading_message);
+        tv.setText(text);
+    }
 }

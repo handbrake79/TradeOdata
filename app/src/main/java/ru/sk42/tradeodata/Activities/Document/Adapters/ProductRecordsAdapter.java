@@ -3,11 +3,16 @@ package ru.sk42.tradeodata.Activities.Document.Adapters;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -28,6 +33,7 @@ import ru.sk42.tradeodata.R;
  */
 public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAdapter.ViewHolder> {
 
+    static final String TAG = "ProductRecordsAdapter";
     private int selectedItem;
     private ArrayList<SaleRecordProduct> mValues;
 
@@ -81,6 +87,7 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
             holder.tvDocSaleProductsDiscountPercentAuto.setVisibility(View.INVISIBLE);
         }
 
+
     }
 
 
@@ -118,7 +125,7 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
         TextView tvDocSaleProductsStore;
 
         @Bind(R.id.tv_DocSale_Products_Qty)
-        TextView tvDocSaleProductsQty;
+        EditText tvDocSaleProductsQty;
 
         @Bind(R.id.tv_DocSale_Products_Unit)
         TextView tvDocSaleProductsUnit;
@@ -165,15 +172,28 @@ public class ProductRecordsAdapter extends RecyclerView.Adapter<ProductRecordsAd
                     mListener.minus(getSelectedObject());
                 }
             });
-            // Handle item click and set the selection
-            tvDocSaleProductsQty.setOnClickListener(new View.OnClickListener() {
+
+            tvDocSaleProductsQty.setOnKeyListener(new View.OnKeyListener() {
                 @Override
-                public void onClick(View v) {
-                    // Redraw the old selection and the new
-                    notifyItemChanged(selectedItem);
-                    selectedItem = getLayoutPosition();
-                    notifyItemChanged(selectedItem);
-                    mListener.onRecordSelected(getSelectedObject(), Constants.SELECT_RECORD_FOR_CHANGE);
+                public boolean onKey(View view, int i, KeyEvent event) {
+                    if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == 0) {
+                        String text = tvDocSaleProductsQty.getText().toString();
+                        Log.d(TAG, "onKey: text entered=" + text);
+                        double qty = Double.valueOf(text);
+                        if (qty > 0) {
+                            notifyItemChanged(selectedItem);
+                            selectedItem = getLayoutPosition();
+                            notifyItemChanged(selectedItem);
+                            getSelectedObject().setQty(qty);
+                            mListener.onQtyChanged(getSelectedObject(), Constants.QTY_CHANGED);
+                            return true;
+                        } else {
+                            return false;
+                        }
+
+                    } else {
+                        return false;
+                    }
                 }
             });
 

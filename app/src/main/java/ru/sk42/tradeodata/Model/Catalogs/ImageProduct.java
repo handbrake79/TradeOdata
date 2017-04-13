@@ -124,6 +124,7 @@ public class ImageProduct extends CDO {
             }
             bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
         } catch (Exception e) {
+            Log.d(TAG, "decodeBase64: " + e.getMessage());
             e.printStackTrace();
         }
         return bitmap;

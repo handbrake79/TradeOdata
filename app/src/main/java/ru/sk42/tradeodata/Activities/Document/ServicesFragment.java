@@ -13,10 +13,11 @@ import android.view.ViewGroup;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import ru.sk42.tradeodata.Activities.Document.Adapters.ProductRecordsAdapter;
 import ru.sk42.tradeodata.Activities.Document.Adapters.ServicesRecordsAdapter;
-import ru.sk42.tradeodata.Activities.ProductsList.DividerDecoration;
 
 import ru.sk42.tradeodata.Model.Document.DocSale;
+import ru.sk42.tradeodata.Model.Document.SaleRecord;
 import ru.sk42.tradeodata.R;
 
 
@@ -35,29 +36,29 @@ public class ServicesFragment extends Fragment {
         DocumentActivity activity = (DocumentActivity) getActivity();
         docSale = activity.getDocSale();
 
-        view = inflater.inflate(R.layout.doc__page_services, container, false);
+        view = inflater.inflate(R.layout.doc__services, container, false);
         ButterKnife.bind(this, view);
 
 //        mServicesRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
 //        mServicesRecyclerView.setSelected(true);
         mServicesRecyclerView.setLayoutManager(new LinearLayoutManager(mServicesRecyclerView.getContext()));
 
-        setAdapter();
+//        setAdapter();
 
         return view;
 
     }
 
     private void setAdapter() {
-        if (adapter == null) {
-            adapter = new ServicesRecordsAdapter(docSale.getServicesList(), (SaleRecordInterface) getActivity());
-        }
+        DocumentActivity activity = (DocumentActivity) getActivity();
+        docSale = activity.getDocSale();
+        adapter = new ServicesRecordsAdapter(docSale.getServicesList(), (SaleRecordInterface) getActivity());
         mServicesRecyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
-    public void notifyItemChanged(int position) {
-        adapter.setValues(docSale.getServicesList());
-        adapter.notifyItemChanged(position - 1);
+    public void notifyItemChanged(SaleRecord record) {
+        adapter.updateValue(record);
     }
 
     public void notifyItemAdded() {

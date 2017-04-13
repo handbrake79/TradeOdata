@@ -16,4 +16,6 @@ public interface SaleRecordInterface {
 
     void onRecordSelected(SaleRecord record, int action);
 
+    void onQtyChanged(SaleRecord record, int action);
+
 }

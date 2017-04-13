@@ -22,7 +22,7 @@ public class QtyInputActivity extends AppCompatActivity implements QtyPickerFrag
         id = intent.getLongExtra(Constants.ID, -1);
         double qty = intent.getDoubleExtra(Constants.QUANTITY, -1);
         double price = intent.getDoubleExtra(Constants.PRICE, -1);
-        String descr = intent.getStringExtra(Constants.DESCR);
+        String descr = intent.getStringExtra(Constants.DESCRIPTION);
         QtyPickerFragment qtyPickerFragment = QtyPickerFragment.newInstance(descr, price, qty);
 
         getSupportFragmentManager()

@@ -1,31 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:background="@drawable/done_background_color"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:theme="@style/ThemeOverlay.AppCompat"
     android:orientation="vertical"
 
-    android:gravity="center">
+    android:theme="@style/ThemeOverlay.AppCompat">
 
     <ImageView
+        android:id="@+id/doc__nav_header_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:paddingTop="5dp"
-        android:src="@drawable/logo"
-        android:id="@+id/imageView" />
+        android:src="@drawable/logo" />
 
-    <!--<EditText-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:hint="Поиск по названию товара"-->
-    <!--android:textColorHint="@color/bpDarker_red"-->
-    <!--android:text=""-->
-    <!--android:lines="1"-->
-    <!--/>-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/doc__nav_header_image"
+        android:gravity="center">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/doc__nav_header_search_img"
+            android:layout_marginTop="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/ic_search_holo_light" />
+
+        <EditText
+            android:id="@+id/doc__nav_header_search_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/doc__nav_header_search_img"
+            android:hint="Поиск по названию товара"
+            android:lines="1"
+            android:text=""
+            android:textColorHint="@color/bpDarker_red" />
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -10,12 +10,12 @@ import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CharList {
+public class CharactList implements DataList {
 
     @JsonProperty("value")
     private Collection<Charact> values;
 
-    public CharList() {
+    public CharactList() {
     }
 
 

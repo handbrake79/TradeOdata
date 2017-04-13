@@ -100,15 +100,17 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Currency.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Customer.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, DiscountCard.class);
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, ImageProduct.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Organisation.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Product.class);
+            TableUtils.createTableIfNotExists(getInstance().connectionSource, ProductsList.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Route.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, StartingPoint.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Store.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, Unit.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, User.class);
             TableUtils.createTableIfNotExists(getInstance().connectionSource, VehicleType.class);
-            TableUtils.createTableIfNotExists(getInstance().connectionSource, ImageProduct.class);
+
 
 
             TableUtils.createTableIfNotExists(getInstance().connectionSource, DocSale.class);
@@ -401,6 +403,16 @@ public class MyHelper extends OrmLiteSqliteOpenHelper {
             return null;
         }
     }
+
+    public static Dao<ProductsList, Object> getProductsListDao() {
+        try {
+            return getInstance().getDao(ProductsList.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 }
 

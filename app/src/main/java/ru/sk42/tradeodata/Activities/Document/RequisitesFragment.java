@@ -7,12 +7,12 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -38,8 +38,11 @@ public class RequisitesFragment extends Fragment {
     @Bind(R.id.doc_page_req_disc_text)
     TextInputEditText mDiscountCard;
 
-    @Bind(R.id.doc_page_req_find_card)
+    @Bind(R.id.doc__requisites_find_card)
     Button btnFindCard;
+
+    @Bind(R.id.doc__requisites_delete_card)
+    ImageView imgDeleteCard;
 
     @Bind(R.id.doc_page_req_til_discount_card)
     TextInputLayout tilDiscountCard;
@@ -58,7 +61,7 @@ public class RequisitesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.doc__page_req, container, false);
+        View view = inflater.inflate(R.layout.doc__requisites, container, false);
         ButterKnife.bind(this, view);
 
         mActivityListener = (DocumentListenerInterface) getActivity();
@@ -146,6 +149,18 @@ public class RequisitesFragment extends Fragment {
                 btnFindCardClick();
             }
         });
+
+        imgDeleteCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnDeleteCardClick();
+            }
+        });
+    }
+
+    private void btnDeleteCardClick() {
+        mDiscountCard.setText("");
+        mActivityListener.onDiscountCardNumberEntered("", tilDiscountCard);
     }
 
 
@@ -158,7 +173,6 @@ public class RequisitesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        initView();
     }
 
     @Override

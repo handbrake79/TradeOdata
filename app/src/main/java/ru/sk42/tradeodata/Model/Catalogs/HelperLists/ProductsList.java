@@ -1,5 +1,9 @@
 package ru.sk42.tradeodata.Model.Catalogs.HelperLists;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,17 +18,26 @@ import ru.sk42.tradeodata.Model.Constants;
  * Created by PostRaw on 18.03.2016.
  */
 @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-//@DatabaseTable(tableName = "zProductsList")
-public class ProductsList {
+@DatabaseTable(tableName = "zProductsList")
+public class ProductsList implements DataList {
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @DatabaseField(generatedId = true)
+    private int id;
 
     @com.fasterxml.jackson.annotation.JsonProperty("value")
-
+    @ForeignCollectionField(eager = true, maxEagerLevel = 3)
     private Collection<Product> values;
 
     public ProductsList() {
     }
-
 
     public Collection<Product> getValues() {
         return values;
@@ -57,9 +70,12 @@ public class ProductsList {
 
     public void save() {
         try {
+            MyHelper.getProductsListDao().createOrUpdate(this);
             Iterator<Product> it = getValues().iterator();
             while (it.hasNext()) {
-                MyHelper.getInstance().getDao(Product.class).createOrUpdate(it.next());
+                Product product = it.next();
+                product.setProductsList(this);
+                MyHelper.getInstance().getDao(Product.class).createOrUpdate(product);
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -12,7 +12,7 @@ import ru.sk42.tradeodata.Model.Catalogs.ImageProduct;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class ImageList {
+public class ImageList implements DataList {
 
 
     @JsonProperty("value")

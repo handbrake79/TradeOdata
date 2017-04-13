@@ -298,9 +298,9 @@
                         android:layout_height="wrap_content"
 
                         android:layout_alignParentRight="true"
-
                         android:layout_below="@+id/caption_address"
-                        android:inputType="textPersonName"
+
+                        android:inputType="textCapWords|textPersonName"
                         android:selectAllOnFocus="true" />
                 </android.support.design.widget.TextInputLayout>
 

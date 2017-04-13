@@ -63,8 +63,8 @@ public class Uttils {
     }
 
     public static boolean isPredefined(Product product) {
-        return product.getRef_Key().equals(Constants.SHIPPING_GUID)
-                || product.getRef_Key().equals(Constants.UNLOAD_GUID);
+        return product.getRef_Key().equals(Constants.SHIPPING_SERVICE_GUID)
+                || product.getRef_Key().equals(Constants.UNLOAD_SERVICE_GUID);
     }
 
     public static String formatInt(int i) {

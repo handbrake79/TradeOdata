@@ -31,7 +31,7 @@ public class StockFragment extends android.support.v4.app.Fragment implements In
     RecyclerView mRecyclerView;
     private int mColumnCount = 1;
     private InteractionInterface mListener;
-    private Stock_Adapter mAdapter;
+    private StockAdapter mAdapter;
 
     TextView tvSelect;
     /**
@@ -100,7 +100,7 @@ public class StockFragment extends android.support.v4.app.Fragment implements In
                 mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             productInfo = ProductInfo.getObject(ProductInfo.class, productInfo.getRef_Key());
-            mAdapter = new Stock_Adapter(productInfo.getArrayList(), mListener);
+            mAdapter = new StockAdapter(productInfo.getArrayList(), mListener);
             mRecyclerView.setAdapter(mAdapter);
             //mRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
 

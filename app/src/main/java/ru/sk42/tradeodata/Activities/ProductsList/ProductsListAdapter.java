@@ -23,12 +23,12 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
     private final InteractionInterface mListener;
     private Product parentProduct;
     private ProductsListFragment owner_fragment;
+    private int mProductListId;
 
     public ProductsListAdapter(List<Product> items, InteractionInterface listener, final ProductsListFragment ownerfragment) {
         this.items = items;
         mListener = listener;
         owner_fragment = ownerfragment;
-
     }
 
     public void setParentProduct(Product parentProduct) {
@@ -43,7 +43,7 @@ public class ProductsListAdapter extends RecyclerView.Adapter<ProductsListAdapte
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.products_list_item, parent, false);
+                .inflate(R.layout.products_list__card, parent, false);
         return new ViewHolder(view);
     }
 

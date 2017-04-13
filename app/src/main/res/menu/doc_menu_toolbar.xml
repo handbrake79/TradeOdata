@@ -26,9 +26,15 @@
 
     <item
         android:id="@+id/action_find_barcode"
-        android:title="Поиск по штрихкоду"
-        android:icon="@drawable/barcode_scan"
+        android:title="Ввести штрихкод с клавиатуры"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_find_barcode_using_camera"
+        android:title="Штрихкод"
+        android:icon="@drawable/barcode_scan"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/action_find_product_by_description"
         android:title="Поиск по названию"

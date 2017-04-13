@@ -16,7 +16,7 @@ import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
  * Created by PostRaw on 18.03.2016.
  */
 @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-public class ShippingRatesList {
+public class ShippingRatesList implements DataList {
 
 
     @com.fasterxml.jackson.annotation.JsonProperty("value")

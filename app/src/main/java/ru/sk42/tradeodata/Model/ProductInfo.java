@@ -1,5 +1,7 @@
 package ru.sk42.tradeodata.Model;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
@@ -17,6 +19,8 @@ import ru.sk42.tradeodata.Helpers.MyHelper;
 
 @DatabaseTable
 public class ProductInfo extends CDO {
+
+    static final String TAG = "***ProductInfo";
 
     @DatabaseField(id = true)
     @JsonProperty("Ref_Key")
@@ -146,8 +150,14 @@ public class ProductInfo extends CDO {
 
     public static ProductInfo getByBarcode(String barcode) {
         try {
-            return MyHelper.getProductInfoDao().queryForEq("barcode", barcode).get(0);
-        } catch (Exception e) {
+            List<ProductInfo> list = MyHelper.getProductInfoDao().queryForEq("barcode", barcode);
+            if (list.isEmpty()) {
+                return null;
+            } else {
+                return list.get(0);
+            }
+        } catch (SQLException e) {
+            Log.d(TAG, "getByBarcode: ");
             e.printStackTrace();
             return null;
         }

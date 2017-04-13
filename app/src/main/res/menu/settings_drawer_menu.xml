@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/settings__connection"
+            android:title="Подключение"></item>
+        <item
+            android:id="@+id/settings__users"
+            android:title="Пользователь"></item>
+        <item
+            android:id="@+id/settings__printers"
+            android:title="Принтер"></item>
+        <item
+            android:id="@+id/settings__vehicle_types"
+            android:title="Типы ТС"></item>
+        <item
+            android:id="@+id/settings__scanner"
+            android:title="Сканер штрихкода"></item>
+    </group>
+
+</menu>

@@ -13,7 +13,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Currency;
  * Created by PostRaw on 04.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CurrencyList {
+public class CurrencyList implements DataList {
 
 
     @JsonProperty("value")

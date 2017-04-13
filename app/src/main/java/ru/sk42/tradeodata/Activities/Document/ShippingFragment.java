@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -153,10 +154,10 @@ public class ShippingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.doc__page_shipping, container, false);
+        View view = inflater.inflate(R.layout.doc__shipping, container, false);
         ButterKnife.bind(this, view);
 
-        initView();
+//        initView();
 
 
         return view;
@@ -244,22 +245,6 @@ public class ShippingFragment extends Fragment {
             }
         });
 
-//        mStartingPointSpinner.setAdapter(mStartingPointArrayAdapter);
-//        mStartingPointSpinner.setSelection(getIndexOfSpinnerValue(mStartingPointSpinner, docSale.getStartingPoint().toString()));
-//        mStartingPointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//                                                            @Override
-//                                                            public void onItemSelected(AdapterView<?> adapterView, initView view, int position, long l) {
-//                                                                mListenerShipping.onStartingPointChanged(adapterView.getItemAtPosition(position).toString(), (TextView) mStartingPointSpinner.getSelectedView());
-//                                                                setShippingCostText();
-//                                                            }
-//
-//                                                            @Override
-//                                                            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//                                                            }
-//                                                        }
-//        );
-
         mRouteText.setAdapter(mRouteArrayAdapter);
         mRouteText.setText(docSale.getRoute().toString());
         mRouteText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -276,10 +261,27 @@ public class ShippingFragment extends Fragment {
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 if (mShippingAddressEditText.getText() != null) {
                     mListenerShipping.onAddressChanged(mShippingAddressEditText.getText().toString());
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 }
                 return false;
             }
         });
+        mShippingAddressEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mListenerShipping.onAddressChanged(editable.toString());
+            }
+        });
+
 
         mShippingCostEditText.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -293,6 +295,7 @@ public class ShippingFragment extends Fragment {
                         cost = 0;
                     }
                     mListenerShipping.onShippingCostChanged(cost, tilShippingCost);
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 }
                 return false;
             }
@@ -310,6 +313,7 @@ public class ShippingFragment extends Fragment {
                         cost = 0;
                     }
                     mListenerShipping.onUnloadCostChanged(cost, tilUnloadCost);
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 }
                 return false;
             }
@@ -327,6 +331,7 @@ public class ShippingFragment extends Fragment {
                         count = 0;
                     }
                     mListenerShipping.onWorkersChanged(count, tilWorkers);
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 }
                 return false;
             }
@@ -335,7 +340,6 @@ public class ShippingFragment extends Fragment {
         mContactPerson.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
-
                 if (mContactPerson.getText() != null) {
                     String text = "";
                     try {
@@ -344,8 +348,24 @@ public class ShippingFragment extends Fragment {
                         text = "";
                     }
                     mListenerShipping.onContactPersonChanged(text, tilContactPerson);
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 }
                 return false;
+            }
+        });
+        mContactPerson.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mListenerShipping.onContactPersonChanged(editable.toString(), tilContactPerson);
             }
         });
         mContactPersonPhone.addTextChangedListener(new TextWatcher() {

@@ -30,6 +30,7 @@ public class Constants {
     public static final String OPERATION_SUCCESS_LABEL = "success";
     public static final int SAVE_COMPLETE = 20;
     public static final int POST_COMPLETE = 21;
+    public static final int QTY_CHANGED = 22;
     public static final String MESSAGE_LABEL = "message";
     public static final String RESULT_CODE_LABEL = "result_code";
     public static final String MODE_LABEL = "mode";
@@ -38,35 +39,15 @@ public class Constants {
     public static final int PRODUCT_INFO_EXPIRATION_TIME_SECONDS = 10;
     public static final int REQUEST_SETTINGS_USER = 22;
     public static final String REQUEST_SETTINGS_USER_LABEL = "REQUEST_SETTINGS_USER";
-    public static ArrayList<String> DOCUMENT_ACTIONS;
     public static String QUANTITY = "qty";
-    public static String DESCR = "descr";
-    public static String CHARACT = "charact";
+    public static String DESCRIPTION = "descr";
     public static String PRICE = "price";
 
-    static {
-        DOCUMENT_ACTIONS = new ArrayList<>();
-        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_SAVE));
-        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_SAVE_1C));
-        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_POST_1C));
-        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_PRINT));
-        DOCUMENT_ACTIONS.add(St.getApp().getResources().getString(R.string.ACTION_CLOSE));
-    }
 
-    public static ArrayList<String> SETTINGS_ACTIONS;
+    public static String CALLED_FROM_MENU = "CALLED_FROM_MENU";
 
-    static {
-        SETTINGS_ACTIONS = new ArrayList<>();
-        SETTINGS_ACTIONS.add(St.getApp().getString(R.string.CONNECTION_SETTINGS));
-        SETTINGS_ACTIONS.add("Пользователь");
-        SETTINGS_ACTIONS.add("Принтер");
-        SETTINGS_ACTIONS.add("Настройки сканера");
-        SETTINGS_ACTIONS.add("Типы транспорта");
-        SETTINGS_ACTIONS.add("Прочие настройки");
-    }
-
-    public static final String SHIPPING_GUID = "254bbb25-6395-422b-8f00-fd126ec82289";
-    public static final String UNLOAD_GUID = "7ca2e35d-7f03-4869-9e54-eabe1af8eeba";
+    public static final String SHIPPING_SERVICE_GUID = "254bbb25-6395-422b-8f00-fd126ec82289";
+    public static final String UNLOAD_SERVICE_GUID = "7ca2e35d-7f03-4869-9e54-eabe1af8eeba";
 
     public static final int FEEDBACK = 98765;
     public static final int LOAD_FINISHED = 1;
@@ -103,7 +84,7 @@ public class Constants {
         PRINT_DOCUMENT,
         DISCOUNT_CARD,
         LOAD_IMAGE,
-        NONE
+        FIND_PRODUCT_BY_DESCRIPTION, NONE
     }
 
 

@@ -16,7 +16,7 @@ import ru.sk42.tradeodata.Model.Constants;
  * Created by PostRaw on 04.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UsersList {
+public class UsersList implements DataList {
 
     @JsonProperty("value")
     private Collection<User> values;

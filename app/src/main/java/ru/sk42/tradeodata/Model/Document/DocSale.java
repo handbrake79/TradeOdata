@@ -2,6 +2,7 @@ package ru.sk42.tradeodata.Model.Document;
 
 import android.util.Log;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,7 +45,6 @@ import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.InformationRegisters.ShippingRate;
 import ru.sk42.tradeodata.Activities.Settings.Settings;
-import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.XML.DateConverter;
 
 /**
@@ -223,6 +223,20 @@ public class DocSale extends CDO {
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private int shippingCost;
 
+    @JsonProperty("СтоимостьДоставкиРасчетная")
+    @DatabaseField
+    @Element(name = "СтоимостьДоставкиРасчетная")
+    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+    private int calculatedShippingCost;
+
+    public int getCalculatedShippingCost() {
+        return calculatedShippingCost;
+    }
+
+    public void setCalculatedShippingCost(int calculatedShippingCost) {
+        this.calculatedShippingCost = calculatedShippingCost;
+    }
+
     @JsonProperty("НужнаДоставка")
     @DatabaseField
     @Element(name = "НужнаДоставка")
@@ -316,10 +330,17 @@ public class DocSale extends CDO {
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
     private String shippingAddress;
 
+
+//    @JsonProperty("Комментарий")
+//    @DatabaseField
+//    @Element(name = "Комментарий")
+//    @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
+
+
     @JsonProperty("КонтактноеЛицо")
+    @DatabaseField
     @Element(name = "КонтактноеЛицо")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
-    @DatabaseField
     private String contactPerson;
 
     @JsonProperty("ТелефонКонтактногоЛица")
@@ -343,6 +364,7 @@ public class DocSale extends CDO {
     private Date shippingDate;
 
     @JsonProperty("ВремяДоставкиС")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @DatabaseField
     @Element(name = "ВремяДоставкиС")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
@@ -350,6 +372,7 @@ public class DocSale extends CDO {
     private Date shippingTimeFrom;
 
     @JsonProperty("ВремяДоставкиПо")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @DatabaseField
     @Element(name = "ВремяДоставкиПо")
     @Namespace(reference = "http://schemas.microsoft.com/ado/2007/08/dataservices", prefix = "d")
@@ -918,6 +941,7 @@ public class DocSale extends CDO {
     }
 
     public void setShippingTimeFrom(Date shippingTimeFrom) {
+        Log.d(TAG, "setShippingTimeFrom ***: set time " + String.valueOf(shippingTimeFrom));
         this.shippingTimeFrom = shippingTimeFrom;
     }
 
@@ -991,7 +1015,7 @@ public class DocSale extends CDO {
             if (ref_key == null) {
                 continue;
             }
-            if (ref_key.equals(Constants.SHIPPING_GUID)) {
+            if (ref_key.equals(Constants.SHIPPING_SERVICE_GUID)) {
                 this.getServices().remove(rec);
                 break;
             }
@@ -1005,7 +1029,7 @@ public class DocSale extends CDO {
             if (ref_key == null) {
                 continue;
             }
-            if (ref_key.equals(Constants.UNLOAD_GUID)) {
+            if (ref_key.equals(Constants.UNLOAD_SERVICE_GUID)) {
                 this.getServices().remove(rec);
                 break;
             }
@@ -1019,7 +1043,7 @@ public class DocSale extends CDO {
 
         SaleRecordService rec = new SaleRecordService();
         rec.setRef_Key(this.getRef_Key());
-        rec.setProduct_Key(Constants.SHIPPING_GUID);
+        rec.setProduct_Key(Constants.SHIPPING_SERVICE_GUID);
         rec.setDocSale(this);
         rec.setLineNumber(getServices().size() + 1);
         rec.setPrice(this.shippingCost);
@@ -1035,7 +1059,7 @@ public class DocSale extends CDO {
         SaleRecordService rec = new SaleRecordService();
         rec.setDocSale(this);
         rec.setRef_Key(this.getRef_Key());
-        rec.setProduct_Key(Constants.UNLOAD_GUID);
+        rec.setProduct_Key(Constants.UNLOAD_SERVICE_GUID);
         rec.setLineNumber(getServices().size() + 1);
         rec.setPrice(this.unloadCost);
         rec.setQty(1);
@@ -1049,6 +1073,7 @@ public class DocSale extends CDO {
 
             int routeCost = ShippingRate.getCost(this.getStartingPoint(), route, this.getVehicleType());
             this.referenceShipingCost = routeCost;
+            this.calculatedShippingCost = routeCost;
             this.setShippingCost(routeCost);
 
             addShippingToServicesCollection();
@@ -1058,8 +1083,8 @@ public class DocSale extends CDO {
 
             removeShippingFromServicesCollection();
 
-            //setShippingCost(0);
-            //setUnloadCost(0);
+            setShippingCost(0);
+            setUnloadCost(0);
             setNeedUnload(false);
         }
         if (needUnload) {
@@ -1067,8 +1092,8 @@ public class DocSale extends CDO {
             addUnloadToServicesCollection();
 
         } else {
-            //setUnloadCost(0);
-
+            setUnloadCost(0);
+            setWorkersCount(0);
             removeUnloadFromServicesCollection();
         }
 

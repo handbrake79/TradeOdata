@@ -16,8 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Скидочная карта"
-            android:layout_alignBaseline="@+id/doc_page_req_find_card"
-            android:layout_alignBottom="@+id/doc_page_req_find_card"
+            android:layout_alignBaseline="@+id/doc__requisites_find_card"
+            android:layout_alignBottom="@+id/doc__requisites_find_card"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
@@ -40,7 +40,7 @@
 
         </android.support.design.widget.TextInputLayout>
         <Button
-            android:id="@+id/doc_page_req_find_card"
+            android:id="@+id/doc__requisites_find_card"
             android:layout_height="40dp"
             android:background="@drawable/ic_action_search"
             android:layout_width="40dp"
@@ -48,7 +48,17 @@
             android:layout_alignBottom="@+id/doc_page_req_til_discount_card"
             android:layout_toEndOf="@+id/doc_page_req_til_discount_card"
             android:layout_toRightOf="@+id/doc_page_req_til_discount_card"
-            android:layout_marginLeft="5dp" />
+            android:layout_marginLeft="10dp" />
+
+        <ImageView
+            android:id="@+id/doc__requisites_delete_card"
+            android:layout_toRightOf="@id/doc__requisites_find_card"
+            android:layout_alignBottom="@id/doc__requisites_find_card"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/cross_big" />
 
     </RelativeLayout>
 

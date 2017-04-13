@@ -14,10 +14,8 @@ import android.view.ViewGroup;
 import java.sql.SQLException;
 import java.util.List;
 
-import ru.sk42.tradeodata.Activities.Settings.adapters.UserRecyclerViewAdapter;
 import ru.sk42.tradeodata.Activities.Settings.adapters.VehicleTypesRecyclerViewAdapter;
 import ru.sk42.tradeodata.Helpers.MyHelper;
-import ru.sk42.tradeodata.Model.Catalogs.User;
 import ru.sk42.tradeodata.Model.Catalogs.VehicleType;
 import ru.sk42.tradeodata.R;
 
@@ -63,7 +61,7 @@ public class VehicleTypesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings__fragment_vehicletypes, container, false);
         SettingsActivity settingsActivity = (SettingsActivity) getActivity();
-        settingsActivity.setSettingsTitle("Типы транспорта", "будут использоваться только выбранные");
+        settingsActivity.setTitle("Типы транспорта", "будут использоваться только выбранные");
 
         // Set the adapter
         if (view instanceof RecyclerView) {

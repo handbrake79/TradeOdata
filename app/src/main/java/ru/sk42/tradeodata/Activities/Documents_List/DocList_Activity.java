@@ -1,6 +1,5 @@
 package ru.sk42.tradeodata.Activities.Documents_List;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -60,8 +59,6 @@ public class DocList_Activity extends AppCompatActivity
 
     Calendar startDate;
 
-    ProgressDialog progress;
-
     Toolbar mToolbar;
 
     ActionBarDrawerToggle mDrawerToggle;
@@ -81,14 +78,6 @@ public class DocList_Activity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.doclist__activity);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        if (!Uttils.isUserSet()) {
-
-            Intent intent = new Intent(this, SettingsActivity.class);
-            intent.putExtra(Constants.REQUEST_SETTINGS_USER_LABEL, Constants.REQUEST_SETTINGS_USER);
-            startActivityForResult(intent, Constants.REQUEST_SETTINGS_USER);
-            finish();
-        }
 
         mReceiver = new ServiceResultReceiver(new Handler());
         mReceiver.setReceiver(this);
@@ -165,7 +154,7 @@ public class DocList_Activity extends AppCompatActivity
 
     private void setDrawer() {
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.doclist__drawer_layout);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.doclist__drawer);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         navigationView = (NavigationView) findViewById(doclist__nav_view);
@@ -278,24 +267,6 @@ public class DocList_Activity extends AppCompatActivity
     }
 
 
-    void showToast(String message) {
-        Log.d(TAG, "toast: " + Constants.getCurrentTimeStamp() + " - " + message);
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    void showMessage(String message) {
-        if (message == null) {
-            return;
-        }
-        Log.d(TAG, "progress: " + Constants.getCurrentTimeStamp() + " - " + message);
-        if (progress == null) {
-            progress = new ProgressDialog(this);
-            progress.setIndeterminate(true);
-        }
-        progress.setTitle(Uttils.DATE_FORMATTER.format(startDate.getTime()).toString());
-        progress.setMessage(message);
-        progress.show();
-    }
 
     void showSnack(String s) {
         Snackbar.make(getWindow().getDecorView(), s, Snackbar.LENGTH_SHORT).show();

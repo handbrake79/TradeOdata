@@ -102,7 +102,7 @@
                 android:textStyle="bold"
                 tools:text="-" />
 
-            <TextView
+            <EditText
                 android:id="@+id/tv_DocSale_Products_Qty"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"

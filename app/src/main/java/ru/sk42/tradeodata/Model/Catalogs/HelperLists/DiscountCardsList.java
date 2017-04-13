@@ -13,7 +13,7 @@ import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
  * Created by PostRaw on 04.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DiscountCardsList {
+public class DiscountCardsList implements DataList {
 
 
     @JsonProperty("value")

@@ -35,6 +35,9 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
 
     private static final String TAG = "ProdListAct***";
 
+    int mProductListID;
+    boolean mSearchResultMode;
+
     ProductsListFragment productsListFragment;
     ServiceResultReceiver mReceiver = new ServiceResultReceiver(new Handler());
 
@@ -44,10 +47,25 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
 //        getSupportActionBar().hide();
         setContentView(R.layout.products_list__main_layout);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //setSettingsTitle("");
+        //setTitle("");
         mReceiver.setReceiver(this);
 
+
+        mProductListID = getIntent().getIntExtra(Constants.ID, -1);
+        if (mProductListID != -1) {
+            mSearchResultMode = true;
+            String mCriteria = getIntent().getStringExtra(Constants.MESSAGE_LABEL);
+            mCriteria = "Результат поиска " + mCriteria;
+            setActivityTitle(mCriteria, true);
+        } else {
+            mSearchResultMode = false;
+        }
+
+
         productsListFragment = new ProductsListFragment();
+        Bundle b = new Bundle();
+        b.putInt(Constants.ID, mProductListID);
+        productsListFragment.setArguments(b);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(product_list__frame_list, productsListFragment)
@@ -81,24 +99,30 @@ public class ProductsListActivity extends AppCompatActivity implements ServiceRe
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onButtonBackPressed();
+                if (!mSearchResultMode) {
+                    onButtonBackPressed();
+                } else {
+                    finish();
+                }
             }
         });
         ImageButton button = (ImageButton) findViewById(R.id.products_list_button_back);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onButtonBackPressed();
+                if (!mSearchResultMode) {
+                    onButtonBackPressed();
+                } else {
+                    finish();
+                }
             }
         });
-
-//        getSupportActionBar().setCustomView(actionBarView);
-//        getSupportActionBar().setHomeButtonEnabled(true);
-//        getSupportActionBar().setDisplayShowCustomEnabled(true);
-
     }
 
     public void onBackPressed() {
+        if (mSearchResultMode) {
+            finish();
+        }
         if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
             Log.d(TAG, "onBackPressed: popBackStack");
             getSupportFragmentManager().popBackStack();

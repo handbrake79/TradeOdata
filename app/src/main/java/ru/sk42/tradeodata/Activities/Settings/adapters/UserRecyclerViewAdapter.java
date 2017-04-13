@@ -38,22 +38,11 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mUser = mValues.get(position);
         holder.tvUser.setText(holder.mUser.getDescription());
-        holder.ivIcon.setImageResource(R.drawable.ic_account_box_black_24dp);
         if (selected == position) {
             holder.itemView.setBackgroundColor(St.getApp().getResources().getColor(R.color.bpRed));
         } else {
             holder.itemView.setBackgroundColor(Color.WHITE);
         }
-//        holder.mView.setOnClickListener(new initView.OnClickListener() {
-//            @Override
-//            public void onClick(initView v) {
-//                if (null != mListener) {
-//                    // Notify the active callbacks interface (the activity, if the
-//                    // fragment is attached to one) that an item has been selected.
-//                    mListener.onValueSelected(holder.mVehicleType);
-//                }
-//            }
-//        });
     }
 
     @Override
@@ -86,11 +75,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
             });
             tvUser = (TextView) view.findViewById(R.id.list_item_text);
             ivIcon = (ImageView) view.findViewById(R.id.list_item_icon);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + tvUser.getText() + "'";
+            ivIcon.setImageResource(R.drawable.ic_account_box_black_24dp);
         }
     }
 }

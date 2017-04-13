@@ -47,7 +47,7 @@ public class ProductsFragment extends Fragment {
         //      mProductsRecyclerView.setSelected(true);
         mProductsRecyclerView.setLayoutManager(new LinearLayoutManager(mProductsRecyclerView.getContext()));
 
-        initView();
+//        initView();
 
         return mProductsRecyclerView;
     }

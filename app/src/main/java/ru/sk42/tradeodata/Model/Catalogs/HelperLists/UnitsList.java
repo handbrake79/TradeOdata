@@ -14,7 +14,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Unit;
  * Created by юзер on 30.05.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UnitsList {
+public class UnitsList implements DataList {
 
 
     @JsonProperty("value")

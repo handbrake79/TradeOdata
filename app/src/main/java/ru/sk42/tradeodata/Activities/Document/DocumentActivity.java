@@ -29,6 +29,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,6 +58,8 @@ import ru.sk42.tradeodata.Activities.Product.ProductActivity;
 import ru.sk42.tradeodata.Activities.ProductsList.ProductsListActivity;
 import ru.sk42.tradeodata.Activities.Settings.Settings;
 import ru.sk42.tradeodata.Activities.Settings.SettingsActivity;
+import ru.sk42.tradeodata.BardoceReader.IntentIntegrator;
+import ru.sk42.tradeodata.BardoceReader.IntentResult;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
@@ -86,7 +89,7 @@ public class DocumentActivity extends AppCompatActivity
 
     private static final String TAG = "Document ACTIVITY***";
     View view;
-
+    View headerView;
     private int productsCount;
 
     Activity mActivity;
@@ -174,7 +177,6 @@ public class DocumentActivity extends AppCompatActivity
         setContentView(R.layout.doc__activity);
         ButterKnife.bind(this, this);
 
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -234,12 +236,46 @@ public class DocumentActivity extends AppCompatActivity
 
     }
 
+
+    private void findProductByName(String name) {
+        //mDrawerLayout.closeDrawer(Gravity.LEFT);
+        Intent i = new Intent(this, CommunicationWithServer.class);
+        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.FIND_PRODUCT_BY_DESCRIPTION.ordinal());
+        i.putExtra("from", "Document");
+        i.putExtra(Constants.DESCRIPTION, name);
+        i.putExtra("receiverTag", mReceiver);
+        callService(i);
+    }
+
     private void setDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, myToolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         navigationView.setNavigationItemSelectedListener(this);
+        headerView = navigationView.getHeaderView(0);
+        final EditText search = (EditText) headerView.findViewById(R.id.doc__nav_header_search_edittext);
+
+        search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                                             @Override
+                                             public boolean onEditorAction(TextView textView, int i, KeyEvent event) {
+                                                 if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == 0) {
+                                                     String text = textView.getText().toString();
+                                                     if (!text.isEmpty() && text.length() > 3) {
+                                                         findProductByName(text);
+                                                         return true;
+                                                     } else {
+//                                                         showMessage("Минимум 3 символа для поиска");
+                                                         return false;
+                                                     }
+                                                 } else {
+                                                     return false;
+                                                 }
+                                             }
+                                         }
+        );
+
+
         mDrawerToggle.syncState();
     }
 
@@ -263,6 +299,7 @@ public class DocumentActivity extends AppCompatActivity
         BluetoothConnect.SetOnDataReceive(new OnDataReceive() {
             @Override
             public void DataReceive(String s) {
+                Log.d(TAG, "DataReceive: s = " + s);
                 if ((s.equals("\n") || s.equals("\r")) && barcode.length() > 0) {
 
                     onBarcodeAquired(barcode);
@@ -273,6 +310,7 @@ public class DocumentActivity extends AppCompatActivity
                 }
             }
         });
+
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -295,7 +333,7 @@ public class DocumentActivity extends AppCompatActivity
         try {
             BluetoothConnect.Connect();
         } catch (Exception e) {
-            e.printStackTrace();
+            BluetoothConnect.Connect();
         }
     }
 
@@ -317,7 +355,7 @@ public class DocumentActivity extends AppCompatActivity
                 }
                 break;
             case R.id.action_view_product_list:
-                showProductsListFragment();
+                showProductsListActivity();
                 break;
             case R.id.action_scanner_pair:
                 pairScaner();
@@ -330,6 +368,9 @@ public class DocumentActivity extends AppCompatActivity
                 break;
             case R.id.action_find_barcode:
                 inputBarcode();
+                break;
+            case R.id.action_find_barcode_using_camera:
+                inputBarcodeUsingCamera();
                 break;
             case R.id.action_find_product_by_description:
                 //TODO поиск по названию товара
@@ -372,6 +413,10 @@ public class DocumentActivity extends AppCompatActivity
         builder.show();
     }
 
+    private void inputBarcodeUsingCamera() {
+        IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+        intentIntegrator.initiateScan();
+    }
 
     private void addProduct(Stock stock) {
         Product product = Product.getObject(Product.class, stock.getProductInfo().getRef_Key());
@@ -503,7 +548,10 @@ public class DocumentActivity extends AppCompatActivity
     public void onShippingCostChanged(int shippingCost, TextInputLayout til) {
 
         docSale.setChanged(true);
-
+        if (shippingCost < docSale.getCalculatedShippingCost()) {
+            til.setError("Минимальная стоимость " + Uttils.formatDoubleToMoney(docSale.getCalculatedShippingCost()) + "!");
+            return;
+        }
         docSale.setShippingCost(shippingCost);
         if (docSale.getNeedShipping() &&
                 (shippingCost == 0 || shippingCost < docSale.getReferenceShipingCost())) {
@@ -721,7 +769,7 @@ public class DocumentActivity extends AppCompatActivity
         i.putExtra(Constants.REF_KEY_LABEL, cardNumber);
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "Document_Activity");
-        startMyService(i);
+        callService(i);
 
     }
 
@@ -759,7 +807,7 @@ public class DocumentActivity extends AppCompatActivity
     }
 
     public void fab_onclick(View view) {
-        showProductsListFragment();
+        showProductsListActivity();
     }
 
 
@@ -831,7 +879,7 @@ public class DocumentActivity extends AppCompatActivity
     }
 
 
-    private void showProductsListFragment() {
+    private void showProductsListActivity() {
         if (docSale.getPosted()) {
             showError("Документ проведен, изменения запрещены.");
             return;
@@ -840,8 +888,39 @@ public class DocumentActivity extends AppCompatActivity
         startActivityForResult(intent, Constants.SHOW_PRODUCTS_LIST);
     }
 
+    private void showProductsListActivity(int id, String criteria) {
+        if (docSale.getPosted()) {
+            showError("Документ проведен, изменения запрещены.");
+            return;
+        }
+        Intent intent = new Intent(this, ProductsListActivity.class);
+        intent.putExtra(Constants.ID, id);
+        intent.putExtra(Constants.MESSAGE_LABEL, criteria);
+        startActivityForResult(intent, Constants.SHOW_PRODUCTS_LIST);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == IntentIntegrator.REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+
+            IntentResult intentResult =
+                    IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+            if (intentResult != null) {
+
+                String contents = intentResult.getContents();
+                String format = intentResult.getFormatName();
+
+                onBarcodeAquired(contents);
+                Log.d("SEARCH_EAN", "OK, EAN: " + contents + ", FORMAT: " + format);
+            } else {
+                Log.e("SEARCH_EAN", "IntentResult je NULL!");
+            }
+        } else if (resultCode == Activity.RESULT_CANCELED) {
+            Log.e("SEARCH_EAN", "CANCEL");
+        }
+
         if (data == null) {
             return;
         }
@@ -863,7 +942,6 @@ public class DocumentActivity extends AppCompatActivity
         }
 
         if (requestCode == Constants.RECORD_SELECTED_IN_DOCUMENT && resultCode == 0) {
-            //вызывается только для товаров, не для услуг
             //вызывается только для товаров, не для услуг
             double qty = data.getDoubleExtra("qty", -1);
             long id = data.getLongExtra(Constants.ID, -1);
@@ -887,7 +965,7 @@ public class DocumentActivity extends AppCompatActivity
         }
         if (record instanceof SaleRecordService) {
             //mViewPager.setCurrentItem(2);
-            servicesFragment.notifyItemChanged(record.getLineNumber());
+            servicesFragment.notifyItemChanged(record);
         }
     }
 
@@ -938,6 +1016,11 @@ public class DocumentActivity extends AppCompatActivity
             showError("Документ проведен, изменения запрещены.");
             return;
         }
+        if (record.getProduct().getRef_Key().equals(Constants.SHIPPING_SERVICE_GUID) || record.getProduct().getRef_Key().equals(Constants.UNLOAD_SERVICE_GUID)) {
+            showError("Услуги доставки и разгрузки не редактируются, пользуйтесь страницей Доставка");
+            return;
+        }
+        docSale.save();
         SaleRecord changedRecord = findRecordInCollection(record);
         changedRecord.setQty(record.getQty() + 1);
         notifyItemChanged(changedRecord);
@@ -950,7 +1033,7 @@ public class DocumentActivity extends AppCompatActivity
             showError("Документ проведен, изменения запрещены.");
             return;
         }
-
+        docSale.save();
         SaleRecord changedRecord = findRecordInCollection(record);
 
         double q = record.getQty();
@@ -976,12 +1059,29 @@ public class DocumentActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onQtyChanged(SaleRecord mRecord, int action) {
+        if (action == Constants.QTY_CHANGED) {
+            if (mRecord.getProduct_Key().equals(Constants.SHIPPING_SERVICE_GUID) ||
+                    mRecord.getProduct_Key().equals(Constants.UNLOAD_SERVICE_GUID)) {
+                return; //для услуг по доставке и разгрузке не редактируем кол-во
+            }
+
+            SaleRecordProduct record = getRecordByID(mRecord.getId());
+            record.setQty(mRecord.getQty());
+            recalc();
+            mViewPager.setCurrentItem(1);
+            notifyItemChanged(record);
+
+
+        }
+    }
 
     @Override
     public void onRecordSelected(SaleRecord record, int action) {
         if (action == Constants.SELECT_RECORD_FOR_CHANGE) {
-            if (record.getProduct_Key().equals(Constants.SHIPPING_GUID) ||
-                    record.getProduct_Key().equals(Constants.UNLOAD_GUID)) {
+            if (record.getProduct_Key().equals(Constants.SHIPPING_SERVICE_GUID) ||
+                    record.getProduct_Key().equals(Constants.UNLOAD_SERVICE_GUID)) {
                 return; //для услуг по доставке и разгрузке не редактируем кол-во
             }
 
@@ -990,7 +1090,7 @@ public class DocumentActivity extends AppCompatActivity
             intent.putExtra(Constants.ID, record.getId());
             intent.putExtra(Constants.QUANTITY, record.getQty());
             intent.putExtra(Constants.PRICE, record.getPrice());
-            intent.putExtra(Constants.DESCR, record.getProduct().getDescription());
+            intent.putExtra(Constants.DESCRIPTION, record.getProduct().getDescription());
             startActivityForResult(intent, Constants.RECORD_SELECTED_IN_DOCUMENT);
         }
         if (action == Constants.SELECT_RECORD_FOR_VIEW_PRODUCT) {
@@ -1030,9 +1130,14 @@ public class DocumentActivity extends AppCompatActivity
     }
 
     private void soundNotification() {
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-        r.play();
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(this, notification);
+            r.play();
+        } catch (Exception e) {
+            Log.d(TAG, "soundNotification: error");
+            e.printStackTrace();
+        }
     }
 
     private void showMessage(String text) {
@@ -1098,13 +1203,18 @@ public class DocumentActivity extends AppCompatActivity
         i.putExtra(Constants.PRINTER_NAME, printer);
         i.putExtra("receiverTag", mReceiver);
         i.putExtra("from", "Document_Activity");
-        startMyService(i);
+        callService(i);
 
     }
 
-    private void startMyService(Intent i) {
+    private void callService(Intent i) {
         String s = Constants.REQUESTS.values()[i.getIntExtra(Constants.MODE_LABEL, -1)].name();
-        showLoading(s);
+        try {
+            showLoading(s);
+        } catch (Exception e) {
+            Log.d(TAG, "callService: " + e.getMessage());
+            e.printStackTrace();
+        }
         startService(i);
     }
 
@@ -1189,7 +1299,7 @@ public class DocumentActivity extends AppCompatActivity
             i.putExtra(Constants.REF_KEY_LABEL, docRef_Key);
             i.putExtra("receiverTag", mReceiver);
             i.putExtra("from", "Document_Activity");
-            startMyService(i);
+            callService(i);
 
         } else {
             Intent i = new Intent(this, CommunicationWithServer.class);
@@ -1197,7 +1307,7 @@ public class DocumentActivity extends AppCompatActivity
             i.putExtra("id", docSale.getId());
             i.putExtra("receiverTag", mReceiver);
             i.putExtra("from", "Document_Activity");
-            startMyService(i);
+            callService(i);
         }
     }
 
@@ -1207,7 +1317,7 @@ public class DocumentActivity extends AppCompatActivity
         i.putExtra("from", "Document");
         i.putExtra(Constants.REF_KEY_LABEL, getDocRef_Key());
         i.putExtra("receiverTag", mReceiver);
-        startMyService(i);
+        callService(i);
     }
 
     private void showProductActivity(String ref_Key) {
@@ -1219,12 +1329,12 @@ public class DocumentActivity extends AppCompatActivity
 
     private void onBarcodeAquired(String barcode) {
         barcode = barcode.replaceAll("[^0-9.]", "");
-        Intent i = new Intent(this, CommunicationWithServer.class);
-        i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.BARCODE.ordinal());
-        i.putExtra(Constants.BARCODE_LABEL, barcode);
-        i.putExtra("receiverTag", mReceiver);
-        i.putExtra("from", "Document_Activity");
-        startMyService(i);
+        Intent intent = new Intent(this, CommunicationWithServer.class);
+        intent.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.BARCODE.ordinal());
+        intent.putExtra(Constants.BARCODE_LABEL, barcode);
+        intent.putExtra("receiverTag", mReceiver);
+        intent.putExtra("from", "Document_Activity");
+        callService(intent);
 
     }
 
@@ -1235,23 +1345,20 @@ public class DocumentActivity extends AppCompatActivity
             return;
         }
 
-        if (code == Constants.SCANNER_EVENT) {
-            String barchar = mResult.getString(Constants.SCANNER_DATA_LABEL, "");
-            if ((barchar.equals("\n") || barchar.equals("\r")) && barcode.length() > 0) {
-
-                onBarcodeAquired(barcode);
-                barcode = "";
-            }
-            if (!barchar.equals("\n") && !barchar.equals("\r")) {
-                barcode += barchar;
-            }
-            return;
-        }
-
         Constants.REQUESTS requestedOperation = Constants.REQUESTS.values()[code];
         boolean success = mResult.getBoolean(Constants.OPERATION_SUCCESS_LABEL);
         String message = mResult.getString(Constants.MESSAGE_LABEL, "Ошибка не передана сервисом!");
         int resultCode = mResult.getInt(Constants.RESULT_CODE_LABEL);
+
+        if (requestedOperation == Constants.REQUESTS.FIND_PRODUCT_BY_DESCRIPTION) {
+            //получили список товаров размером от 0 до Х
+            if (success) {
+                int id = mResult.getInt(Constants.ID);
+                showProductsListActivity(id, message);
+            } else {
+                showError(message);
+            }
+        }
 
         if (requestedOperation == Constants.REQUESTS.PRINT_DOCUMENT) {
             showMessage(message + "(" + String.valueOf(resultCode) + ")");
@@ -1261,7 +1368,7 @@ public class DocumentActivity extends AppCompatActivity
             if (success) {
                 onDiscountCardFound(mResult.getString(Constants.REF_KEY_LABEL));
             } else {
-                showMessage(message + "(" + String.valueOf(resultCode) + ")");
+                showError(message + "(" + String.valueOf(resultCode) + ")");
             }
         }
 
@@ -1277,7 +1384,7 @@ public class DocumentActivity extends AppCompatActivity
             if (success) {
                 showProductActivity(mResult.getString(Constants.REF_KEY_LABEL));
             } else {
-                showMessage(message + "(" + String.valueOf(resultCode) + ")");
+                showError(message + "(" + String.valueOf(resultCode) + ")");
             }
         }
 
@@ -1300,6 +1407,8 @@ public class DocumentActivity extends AppCompatActivity
                         showMessage("Были добавлены подарки (" + String.valueOf(gifts) + ")!");
                     }
                 }
+            } else {
+                showError(message + "(" + resultCode + ")");
             }
         }
         hideLoading();

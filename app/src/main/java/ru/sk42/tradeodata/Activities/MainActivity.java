@@ -24,7 +24,9 @@ import ru.sk42.tradeodata.Activities.Documents_List.DocList_Activity;
 import ru.sk42.tradeodata.Activities.Settings.SettingsActivity;
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Activities.Settings.Settings;
+import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Catalogs.Charact;
+import ru.sk42.tradeodata.Model.Catalogs.DiscountCard;
 import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.St;
 import ru.sk42.tradeodata.R;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     private static boolean mNetworkAvailable = false;
 
     private static String TAG = "*** MainAct";
+    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
             if (result) {
                 callPreload();
+
             } else {
                 hideLoading();
                 MainActivity.this.showToast("Сервер недоступен!");
@@ -100,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         mReceiver = new ServiceResultReceiver(new Handler());
         mReceiver.setReceiver(MainActivity.this);
         Charact.createStub();
+        DiscountCard.createStub();
         Intent i = new Intent(MainActivity.this, CommunicationWithServer.class);
         i.putExtra("from", "MainAct");
         i.putExtra(Constants.MODE_LABEL, Constants.REQUESTS.PRELOAD.ordinal());
@@ -114,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
         MyHelper.getInstance(getApplication());
         MyHelper.createTables();
+        //MyHelper.dropAndCreateTables();
 
         St.setApplication(getApplication());
 
@@ -149,12 +155,16 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         }
     }
 
-    private void showLoading(String... params) {
-        LoadingFragment fragment = LoadingFragment.newInstance(params);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.loading, fragment, "loading")
-                .addToBackStack("loading")
-                .commit();
+    private void showLoading(String text) {
+        if (loadingFragment == null) {
+            loadingFragment = LoadingFragment.newInstance(text);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.loading, loadingFragment, "loading")
+                    .addToBackStack("loading")
+                    .commit();
+        } else {
+            loadingFragment.showMessage(text);
+        }
 
     }
 
@@ -190,20 +200,15 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
 //            showSnack("Предварительная загрузка завершена");
             St.setInitComplete();
-
-            //TODO         // переписать нормально
-            try {
-                Settings.setDefaultStartingPointStatic(MyHelper.getStartingPointDao().queryForEq(Constants.REF_KEY_LABEL, "96487975-3968-426e-9dff-50f4da82431e").get(0));
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (!Uttils.isUserSet()) {
+                Intent intent = new Intent(this, SettingsActivity.class);
+                intent.putExtra(Constants.REQUEST_SETTINGS_USER_LABEL, Constants.REQUEST_SETTINGS_USER);
+                startActivityForResult(intent, Constants.REQUEST_SETTINGS_USER);
+                finish();
+            } else {
+                Intent intent = new Intent(this, DocList_Activity.class);
+                startActivity(intent);
             }
-            try {
-                Settings.setDefaultVehicleTypeStatic(MyHelper.getVehicleTypesDao().queryForEq(Constants.REF_KEY_LABEL, "b56961f4-294a-11e2-a8fe-984be1645107").get(0));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            Intent intent = new Intent(this, DocList_Activity.class);
-            startActivity(intent);
         }
     }
 

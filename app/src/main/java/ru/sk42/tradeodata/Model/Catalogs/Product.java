@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 import ru.sk42.tradeodata.Helpers.MyHelper;
 import ru.sk42.tradeodata.Model.CDO;
+import ru.sk42.tradeodata.Model.Catalogs.HelperLists.ProductsList;
 import ru.sk42.tradeodata.Model.Constants;
 
 /**
@@ -18,6 +19,16 @@ import ru.sk42.tradeodata.Model.Constants;
 @DatabaseTable(tableName = "Products")
 public class Product extends CDO {
 
+    @DatabaseField(foreign = true)
+    private ProductsList productsList;
+
+    public ProductsList getProductsList() {
+        return productsList;
+    }
+
+    public void setProductsList(ProductsList productsList) {
+        this.productsList = productsList;
+    }
 
     @DatabaseField(id = true)
     @com.fasterxml.jackson.annotation.JsonProperty("Ref_Key")

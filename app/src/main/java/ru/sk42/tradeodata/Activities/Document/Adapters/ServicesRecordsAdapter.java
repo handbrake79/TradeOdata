@@ -10,12 +10,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.sk42.tradeodata.Activities.Document.SaleRecordInterface;
 import ru.sk42.tradeodata.Helpers.Uttils;
 import ru.sk42.tradeodata.Model.Constants;
+import ru.sk42.tradeodata.Model.Document.SaleRecord;
+import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
 import ru.sk42.tradeodata.Model.Document.SaleRecordService;
 import ru.sk42.tradeodata.R;
 
@@ -32,6 +35,23 @@ public class ServicesRecordsAdapter extends RecyclerView.Adapter<ServicesRecords
     public ServicesRecordsAdapter(ArrayList<SaleRecordService> mValues, SaleRecordInterface mListener) {
         this.mListener = mListener;
         this.mValues = mValues;
+    }
+
+    public void updateValue(SaleRecord record) {
+        int pos = -1;
+        Iterator<SaleRecordService> it = mValues.iterator();
+        while (it.hasNext()) {
+            SaleRecord currentRecord = it.next();
+            pos++;
+            if (currentRecord.getId() == record.getId()) {
+                currentRecord.setQty(record.getQty());
+                currentRecord.setTotal(record.getTotal());
+                currentRecord.setPrice(record.getPrice());
+                this.notifyItemChanged(pos);
+                break;
+            }
+
+        }
     }
 
     public void setValues(ArrayList<SaleRecordService> values) {

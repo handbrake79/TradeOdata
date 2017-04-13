@@ -14,6 +14,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Product;
 import ru.sk42.tradeodata.Model.Catalogs.Store;
 import ru.sk42.tradeodata.Model.Catalogs.Unit;
 import ru.sk42.tradeodata.Model.Catalogs.User;
+import ru.sk42.tradeodata.Model.Constants;
 import ru.sk42.tradeodata.Model.Document.DocSale;
 import ru.sk42.tradeodata.Model.Document.DocSaleList;
 import ru.sk42.tradeodata.Model.Document.SaleRecordProduct;
@@ -30,7 +31,7 @@ public class CheckRelatedDataToLoad {
 
     static HashMap<Class<?>, ArrayList<String>> guidsToLoadMap;
 
-    public static HashMap<Class<?>, ArrayList<String>> checkObject(Object obj) {
+    public static HashMap<Class<?>, ArrayList<String>> processObject(Object obj) {
         guidsToLoadMap = new HashMap<>();
         guidsToLoadMap.put(Charact.class, new ArrayList<String>());
         guidsToLoadMap.put(Customer.class, new ArrayList<String>());
@@ -42,7 +43,6 @@ public class CheckRelatedDataToLoad {
 
         if (obj instanceof DocSaleList) {
             Integer size = 0, current = 0;
-            size = ((DocSaleList) obj).getValues().size();
             for (DocSale docSale : ((DocSaleList) obj).getValues()
                     ) {
                 //и так, проверяем наличие в локальной базе данных объектов, на которые есть ссылки из текущего объекта
@@ -54,15 +54,7 @@ public class CheckRelatedDataToLoad {
                     continue;
                 current++;
 
-                if (current % 20 == 0) {
-                    //callBackInterface.showProgress(current.toString() + " from " + size.toString() + " completed", "Processing " + docSale.getNumber());
-                }
-
-                checkDocCustomer(docSale);
-                checkDocContract(docSale);
-                checkDocAuthor(docSale);
-                checkDocProductsAndServices(docSale);
-                //callBackInterface.showProgress(current.toString() + " from " + size.toString() + " completed", "processed " + docSale.getNumber());
+                checkDocSale(docSale);
 
             }
         }
@@ -74,13 +66,7 @@ public class CheckRelatedDataToLoad {
             //если объект не указан, ищем в соответствующей таблице по ссылке
             //если нашли - считываем объект в память
             //если не нашли - добавляем в мапу для дальнейшей загрузки с сервера
-            DocSale docSale = (DocSale) obj;
-            if (docSale != null) {
-                checkDocCustomer(docSale);
-                checkDocContract(docSale);
-                checkDocAuthor(docSale);
-                checkDocProductsAndServices(docSale);
-            }
+            checkDocSale((DocSale) obj);
 
         }
 
@@ -100,7 +86,7 @@ public class CheckRelatedDataToLoad {
                 Stock row = it.next();
 
                 String guid = row.getCharact_Key();
-                if (!listCharact.contains(guid) && row.getCharact() == null) {
+                if (!listCharact.contains(guid) && row.getCharact() == null && !guid.equals(Constants.ZERO_GUID)) {
                     listCharact.add(guid);
                 }
 
@@ -124,6 +110,17 @@ public class CheckRelatedDataToLoad {
         return guidsToLoadMap;
     }
 
+    private static void checkDocSale(DocSale docSale) {
+
+        docSale.setForeignObjects();
+
+        checkDocCustomer(docSale);
+        checkDocContract(docSale);
+        checkDocAuthor(docSale);
+        checkDocProductsAndServices(docSale);
+
+    }
+
     private static void checkDocProductsAndServices(DocSale docSale) {
         //если такой гуид уже есть в списке - возврат
         ArrayList<String> listProducts = guidsToLoadMap.get(Product.class);
@@ -143,7 +140,7 @@ public class CheckRelatedDataToLoad {
             if (guid == null) {
                 Log.d(TAG, "checkDocProductsAndServices: NULL CHARACT!");
             }
-            if (!listCharact.contains(guid) && row.getCharact() == null) {
+            if (!listCharact.contains(guid) && row.getCharact() == null && !guid.equals(Constants.ZERO_GUID)) {
                 listCharact.add(guid);
             }
 

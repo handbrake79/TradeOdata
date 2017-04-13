@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
@@ -58,6 +59,9 @@ public class ProductsListFragment extends Fragment {
     AVLoadingIndicatorView avLoadingIndicatorView;
     RecyclerView mRecyclerView;
 
+    int mProductListId = -1;
+    boolean mSearchresultMode = false;
+
     //ProgressDialog progressDialog;
 
     /**
@@ -74,9 +78,18 @@ public class ProductsListFragment extends Fragment {
 
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mProductListId = getArguments().getInt(Constants.ID);
+            mSearchresultMode = mProductListId != -1;
         }
-        productArrayList = new ProductsList().getArrayList();
+        if (!mSearchresultMode) {
+            productArrayList = new ProductsList().getArrayList();
+        } else {
+            try {
+                productArrayList = MyHelper.getProductDao().queryForEq("productsList_id", mProductListId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -89,28 +102,23 @@ public class ProductsListFragment extends Fragment {
         avLoadingIndicatorView.setVisibility(View.GONE);
         // Set the adapter
         Context context = mRecyclerView.getContext();
-
-        if (mColumnCount <= 1) {
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-        }
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mAdapter = new ProductsListAdapter(productArrayList, mListener, this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerDecoration(this.getContext()));
 
-
-        lastViewedGroupKey = Settings.getLastViewedProductGroupStatic();
-        if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.ZERO_GUID)) {
-            Product lastViewedGroup = Product.getObject(Product.class, lastViewedGroupKey);
-            if (lastViewedGroup != null) {
-                showChildProducts(lastViewedGroup);
+        if (!mSearchresultMode) {
+            lastViewedGroupKey = Settings.getLastViewedProductGroupStatic();
+            if (lastViewedGroupKey != null && !lastViewedGroupKey.equals(Constants.ZERO_GUID)) {
+                Product lastViewedGroup = Product.getObject(Product.class, lastViewedGroupKey);
+                if (lastViewedGroup != null) {
+                    showChildProducts(lastViewedGroup);
+                }
+            } else {
+                showTopLevelProducts();
             }
-        } else {
-            showTopLevelProducts();
+
         }
-
-
         return view;
     }
 
@@ -161,8 +169,7 @@ public class ProductsListFragment extends Fragment {
 
         } catch (Exception e) {
             Log.e(getClass().getName(), e.getMessage());
-            Toast.makeText(this.getContext(), "ОШИБКА ТЕСТ_ПРОДУКТ", Toast.LENGTH_LONG).show();
-            System.exit(0);
+            showTopLevelProducts();
         }
 
 

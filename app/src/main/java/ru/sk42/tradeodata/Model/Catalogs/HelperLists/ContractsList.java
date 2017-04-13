@@ -13,7 +13,7 @@ import ru.sk42.tradeodata.Model.Catalogs.Contract;
  * Created by PostRaw on 04.03.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ContractsList {
+public class ContractsList implements DataList {
 
 
     @JsonProperty("value")

@@ -80,7 +80,7 @@ public class ConnectionFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         SettingsActivity settingsActivity = (SettingsActivity) getActivity();
-        settingsActivity.setSettingsTitle("Параметры соединения с сервером", "");
+        settingsActivity.setTitle("Параметры соединения с сервером", "");
         Settings settings = Settings.getSettings();
         serverAddress.setText(settings.getServerAddress());
         baseName.setText(settings.getBaseName());

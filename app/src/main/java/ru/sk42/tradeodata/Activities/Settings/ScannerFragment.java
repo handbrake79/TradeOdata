@@ -62,7 +62,7 @@ public class ScannerFragment extends Fragment {
         View view = inflater.inflate(R.layout.settings__fragment_scanner, container, false);
         ButterKnife.bind(this, view);
         SettingsActivity settingsActivity = (SettingsActivity) getActivity();
-        settingsActivity.setSettingsTitle("Настройки сканера", "");
+        settingsActivity.setTitle("Настройки сканера", "");
 
         mScannerStartDelayMillis.addTextChangedListener(new TextWatcher() {
             @Override
